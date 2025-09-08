@@ -1,0 +1,1 @@
+export const DEFAULT_ERROR_MESSAGE = "Error unknown. Check your internet connection.";

@@ -1,0 +1,12 @@
+.loginWrapper{
+  width: 100vw;
+  height: 100vh;
+  padding: 20px 30px;
+  overflow: hidden;
+}
+
+@media (min-width: 1025px) {
+  .h-custom-2 {
+    height: 100%;
+    }
+  }

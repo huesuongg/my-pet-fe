@@ -1,0 +1,9 @@
+.projects-wrapper {
+    padding: 15px 15px 5px 15px;
+}
+
+.custom-alert {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
