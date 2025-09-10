@@ -1,5 +1,3 @@
-import React from "react";
-import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -7,7 +5,7 @@ import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PetsIcon from "@mui/icons-material/Pets";
@@ -75,7 +73,7 @@ export const Header = () => {
                 color: "white",
                 // fontWeight: "bold",
                 textTransform: "none",
-                 fontSize: "1rem",
+                fontSize: "1rem",
               }}
             >
               {item}
