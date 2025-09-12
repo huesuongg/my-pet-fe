@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -248,6 +248,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
   const [selectedWeight, setSelectedWeight] = useState(productDetail.weightOptions[0]);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState(0);
+
+  // Scroll to top when component mounts or product ID changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [productId]);
 
   const handleWeightChange = (weight: typeof productDetail.weightOptions[0]) => {
     setSelectedWeight(weight);
