@@ -276,10 +276,22 @@
   align-items: center;
 }
 
+.recommendedInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .recommendedName {
   font-weight: 600;
   color: #333;
-  flex: 1;
+  margin-bottom: 4px;
+}
+
+.recommendedPrice {
+  color: #2F80ED;
+  font-weight: 500;
+  font-size: 14px;
 }
 
 .recommendedButton {
