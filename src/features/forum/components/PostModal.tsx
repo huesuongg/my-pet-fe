@@ -44,7 +44,8 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
     >
       <div
         ref={panelRef}
-        className="modal-dialog modal-dialog-centered modal-lg"
+        className="modal-dialog modal-dialog-centered "
+        style={{ width: "900px" }}
       >
         <div className="modal-content">
           {/* Header */}
@@ -81,6 +82,7 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
               className="form-control mb-3"
               rows={4}
               placeholder="Bạn đang nghĩ gì?"
+              style={{height: '250px'}}
             />
 
             {/* Add to post */}
