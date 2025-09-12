@@ -9,6 +9,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import PostModal from "./PostModal";
 
 const ProfileHeader: React.FC = () => {
+  console.log('Profile Header render');
   const userProfileType = 1; // For demonstration, keep this as 2 to show "Follow" button logic
   const [isFollowing, setIsFollowing] = useState(false);
 
