@@ -12,7 +12,6 @@ const NewsFeedLeftSideBar: React.FC = () => {
         <NewsFeedsDashboard
           active="Feed"
           onChange={(k) => console.log("switch:", k)}
-          onCreatePost={() => console.log("create post")}
         />
       </div>
     </div>

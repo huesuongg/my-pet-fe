@@ -1,5 +1,5 @@
 // src/features/.../components/NewsFeedsDashboard.tsx
-import React from "react";
+import React, { useState } from "react";
 
 // MUI icons (chỉ icons, không dùng component khác)
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
@@ -7,17 +7,13 @@ import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import PostModal from "./PostModal";
 
-export type ItemKey =
-  | "Feed"
-  | "Khám Phá"
-  | "Marketplace"
-  | "Profile";
+export type ItemKey = "Feed" | "Khám Phá" | "Marketplace" | "Profile";
 
 type Props = {
   active?: ItemKey;
   onChange?: (key: ItemKey) => void;
-  onCreatePost?: () => void;
 };
 
 const ITEMS: { key: ItemKey; label: string; Icon: React.ElementType }[] = [
@@ -29,9 +25,13 @@ const ITEMS: { key: ItemKey; label: string; Icon: React.ElementType }[] = [
 
 const NewsFeedsDashboard: React.FC<Props> = ({
   active = "Feed",
-  onChange,
-  onCreatePost,
+  onChange
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false); // State để quản lý modal
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
   return (
     <div className="w-full">
       <nav className="flex flex-col gap-1.5">
@@ -65,7 +65,6 @@ const NewsFeedsDashboard: React.FC<Props> = ({
       {/* Nút Create Post gọn, không to quá */}
       <button
         type="button"
-        onClick={onCreatePost}
         className="mt-4 w-full rounded-lg py-2.5 text-white text-sm font-semibold shadow
                    bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:opacity-95
                    focus:outline-none focus:ring-2 focus:ring-indigo-300
@@ -78,6 +77,7 @@ const NewsFeedsDashboard: React.FC<Props> = ({
           boxShadow: "inset 0 0 0 1px rgba(255,255,255,.06)",
           minHeight: 50,
         }}
+        onClick={handleOpenModal}
       >
         <AddCircleOutlineIcon
           sx={{ fontSize: 35 }}
@@ -85,6 +85,7 @@ const NewsFeedsDashboard: React.FC<Props> = ({
         />
         Thêm bài viết
       </button>
+      {isModalOpen && <PostModal onClose={handleCloseModal} />}
     </div>
   );
 };
