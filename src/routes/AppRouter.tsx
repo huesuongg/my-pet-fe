@@ -7,8 +7,10 @@ import Logout from "../features/authenticate/pages/Logout";
 import NotFoundPage from "../components/NotFound";
 import HomePage from "../pages/home/HomePage";
 import { AdminDashboard } from "../features/admin/pages/Dashboard";
+import ProfilePage from "../features/forum/pages/ProfilePage";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
+
 
 export const routes = {
   ALL_PATH: "*",
@@ -18,9 +20,12 @@ export const routes = {
   DASHBOARD_PATH: "/dashboard",
   ADMIN_PROFILE_PATH: "/dashboard/admin-profile",
   PROJECTS_PATH: "/dashboard/project",
+  // add profile path for forum
+  PROFILE_PATH: "/profile"
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id"
+
 };
 
 export const router = createBrowserRouter([
@@ -30,6 +35,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: routes.LOGIN_PATH, element: <LoginPage /> },
+      { path: routes.ALL_PATH, element: <NotFoundPage /> },
+      { path: routes.PROFILE_PATH, element: <ProfilePage  /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
     ],
