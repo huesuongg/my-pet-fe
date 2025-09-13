@@ -1,10 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
+﻿import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/authenticate/authSlice";
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { combineReducers } from 'redux';
 import projectReducer from '../features/manage-project/manageProjectSlice';
 import projectMetaReducer from '../features/manage-project/projectMetaSlice';
+import shoppingReducer from '../features/shopping/shoppingSlice';
 
 const persistConfig = {
   key: 'root',
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   projects: projectReducer,
   projectMeta: projectMetaReducer,
+  shopping: shoppingReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -29,4 +31,3 @@ export const persistor = persistStore(store);
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
-
