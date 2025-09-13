@@ -1,18 +1,14 @@
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import InputBase from "@mui/material/InputBase";
-import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
+import { Box, Typography, Button, InputBase, IconButton, Badge } from "@mui/material";
+
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PetsIcon from "@mui/icons-material/Pets";
+import { useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
-  borderRadius: 9999, // bo tròn full
+  borderRadius: 9999,
   backgroundColor: "#fff",
   marginLeft: theme.spacing(2),
   width: "250px",
@@ -27,6 +23,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const Header = () => {
+  const navigate = useNavigate();
+
+  const navigationItems = [
+    { label: "Trang chủ", path: "/" },
+    { label: "Lịch khám", path: "#" },
+    { label: "Sản phẩm", path: "/shopping" },
+    { label: "Về chúng tôi", path: "#" },
+    { label: "Hồ sơ thú y", path: "#" },
+    { label: "Mạng xã hội", path: "#" },
+  ];
+
+  const handleNavigation = (path: string) => {
+    if (path !== "#") {
+      navigate(path);
+    }
+  };
+
   return (
     <Box
       position="static"
@@ -37,8 +50,14 @@ export const Header = () => {
         px: 4,
       }}
     >
-      <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
-        {/* Logo */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 2,
+        }}
+      >
         <Box display="flex" alignItems="center">
           <PetsIcon sx={{ color: "#FFD43B", fontSize: 32, mr: 1 }} />
           <Typography
@@ -50,7 +69,6 @@ export const Header = () => {
           </Typography>
         </Box>
 
-        {/* Menu */}
         <Box
           sx={{
             flexGrow: 1,
@@ -59,29 +77,21 @@ export const Header = () => {
             gap: 3,
           }}
         >
-          {[
-            "Trang chủ",
-            "Lịch khám",
-            "Sản phẩm",
-            "Về chúng tôi",
-            "Hồ sơ thú y",
-            "Mạng xã hội",
-          ].map((item) => (
+          {navigationItems.map((item) => (
             <Button
-              key={item}
+              key={item.label}
+              onClick={() => handleNavigation(item.path)}
               sx={{
                 color: "white",
-                // fontWeight: "bold",
                 textTransform: "none",
                 fontSize: "1rem",
               }}
             >
-              {item}
+              {item.label}
             </Button>
           ))}
         </Box>
 
-        {/* Search + Cart */}
         <Box display="flex" alignItems="center" gap={2}>
           <Search>
             <StyledInputBase
@@ -98,7 +108,7 @@ export const Header = () => {
             </Badge>
           </IconButton>
         </Box>
-      </Toolbar>
+      </Box>
     </Box>
   );
 };

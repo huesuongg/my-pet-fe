@@ -1,0 +1,132 @@
+﻿/* Shopping Page Styles */
+.heroBanner {
+  position: relative;
+  height: 500px;
+  background-image: url('https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1200&h=500&fit=crop&crop=center');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.heroTitle {
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  z-index: 1;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.categoriesSection {
+  background-color: #E3F2FD;
+  padding: 48px 32px;
+}
+
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 600px) {
+  .categoriesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .categoriesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.productsSection {
+  background-color: #2F80ED;
+  padding: 64px 32px;
+}
+
+.productsTitle {
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 48px;
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 600px) {
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .productsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.loadMoreButton {
+  text-align: center;
+  margin-top: 48px;
+}
+
+.loadMoreButton button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 32px;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loadMoreButton button:hover {
+  background-color: #45a049;
+}
+
+.blogSection {
+  background-color: white;
+  padding: 64px 32px;
+}
+
+.blogTitle {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 48px;
+  color: #333;
+}
+
+.blogGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .blogGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
