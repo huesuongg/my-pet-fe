@@ -9,6 +9,7 @@ import HomePage from "../pages/home/HomePage";
 import { AdminDashboard } from "../features/admin/pages/Dashboard";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
+import CartPage from "../features/shopping/pages/CartPage";
 
 export const routes = {
   ALL_PATH: "*",
@@ -20,7 +21,8 @@ export const routes = {
   PROJECTS_PATH: "/dashboard/project",
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
-  PRODUCT_DETAIL_PATH: "/product/:id"
+  PRODUCT_DETAIL_PATH: "/product/:id",
+  CART_PATH: "/cart",
 };
 
 export const router = createBrowserRouter([
@@ -32,6 +34,7 @@ export const router = createBrowserRouter([
       { path: routes.LOGIN_PATH, element: <LoginPage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
+      { path: routes.CART_PATH, element: <CartPage /> },
     ],
   },
   {

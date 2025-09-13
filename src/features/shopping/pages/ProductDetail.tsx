@@ -3,41 +3,39 @@ import {
   Box,
   Typography,
   Button,
-  IconButton,
-  Tabs,
-  Tab,
-  Card,
   CardMedia,
   CardContent,
   Avatar,
   Rating,
+  IconButton,
+  Tabs,
+  Tab,
   TextField,
+  Card,
+  Chip,
 } from "@mui/material";
 import {
-  Close as CloseIcon,
   Add as AddIcon,
   Remove as RemoveIcon,
   ShoppingCart as ShoppingCartIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
+import { useCart } from "../../../contexts/CartContext";
 
-// Mock data for multiple products
-const productsData = {
-  1: {
+// Mock data for product detail
+const mockProducts = [
+  {
     id: 1,
-    name: "Thức Ăn Một Cho Chó Con",
-    brand: "Thương hiệu Royal Canin",
-    price: 160000,
-    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500&h=500&fit=crop&crop=center",
+    name: "Thức Ăn Cho Chó Con Royal Canin Mini Puppy",
+    brand: "Royal Canin",
+    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop&crop=center",
     description: `
       ROYAL CANIN INTENSE HAIRBALL được thiết kế đặc biệt để hỗ trợ tiêu hóa đường ruột và kiểm soát lông tụ.
-      
       Lợi ích:
-       Kiểm soát lông: Giảm thiểu sự hình thành của lông tụ trong đường tiêu hóa
-       Sức khỏe răng miệng: Công thức đặc biệt giúp làm sạch răng tự nhiên
-       Ngăn ngừa sỏi thận: Cân bằng khoáng chất giúp bảo vệ hệ tiết niệu
-      
+       Ngăn ngừa sỏi thận: Cân bằng khoáng chất giúp bảo vệ hệ tiết niệu.
+       Sức khỏe răng miệng: Công thức đặc biệt giúp làm sạch răng tự nhiên.
       Thành phần: Thịt gà, gạo, chất béo động vật, chất xơ, vitamin và khoáng chất.
     `,
     weightOptions: [
@@ -45,217 +43,129 @@ const productsData = {
       { id: 2, weight: "1 kg", price: 380000, selected: false },
       { id: 3, weight: "1.5 kg", price: 550000, selected: false },
     ],
+    colorOptions: [
+      { id: 1, color: "Xanh", selected: true },
+      { id: 2, color: "Đỏ", selected: false },
+      { id: 3, color: "Vàng", selected: false },
+    ],
+    sizeOptions: [
+      { id: 1, size: "S", selected: false },
+      { id: 2, size: "M", selected: true },
+      { id: 3, size: "L", selected: false },
+      { id: 4, size: "XL", selected: false },
+    ],
+    reviews: [
+      { id: 1, name: "ADMIN", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Sản phẩm rất tốt, chó nhà tôi rất thích ăn. Đóng gói đẹp, chất lượng cao.", date: "20/11/2023" },
+      { id: 2, name: "Nguyễn Văn A", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Thức ăn này giúp chó con phát triển tốt, tăng cân đều đặn.", date: "18/11/2023" },
+      { id: 3, name: "Trần Thị B", avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Giá cả hợp lý, chất lượng đảm bảo. Sẽ mua lại lần sau.", date: "15/11/2023" },
+      { id: 4, name: "Lê Văn C", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Giao hàng nhanh, đóng gói cẩn thận. Sản phẩm như mô tả.", date: "12/11/2023" },
+    ],
   },
-  2: {
+  {
     id: 2,
-    name: "Thức Ăn Cao Cấp Cho Mèo Trưởng Thành",
+    name: "Thức Ăn Cho Mèo Trưởng Thành Whiskas Premium",
     brand: "Whiskas Premium",
-    price: 85000,
-    image: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=500&h=500&fit=crop&crop=center",
+    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop&crop=center",
     description: `
-      WHISKAS PREMIUM ADULT CAT FOOD - Thức ăn cao cấp dành cho mèo trưởng thành từ 1-7 tuổi.
-      
-      Đặc điểm nổi bật:
-       Protein cao: 35% protein từ thịt cá hồi và thịt gà tươi
-       Omega-3 & Omega-6: Tăng cường sức khỏe da và lông
-       Prebiotics: Hỗ trợ hệ tiêu hóa khỏe mạnh
-       Không chất bảo quản nhân tạo
-       Hương vị tự nhiên, mèo yêu thích
-      
-      Thành phần: Cá hồi (25%), thịt gà (20%), gạo lứt, khoai tây, dầu cá, vitamin tổng hợp.
-      Phù hợp cho: Mèo trưởng thành, mèo trong nhà, mèo có hệ tiêu hóa nhạy cảm.
+      WHISKAS PREMIUM được chế biến đặc biệt để đáp ứng nhu cầu dinh dưỡng của mèo trưởng thành.
+      Lợi ích:
+       Protein cao: Từ cá hồi và thịt gà giúp duy trì cơ bắp săn chắc.
+       Omega-3 & Omega-6: Cho da lông khỏe mạnh và bóng mượt.
+       Prebiotics: Hỗ trợ hệ tiêu hóa khỏe mạnh.
+      Thành phần: Cá hồi, thịt gà, ngô, gạo, dầu cá, vitamin và khoáng chất.
     `,
     weightOptions: [
       { id: 1, weight: "300g", price: 85000, selected: true },
-      { id: 2, weight: "800g", price: 195000, selected: false },
-      { id: 3, weight: "1.2kg", price: 275000, selected: false },
+      { id: 2, weight: "800g", price: 200000, selected: false },
+      { id: 3, weight: "1.2 kg", price: 280000, selected: false },
+    ],
+    colorOptions: [
+      { id: 1, color: "Xanh", selected: true },
+      { id: 2, color: "Đỏ", selected: false },
+    ],
+    sizeOptions: [
+      { id: 1, size: "S", selected: true },
+      { id: 2, size: "M", selected: false },
+    ],
+    reviews: [
+      { id: 5, name: "Mèo Con", avatar: "https://images.unsplash.com/photo-1514888627710-901001000000?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Mèo nhà tôi rất thích, ăn ngon miệng hơn hẳn!", date: "25/11/2023" },
+      { id: 6, name: "Chủ Mèo", avatar: "https://images.unsplash.com/photo-1529626465-bb6a0cc77079?w=40&h=40&fit=crop&crop=face", rating: 4, comment: "Giá cả phải chăng, chất lượng tốt. Sẽ mua lại.", date: "22/11/2023" },
     ],
   },
-  3: {
+  {
     id: 3,
-    name: "Thức Ăn Siêu Cao Cấp Cho Chó Lớn",
+    name: "Thức Ăn Cho Chó Lớn Hill's Science Diet Healthy Mobility",
     brand: "Hill's Science Diet",
-    price: 450000,
-    image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=500&h=500&fit=crop&crop=center",
+    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop&crop=center",
     description: `
-      HILL'S SCIENCE DIET ADULT LARGE BREED - Thức ăn khoa học cho chó lớn từ 1-5 tuổi.
-      
-      Công nghệ tiên tiến:
-       Glucosamine & Chondroitin: Bảo vệ khớp xương cho chó lớn
-       Antioxidants: Tăng cường hệ miễn dịch tự nhiên
-       Omega-3 EPA: Hỗ trợ sức khỏe tim mạch
-       Prebiotic Fiber: Cải thiện hệ tiêu hóa
-       Vitamin E & C: Chống oxy hóa, làm chậm lão hóa
-      
-      Thành phần: Thịt gà (18%), bột cá, gạo, ngô, chất béo động vật, glucosamine hydrochloride.
-      Được khuyến nghị bởi: Bác sĩ thú y hàng đầu thế giới.
+      HILL'S SCIENCE DIET HEALTHY MOBILITY được phát triển bởi các nhà khoa học để hỗ trợ sức khỏe xương khớp cho chó lớn.
+      Lợi ích:
+       Glucosamine & Chondroitin: Hỗ trợ sụn khớp khỏe mạnh.
+       EPA từ dầu cá: Giảm viêm và cải thiện khả năng vận động.
+       Chất chống oxy hóa: Tăng cường hệ miễn dịch.
+      Thành phần: Thịt gà, lúa mì, ngô, gạo lứt, dầu cá, hạt lanh, vitamin và khoáng chất.
       Chứng nhận: AAFCO, FDA, ISO 9001.
     `,
     weightOptions: [
-      { id: 1, weight: "500g", price: 450000, selected: true },
-      { id: 2, weight: "1.5kg", price: 1200000, selected: false },
-      { id: 3, weight: "3kg", price: 2200000, selected: false },
+      { id: 1, weight: "1.5 kg", price: 450000, selected: true },
+      { id: 2, weight: "3 kg", price: 800000, selected: false },
+      { id: 3, weight: "7 kg", price: 1500000, selected: false },
     ],
-  },
-};
-
-// Mock data for reviews
-const reviewsData = {
-  1: [
-    {
-      id: 1,
-      name: "ADMIN",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Sản phẩm rất tốt, chó nhà tôi rất thích ăn. Đóng gói đẹp, chất lượng cao.",
-      date: "20/11/2023",
-    },
-    {
-      id: 2,
-      name: "Nguyễn Văn A",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Thức ăn này giúp chó con phát triển tốt, tăng cân đều đặn.",
-      date: "18/11/2023",
-    },
-    {
-      id: 3,
-      name: "Trần Thị B",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Giá cả hợp lý, chất lượng đảm bảo. Sẽ mua lại lần sau.",
-      date: "15/11/2023",
-    },
-    {
-      id: 4,
-      name: "Lê Văn C",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Giao hàng nhanh, đóng gói cẩn thận. Sản phẩm như mô tả.",
-      date: "12/11/2023",
-    },
-  ],
-  2: [
-    {
-      id: 1,
-      name: "Minh Anh",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Mèo nhà mình rất thích ăn Whiskas này. Lông mượt hơn nhiều sau 2 tuần.",
-      date: "22/11/2023",
-    },
-    {
-      id: 2,
-      name: "Hoàng Nam",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      rating: 4,
-      comment: "Chất lượng tốt, giá hơi cao nhưng đáng đồng tiền. Mèo ăn ngon miệng.",
-      date: "19/11/2023",
-    },
-    {
-      id: 3,
-      name: "Thu Hương",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Đóng gói đẹp, hương vị thơm ngon. Mèo nhà mình từ chối ăn thức ăn khác.",
-      date: "16/11/2023",
-    },
-    {
-      id: 4,
-      name: "Đức Minh",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Sản phẩm cao cấp, thành phần tự nhiên. Mèo khỏe mạnh, năng động hơn.",
-      date: "14/11/2023",
-    },
-  ],
-  3: [
-    {
-      id: 1,
-      name: "Bác sĩ Thú y",
-      avatar: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Là bác sĩ thú y, tôi khuyên dùng Hill's cho chó lớn. Công thức khoa học, an toàn.",
-      date: "25/11/2023",
-    },
-    {
-      id: 2,
-      name: "Chủ trại chó",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Dùng cho 15 con chó lớn trong trại. Tất cả đều khỏe mạnh, lông bóng mượt.",
-      date: "23/11/2023",
-    },
-    {
-      id: 3,
-      name: "Người nuôi chó",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-      rating: 4,
-      comment: "Giá cao nhưng chất lượng tuyệt vời. Chó Golden của mình rất thích ăn.",
-      date: "21/11/2023",
-    },
-    {
-      id: 4,
-      name: "Khách hàng VIP",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-      rating: 5,
-      comment: "Sản phẩm cao cấp nhất trên thị trường. Chó nhà mình khỏe mạnh, năng động.",
-      date: "18/11/2023",
-    },
-  ],
-};
-
-// Mock data for recommended products
-const recommendedProducts = [
-  {
-    id: 1,
-    name: "Thức Ăn Cho Chó",
-    price: "120.000 VNĐ",
-    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center",
-  },
-  {
-    id: 2,
-    name: "Thức Ăn Cho Mèo",
-    price: "95.000 VNĐ",
-    image: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=200&h=200&fit=crop&crop=center",
-  },
-  {
-    id: 3,
-    name: "Thức Ăn Cao Cấp",
-    price: "350.000 VNĐ",
-    image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=200&h=200&fit=crop&crop=center",
-  },
-  {
-    id: 4,
-    name: "Thức Ăn Hữu Cơ",
-    price: "280.000 VNĐ",
-    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center",
+    colorOptions: [
+      { id: 1, color: "Xanh", selected: true },
+    ],
+    sizeOptions: [
+      { id: 1, size: "L", selected: true },
+      { id: 2, size: "XL", selected: false },
+    ],
+    reviews: [
+      { id: 7, name: "Bác Sĩ Thú Y", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cfdfeeab?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Sản phẩm tuyệt vời cho chó có vấn đề về khớp. Rất khuyến nghị!", date: "01/12/2023" },
+      { id: 8, name: "Chủ Trại Chó", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Chó của tôi đã cải thiện rõ rệt sau khi dùng sản phẩm này.", date: "28/11/2023" },
+    ],
   },
 ];
 
+// Mock data for recommended products
+const recommendedProducts = [
+  { id: 1, name: "Thức Ăn Cho Chó", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 120000 },
+  { id: 2, name: "Thức Ăn Cho Mèo", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 95000 },
+  { id: 3, name: "Thức Ăn Cao Cấp", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 350000 },
+  { id: 4, name: "Thức Ăn Hữu Cơ", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 280000 },
+];
+
 interface ProductDetailProps {
+  productId?: number;
   onClose?: () => void;
 }
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
   const { id } = useParams<{ id: string }>();
-  const productId = parseInt(id || "1");
-  
-  // Get product data based on ID, fallback to product 1
-  const productDetail = productsData[productId as keyof typeof productsData] || productsData[1];
-  const reviews = reviewsData[productId as keyof typeof reviewsData] || reviewsData[1];
-  
-  const [selectedWeight, setSelectedWeight] = useState(productDetail.weightOptions[0]);
+  const currentProductId = id ? parseInt(id, 10) : mockProducts[0].id;
+
+  const product = mockProducts.find(p => p.id === currentProductId) || mockProducts[0];
+  const reviews = product.reviews;
+
+  const [selectedWeight, setSelectedWeight] = useState(product.weightOptions[0]);
+  const [selectedColor, setSelectedColor] = useState(product.colorOptions[0]);
+  const [selectedSize, setSelectedSize] = useState(product.sizeOptions[0]);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState(0);
+  const { dispatch } = useCart();
 
-  // Scroll to top when component mounts or product ID changes
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [productId]);
+  }, [id]);
 
-  const handleWeightChange = (weight: typeof productDetail.weightOptions[0]) => {
+  const handleWeightChange = (weight: typeof product.weightOptions[0]) => {
     setSelectedWeight(weight);
+  };
+
+  const handleColorChange = (color: typeof product.colorOptions[0]) => {
+    setSelectedColor(color);
+  };
+
+  const handleSizeChange = (size: typeof product.sizeOptions[0]) => {
+    setSelectedSize(size);
   };
 
   const handleQuantityChange = (delta: number) => {
@@ -264,13 +174,30 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
   };
 
   const handleAddToCart = () => {
-    console.log("Add to cart:", {
-      productId: productId,
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        product: {
+          id: product.id,
+          name: product.name,
+          price: selectedWeight.price,
+          image: product.image,
+          brand: product.brand,
+          weight: selectedWeight.weight,
+          color: selectedColor.color,
+          size: selectedSize.size,
+        },
+        quantity,
+      },
+    });
+    console.log("Added to cart:", {
+      productId: product.id,
       weight: selectedWeight.weight,
+      color: selectedColor.color,
+      size: selectedSize.size,
       quantity,
       totalPrice: selectedWeight.price * quantity,
     });
-    // TODO: Implement add to cart functionality
   };
 
   const totalPrice = selectedWeight.price * quantity;
@@ -292,19 +219,19 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
       <Box className={styles.productInfoSection}>
         <Box className={styles.productImageContainer}>
           <img
-            src={productDetail.image}
-            alt={productDetail.name}
+            src={product.image}
+            alt={product.name}
             className={styles.productImage}
           />
         </Box>
 
         <Box className={styles.productDetailsContainer}>
           <Typography variant="h4" className={styles.productTitle}>
-            {productDetail.name}
+            {product.name}
           </Typography>
 
           <Typography variant="h6" className={styles.brandName}>
-            {productDetail.brand}
+            {product.brand}
           </Typography>
 
           <Typography variant="h4" className={styles.price}>
@@ -317,7 +244,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
               Trọng lượng:
             </Typography>
             <Box className={styles.weightButtons}>
-              {productDetail.weightOptions.map((weight) => (
+              {product.weightOptions.map((weight) => (
                 <Button
                   key={weight.id}
                   variant={weight.id === selectedWeight.id ? "contained" : "outlined"}
@@ -326,6 +253,42 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
                 >
                   {weight.weight}
                 </Button>
+              ))}
+            </Box>
+          </Box>
+
+          {/* Color Options */}
+          <Box className={styles.colorOptions}>
+            <Typography variant="h6" className={styles.colorLabel}>
+              Màu sắc:
+            </Typography>
+            <Box className={styles.colorButtons}>
+              {product.colorOptions.map((color) => (
+                <Chip
+                  key={color.id}
+                  label={color.color}
+                  variant={color.id === selectedColor.id ? "filled" : "outlined"}
+                  onClick={() => handleColorChange(color)}
+                  className={styles.colorChip}
+                />
+              ))}
+            </Box>
+          </Box>
+
+          {/* Size Options */}
+          <Box className={styles.sizeOptions}>
+            <Typography variant="h6" className={styles.sizeLabel}>
+              Kích thước:
+            </Typography>
+            <Box className={styles.sizeButtons}>
+              {product.sizeOptions.map((size) => (
+                <Chip
+                  key={size.id}
+                  label={size.size}
+                  variant={size.id === selectedSize.id ? "filled" : "outlined"}
+                  onClick={() => handleSizeChange(size)}
+                  className={styles.sizeChip}
+                />
               ))}
             </Box>
           </Box>
@@ -388,7 +351,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
         {activeTab === 0 && (
           <Box className={styles.descriptionContent}>
             <Typography variant="body1" className={styles.descriptionText}>
-              {productDetail.description}
+              {product.description}
             </Typography>
           </Box>
         )}
@@ -437,24 +400,22 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
           Sản Phẩm Đề xuất
         </Typography>
         <Box className={styles.recommendedProducts}>
-          {recommendedProducts.map((product) => (
-            <Card key={product.id} className={styles.recommendedCard}>
+          {recommendedProducts.map((recProduct) => (
+            <Card key={recProduct.id} className={styles.recommendedCard}>
               <CardMedia
                 component="img"
                 height="200"
-                image={product.image}
-                alt={product.name}
+                image={recProduct.image}
+                alt={recProduct.name}
                 className={styles.recommendedImage}
               />
               <CardContent className={styles.recommendedContent}>
-                <Box className={styles.recommendedInfo}>
-                  <Typography variant="subtitle1" className={styles.recommendedName}>
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body2" className={styles.recommendedPrice}>
-                    {product.price}
-                  </Typography>
-                </Box>
+                <Typography variant="subtitle1" className={styles.recommendedName}>
+                  {recProduct.name}
+                </Typography>
+                <Typography variant="body2" className={styles.recommendedPrice}>
+                  {recProduct.price.toLocaleString("vi-VN")} VNĐ
+                </Typography>
                 <IconButton className={styles.recommendedButton}>
                   <ShoppingCartIcon />
                 </IconButton>
