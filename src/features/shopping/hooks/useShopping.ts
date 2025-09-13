@@ -44,7 +44,7 @@ export const useShopping = () => {
     limit?: number;
     search?: string;
   }) => {
-    dispatch(fetchBlogArticles(params));
+    dispatch(fetchBlogArticles(params || {}));
   }, [dispatch]);
 
   const loadCart = useCallback(() => {

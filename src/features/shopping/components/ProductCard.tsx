@@ -1,6 +1,7 @@
 ﻿import React from "react";
-import { Card, CardMedia, CardContent, Typography, IconButton } from "@mui/material";
-import { AddShoppingCart } from "@mui/icons-material";
+import { Card, CardMedia, CardContent, Typography, IconButton, Box } from "@mui/material";
+import { AddShoppingCart, Visibility } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   id: number;
@@ -17,10 +18,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   onAddToCart,
 }) => {
+  const navigate = useNavigate();
+
   const handleAddToCart = () => {
     if (onAddToCart) {
       onAddToCart(id);
     }
+  };
+
+  const handleViewDetail = () => {
+    navigate(`/product/${id}`);
   };
 
   return (
@@ -30,10 +37,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         boxShadow: 3,
         position: "relative",
         transition: "transform 0.2s",
+        cursor: "pointer",
         "&:hover": {
           transform: "translateY(-4px)",
         },
       }}
+      onClick={handleViewDetail}
     >
       <CardMedia
         component="img"
@@ -49,21 +58,38 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Typography variant="h6" color="primary" fontWeight="bold">
           {price}
         </Typography>
-        <IconButton
-          onClick={handleAddToCart}
-          sx={{
-            position: "absolute",
-            bottom: 16,
-            right: 16,
-            bgcolor: "#2F80ED",
-            color: "white",
-            "&:hover": {
-              bgcolor: "#1976D2",
-            },
-          }}
-        >
-          <AddShoppingCart />
-        </IconButton>
+        <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewDetail();
+            }}
+            sx={{
+              bgcolor: "#2F80ED",
+              color: "white",
+              "&:hover": {
+                bgcolor: "#1976D2",
+              },
+            }}
+          >
+            <Visibility />
+          </IconButton>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart();
+            }}
+            sx={{
+              bgcolor: "#4CAF50",
+              color: "white",
+              "&:hover": {
+                bgcolor: "#45a049",
+              },
+            }}
+          >
+            <AddShoppingCart />
+          </IconButton>
+        </Box>
       </CardContent>
     </Card>
   );
