@@ -8,6 +8,7 @@ import NotFoundPage from "../components/NotFound";
 import HomePage from "../pages/home/HomePage";
 import { AdminDashboard } from "../features/admin/pages/Dashboard";
 import ProfilePage from "../features/forum/pages/ProfilePage";
+import NewFeeds from "../features/forum/pages/NewFeeds";
 
 export const routes = {
   ALL_PATH: "*",
@@ -18,7 +19,8 @@ export const routes = {
   ADMIN_PROFILE_PATH: "/dashboard/admin-profile",
   PROJECTS_PATH: "/dashboard/project",
   // add profile path for forum
-  PROFILE_PATH: "/profile"
+  PROFILE_PATH: "/profile",
+  NEWSFEED_PATH: "/news-feeds"
 };
 
 export const router = createBrowserRouter([
@@ -30,6 +32,7 @@ export const router = createBrowserRouter([
       { path: routes.LOGIN_PATH, element: <LoginPage /> },
       { path: routes.ALL_PATH, element: <NotFoundPage /> },
       { path: routes.PROFILE_PATH, element: <ProfilePage  /> },
+      { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
     ],
   },
   {
