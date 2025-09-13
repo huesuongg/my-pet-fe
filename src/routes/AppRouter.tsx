@@ -23,8 +23,7 @@ export const routes = {
   PROJECTS_PATH: "/dashboard/project",
   // add profile path for forum
   PROFILE_PATH: "/profile",
-  NEWSFEED_PATH: "/news-feeds"
-  PROFILE_PATH: "/profile"
+  NEWSFEED_PATH: "/news-feeds",
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id"
