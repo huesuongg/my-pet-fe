@@ -1,8 +1,13 @@
 // src/components/PostCreator.tsx
-import React from 'react';
-import profilePic from '../../../assets/profile-pic.jpg';
+import React, { useState } from "react";
+import profilePic from "../../../assets/profile-pic.jpg";
+import PostModal from "./PostModal";
 
 const PostCreator: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false); // State để quản lý modal
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
       <div className="flex items-center space-x-2 mb-4">
@@ -16,6 +21,8 @@ const PostCreator: React.FC = () => {
             type="text"
             placeholder="Bạn đang nghĩ gì?"
             className="w-full bg-gray-100 p-3 rounded-full outline-none"
+            onFocus={handleOpenModal}
+            readOnly
           />
         </div>
       </div>
@@ -33,6 +40,7 @@ const PostCreator: React.FC = () => {
           <span>Cảm xúc/Hoạt động</span>
         </button>
       </div>
+      {isModalOpen && <PostModal onClose={handleCloseModal} />}
     </div>
   );
 };
