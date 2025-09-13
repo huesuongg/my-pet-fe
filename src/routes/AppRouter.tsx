@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+﻿import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LandingLayout from "../layouts/LandingLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { LoginPage } from "../features/authenticate/pages/LoginPage";
@@ -9,6 +9,9 @@ import HomePage from "../pages/home/HomePage";
 import { AdminDashboard } from "../features/admin/pages/Dashboard";
 import ProfilePage from "../features/forum/pages/ProfilePage";
 import NewFeeds from "../features/forum/pages/NewFeeds";
+import ShoppingPage from "../features/shopping/pages/ShoppingPage";
+import ProductDetail from "../features/shopping/pages/ProductDetail";
+
 
 export const routes = {
   ALL_PATH: "*",
@@ -21,6 +24,11 @@ export const routes = {
   // add profile path for forum
   PROFILE_PATH: "/profile",
   NEWSFEED_PATH: "/news-feeds"
+  PROFILE_PATH: "/profile"
+  PROJECTS_CREATE_PATH: "/dashboard/project/create",
+  SHOPPING_PATH: "/shopping",
+  PRODUCT_DETAIL_PATH: "/product/:id"
+
 };
 
 export const router = createBrowserRouter([
@@ -33,6 +41,8 @@ export const router = createBrowserRouter([
       { path: routes.ALL_PATH, element: <NotFoundPage /> },
       { path: routes.PROFILE_PATH, element: <ProfilePage  /> },
       { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
+      { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
+      { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
     ],
   },
   {
@@ -43,19 +53,18 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
+      { index: true, element: <AdminDashboard /> },
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
+      { path: routes.PROJECTS_PATH, element: <AdminDashboard /> },
+      { path: routes.PROJECTS_CREATE_PATH, element: <AdminDashboard /> },
     ],
   },
-  {
-    path: routes.HOME_PATH,
-    element: (
-      <PrivateRoute>
-        <LandingLayout />
-      </PrivateRoute>
-    ),
-    children: [{ path: routes.LOGOUT_PATH, element: <Logout /> }],
-  },
+  { path: routes.LOGOUT_PATH, element: <Logout /> },
+  { path: routes.ALL_PATH, element: <NotFoundPage /> },
 ]);
 
-const AppRouter = () => <RouterProvider router={router} />;
+const AppRouter = () => {
+  return <RouterProvider router={router} />;
+};
+
 export default AppRouter;
