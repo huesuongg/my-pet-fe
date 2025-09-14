@@ -1,4 +1,5 @@
-﻿import { Box, Typography, Button, InputBase, IconButton, Badge } from "@mui/material";
+import { Box, Typography, Button, InputBase, IconButton, Badge } from "@mui/material";
+
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
