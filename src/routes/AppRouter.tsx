@@ -10,6 +10,7 @@ import { AdminDashboard } from "../features/admin/pages/Dashboard";
 import ProfilePage from "../features/forum/pages/ProfilePage";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
+import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
 
 
 export const routes = {
@@ -21,8 +22,10 @@ export const routes = {
   ADMIN_PROFILE_PATH: "/dashboard/admin-profile",
   PROJECTS_PATH: "/dashboard/project",
   // add profile path for forum
-  PROFILE_PATH: "/profile"
+  PROFILE_PATH: "/profile",
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
+  // chat support path
+  CHAT_SUPPORT_PATH: "/chat-support",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id"
 
@@ -39,6 +42,7 @@ export const router = createBrowserRouter([
       { path: routes.PROFILE_PATH, element: <ProfilePage  /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
+      { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
     ],
   },
   {
