@@ -193,7 +193,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <Visibility sx={{ mr: 1, fontSize: "1.1rem" }} />
             Xem
           </IconButton>
-          <IconButton
+          {/* <IconButton
             onClick={handleAddToCart}
             sx={{
               bgcolor: "#22C55E",
@@ -213,7 +213,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           >
             <AddShoppingCart sx={{ mr: 1, fontSize: "1.1rem" }} />
             Mua
-          </IconButton>
+          </IconButton> */}
         </Box>
       </CardContent>
     </Card>

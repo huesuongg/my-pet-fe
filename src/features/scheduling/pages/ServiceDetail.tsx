@@ -379,7 +379,7 @@ export default function ServiceDetail() {
                       color: "white",
                       mb: 2,
                       fontFamily: "'Inter', sans-serif",
-                      textShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                    //   boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
                       background: "linear-gradient(45deg, #ffffff, #f0f9ff)",
                       backgroundClip: "text",
                       WebkitBackgroundClip: "text",
