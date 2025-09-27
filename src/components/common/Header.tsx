@@ -36,7 +36,7 @@ export const Header = () => {
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
     { label: "Đặt lịch", path: "/scheduling", icon: <CalendarTodayIcon /> },
     { label: "Sản phẩm", path: "/shopping", icon: <Shop2 /> },
-    { label: "Mạng xã hội", path: "#", icon: <PersonIcon /> },
+    { label: "Mạng xã hội", path: "/news-feeds", icon: <PersonIcon /> },
     {label: "Hồ sơ thú cưng", path: "#", icon: <PetsIcon />},
   ];
 

@@ -22,82 +22,8 @@ import {
 import { useParams } from "react-router-dom";
 import styles from "./ProductDetail.module.css";
 
-// Mock data for multiple products
-const productsData = {
-  1: {
-    id: 1,
-    name: "Thức Ăn Một Cho Chó Con",
-    brand: "Thương hiệu Royal Canin",
-    price: 160000,
-    image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500&h=500&fit=crop&crop=center",
-    description: `
-      ROYAL CANIN INTENSE HAIRBALL được thiết kế đặc biệt để hỗ trợ tiêu hóa đường ruột và kiểm soát lông tụ.
-      
-      Lợi ích:
-       Kiểm soát lông: Giảm thiểu sự hình thành của lông tụ trong đường tiêu hóa
-       Sức khỏe răng miệng: Công thức đặc biệt giúp làm sạch răng tự nhiên
-       Ngăn ngừa sỏi thận: Cân bằng khoáng chất giúp bảo vệ hệ tiết niệu
-      
-      Thành phần: Thịt gà, gạo, chất béo động vật, chất xơ, vitamin và khoáng chất.
-    `,
-    weightOptions: [
-      { id: 1, weight: "400g", price: 160000, selected: true },
-      { id: 2, weight: "1 kg", price: 380000, selected: false },
-      { id: 3, weight: "1.5 kg", price: 550000, selected: false },
-    ],
-  },
-  2: {
-    id: 2,
-    name: "Thức Ăn Cao Cấp Cho Mèo Trưởng Thành",
-    brand: "Whiskas Premium",
-    price: 85000,
-    image: "https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=500&h=500&fit=crop&crop=center",
-    description: `
-      WHISKAS PREMIUM ADULT CAT FOOD - Thức ăn cao cấp dành cho mèo trưởng thành từ 1-7 tuổi.
-      
-      Đặc điểm nổi bật:
-       Protein cao: 35% protein từ thịt cá hồi và thịt gà tươi
-       Omega-3 & Omega-6: Tăng cường sức khỏe da và lông
-       Prebiotics: Hỗ trợ hệ tiêu hóa khỏe mạnh
-       Không chất bảo quản nhân tạo
-       Hương vị tự nhiên, mèo yêu thích
-      
-      Thành phần: Cá hồi (25%), thịt gà (20%), gạo lứt, khoai tây, dầu cá, vitamin tổng hợp.
-      Phù hợp cho: Mèo trưởng thành, mèo trong nhà, mèo có hệ tiêu hóa nhạy cảm.
-    `,
-    weightOptions: [
-      { id: 1, weight: "300g", price: 85000, selected: true },
-      { id: 2, weight: "800g", price: 195000, selected: false },
-      { id: 3, weight: "1.2kg", price: 275000, selected: false },
-    ],
-  },
-  3: {
-    id: 3,
-    name: "Thức Ăn Siêu Cao Cấp Cho Chó Lớn",
-    brand: "Hill's Science Diet",
-    price: 450000,
-    image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=500&h=500&fit=crop&crop=center",
-    description: `
-      HILL'S SCIENCE DIET ADULT LARGE BREED - Thức ăn khoa học cho chó lớn từ 1-5 tuổi.
-      
-      Công nghệ tiên tiến:
-       Glucosamine & Chondroitin: Bảo vệ khớp xương cho chó lớn
-       Antioxidants: Tăng cường hệ miễn dịch tự nhiên
-       Omega-3 EPA: Hỗ trợ sức khỏe tim mạch
-       Prebiotic Fiber: Cải thiện hệ tiêu hóa
-       Vitamin E & C: Chống oxy hóa, làm chậm lão hóa
-      
-      Thành phần: Thịt gà (18%), bột cá, gạo, ngô, chất béo động vật, glucosamine hydrochloride.
-      Được khuyến nghị bởi: Bác sĩ thú y hàng đầu thế giới.
-      Chứng nhận: AAFCO, FDA, ISO 9001.
-    `,
-    weightOptions: [
-      { id: 1, weight: "500g", price: 450000, selected: true },
-      { id: 2, weight: "1.5kg", price: 1200000, selected: false },
-      { id: 3, weight: "3kg", price: 2200000, selected: false },
-    ],
-  },
-};
+// Import shared mock data
+import { productsData } from "./ShoppingPage";
 
 // Mock data for reviews
 const reviewsData = {
