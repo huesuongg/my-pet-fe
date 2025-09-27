@@ -10,6 +10,8 @@ import PetsIcon from "@mui/icons-material/Pets";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Shop2 } from "@mui/icons-material";
+import { useCart } from "../../contexts/CartContext";
+import { ShoppingCart } from "@mui/icons-material";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -31,6 +33,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
+  const { cartState } = useCart();
 
   const navigationItems = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
@@ -60,6 +63,10 @@ export const Header = () => {
 
   const handleNotificationMenuClose = () => {
     setNotificationAnchor(null);
+  }
+    
+  const handleCartClick = () => {
+    navigate("/cart");
   };
 
   return (
@@ -69,7 +76,7 @@ export const Header = () => {
       sx={{
         bgcolor: "#2f80ed", 
         boxShadow: "0 4px 20px rgba(59, 130, 246, 0.3)",
-        px: 4,
+        px: 2,
       }}
     >
       <Box
@@ -78,7 +85,7 @@ export const Header = () => {
           alignItems: "center",
           justifyContent: "space-between",
           py: 1,
-          maxWidth: 1200,
+          maxWidth: 1400,
           mx: "auto",
         }}
       >
@@ -99,7 +106,6 @@ export const Header = () => {
             My Pet
           </Typography>
         </Box>
-
         {/* Navigation */}
         <Box
           sx={{
@@ -155,6 +161,11 @@ export const Header = () => {
           >
             <Badge badgeContent={2} color="error">
               <NotificationsIcon />
+              </Badge>
+          </IconButton>
+          <IconButton size="large" sx={{ color: "white" }} onClick={handleCartClick}>
+            <Badge badgeContent={cartState.totalItems} color="info">
+              <ShoppingCart />
             </Badge>
           </IconButton>
 

@@ -2,15 +2,20 @@
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating } from "@mui/material";
 import { AddShoppingCart, Visibility, Star } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../../contexts/CartContext";
 
 interface ProductCardProps {
   id: number;
   name: string;
-  price: string;
+  price: number;
   originalPrice?: string;
   image: string;
   rating?: number;
   reviews?: number;
+  brand?: string;
+  weight?: string;
+  color?: string;
+  size?: string;
   onAddToCart?: (id: number) => void;
 }
 
@@ -22,14 +27,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   rating = 0,
   reviews = 0,
-  onAddToCart,
+  brand = "Thương hiệu",
+  weight = "400g",
+  color = "Xanh",
+  size = "M",
 }) => {
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart(id);
-    }
+  const { dispatch } = useCart();
+
+  const handleAddToCart = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        product: { id, name, price, image, brand, weight, color, size },
+        quantity: 1,
+      },
+    });
   };
 
   const handleViewDetail = () => {
@@ -37,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const discountPercentage = originalPrice 
-    ? Math.round(((parseFloat(originalPrice.replace(/[^\d]/g, '')) - parseFloat(price.replace(/[^\d]/g, ''))) / parseFloat(originalPrice.replace(/[^\d]/g, '')) * 100))
+    ? Math.round(((parseFloat(originalPrice.replace(/[^\d]/g, '')) - parseFloat(price.toString().replace(/[^\d]/g, ''))) / parseFloat(originalPrice.replace(/[^\d]/g, '')) * 100))
     : 0;
 
   return (
@@ -179,10 +194,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             Xem
           </IconButton>
           <IconButton
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddToCart();
-            }}
+            onClick={handleAddToCart}
             sx={{
               bgcolor: "#22C55E",
               color: "white",
