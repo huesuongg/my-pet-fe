@@ -1,4 +1,5 @@
-import { Grid, Typography, Container } from "@mui/material";
+import { Grid, Typography, Container, Box, Button } from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PetsIcon from "@mui/icons-material/Pets";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
@@ -7,7 +8,7 @@ import ServiceCard from "../../../components/card/ServiceCard";
 export default function ServiceSection() {
   return (
     <Container sx={{ py: 6 }}>
-      <Typography variant="h4" fontWeight="bold" align="center" gutterBottom>
+      <Typography variant="h4" fontWeight="bold" align="center" gutterBottom sx={{ fontFamily: "'Inter', sans-serif" }}>
         Dịch Vụ Chăm Sóc Boss
       </Typography>
 
@@ -39,6 +40,27 @@ export default function ServiceSection() {
           />
         </Grid>
       </Grid>
+
+      {/* AI Chat Button */}
+      <Box sx={{ textAlign: "center", mt: 6 }}>
+        <Button
+          variant="contained"
+          endIcon={<ArrowForwardIcon />}
+          sx={{
+            bgcolor: "limegreen",
+            color: "white",
+            fontWeight: "bold",
+            px: 6,
+            py: 2,
+            borderRadius: "999px",
+            fontSize: "1.1rem",
+            fontFamily: "'Inter', sans-serif",
+            "&:hover": { bgcolor: "green" },
+          }}
+        >
+          Box chat AI, Tư vấn online
+        </Button>
+      </Box>
     </Container>
   );
 }

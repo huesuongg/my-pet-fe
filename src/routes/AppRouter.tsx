@@ -10,6 +10,9 @@ import { AdminDashboard } from "../features/admin/pages/Dashboard";
 import ProfilePage from "../features/forum/pages/ProfilePage";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
+import SchedulesPage from "../features/scheduling/pages/SchedulesPage";
+import ServiceDetail from "../features/scheduling/pages/ServiceDetail";
+import TestScheduling from "../features/scheduling/pages/TestScheduling";
 
 export const routes = {
   ALL_PATH: "*",
@@ -23,6 +26,9 @@ export const routes = {
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id",
+  SCHEDULING_PATH: "/scheduling",
+  DOCTOR_DETAIL_PATH: "/scheduling/doctor/:id",
+  TEST_SCHEDULING_PATH: "/test-scheduling",
 };
 
 export const router = createBrowserRouter([
@@ -36,6 +42,9 @@ export const router = createBrowserRouter([
       { path: routes.PROFILE_PATH, element: <ProfilePage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
+      { path: routes.SCHEDULING_PATH, element: <SchedulesPage /> },
+      { path: routes.DOCTOR_DETAIL_PATH, element: <ServiceDetail /> },
+      { path: routes.TEST_SCHEDULING_PATH, element: <TestScheduling /> },
     ],
   },
   {
