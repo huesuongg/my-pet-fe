@@ -11,6 +11,7 @@ import ProfilePage from "../features/forum/pages/ProfilePage";
 import NewFeeds from "../features/forum/pages/NewFeeds";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
+import CartPage from "../features/shopping/pages/CartPage";
 
 export const routes = {
   ALL_PATH: "*",
@@ -25,6 +26,7 @@ export const routes = {
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id",
+  CART_PATH: "/cart",
 };
 
 export const router = createBrowserRouter([
@@ -39,6 +41,7 @@ export const router = createBrowserRouter([
       { path: routes.PROFILE_PATH, element: <ProfilePage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
+      { path: routes.CART_PATH, element: <CartPage /> },
     ],
   },
   {

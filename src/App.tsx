@@ -1,8 +1,9 @@
-import AppRouter from "./routes/AppRouter";
+﻿import AppRouter from "./routes/AppRouter";
 import "./App.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { CartProvider } from "./contexts/CartContext";
 
 const theme = createTheme({
   palette: {
@@ -19,7 +20,9 @@ function App(): JSX.Element {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <AppRouter />
+        <CartProvider>
+          <AppRouter />
+        </CartProvider>
         <ToastContainer
           position="top-center"
           autoClose={3000}

@@ -5,6 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PetsIcon from "@mui/icons-material/Pets";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../contexts/CartContext";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -24,6 +25,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export const Header = () => {
   const navigate = useNavigate();
+  const { cartState } = useCart();
 
   const navigationItems = [
     { label: "Trang chủ", path: "/" },
@@ -40,12 +42,16 @@ export const Header = () => {
     }
   };
 
+  const handleCartClick = () => {
+    navigate("/cart");
+  };
+
   return (
     <Box
       position="static"
       color="transparent"
       sx={{
-        bgcolor: "#2F80ED", 
+        bgcolor: "#2F80ED",
         boxShadow: "none",
         px: 4,
       }}
@@ -102,8 +108,8 @@ export const Header = () => {
               <SearchIcon />
             </IconButton>
           </Search>
-          <IconButton size="large" sx={{ color: "white" }}>
-            <Badge badgeContent={3} color="info">
+          <IconButton size="large" sx={{ color: "white" }} onClick={handleCartClick}>
+            <Badge badgeContent={cartState.totalItems} color="info">
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
