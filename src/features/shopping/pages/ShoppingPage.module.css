@@ -1,10 +1,4 @@
 ﻿/* Shopping Page Styles */
-.shoppingContainer {
-  background-color: #f5f7fa;
-  padding-bottom: 50px;
-  min-height: 100vh;
-}
-
 .heroBanner {
   position: relative;
   height: 500px;
@@ -12,13 +6,8 @@
   background-size: cover;
   background-position: center;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  color: white;
-  padding: 20px;
-  margin-bottom: 50px;
 }
 
 .heroOverlay {
@@ -27,125 +16,118 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 0;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .heroTitle {
-  font-weight: bold;
-  z-index: 1;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-  margin-bottom: 20px;
-  font-size: 3.5rem;
-}
-
-.heroSubtitle {
-  font-size: 1.5rem;
-  z-index: 1;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-  margin-bottom: 30px;
-}
-
-.heroButton {
-  z-index: 1;
-  background: linear-gradient(45deg, #2F80ED 0%, #1976D2 100%);
   color: white;
-  padding: 15px 30px;
-  border-radius: 10px;
-  text-transform: none;
-  font-weight: 700;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
+  font-weight: bold;
+  text-align: center;
+  z-index: 1;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.heroButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(47, 128, 237, 0.4);
-}
-
-.productsSection {
+.categoriesSection {
+  background-color: #E3F2FD;
   padding: 48px 32px;
+}
+
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.productsTitle {
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin-bottom: 40px;
-  font-size: 2.5rem;
-}
-
-.productsGrid {
-  display: grid;
-  gap: 32px;
-  align-items: stretch;
-  grid-template-columns: repeat(1, 1fr);
-}
-
 @media (min-width: 600px) {
-  .productsGrid {
+  .categoriesGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 900px) {
-  .productsGrid {
-    grid-template-columns: repeat(3, 1fr);
+  .categoriesGrid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-@media (min-width: 1200px) {
+.productsSection {
+  background-color: gradient(to bottom, #0050b9, #efefef);
+  padding: 64px 32px;
+}
+
+.productsTitle {
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 48px;
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 600px) {
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    background-color: gradient(to bottom, #0050b9, #efefef);
+  }
+}
+
+@media (min-width: 900px) {
   .productsGrid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
 .loadMoreButton {
-  display: block;
-  margin: 40px auto 0;
-  background-color: #2F80ED;
+  text-align: center;
+  margin-top: 48px;
+}
+
+.loadMoreButton button {
+  background-color: #4CAF50;
   color: white;
-  padding: 12px 30px;
-  border-radius: 8px;
-  text-transform: none;
-  font-weight: 500;
-  border: 2px solid #2F80ED;
-  transition: all 0.3s ease;
+  padding: 12px 32px;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.loadMoreButton:hover {
-  background-color: transparent;
-  color: #2F80ED;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(47, 128, 237, 0.3);
+.loadMoreButton button:hover {
+  background-color: #45a049;
 }
 
-/* Responsive adjustments for hero banner */
-@media (max-width: 768px) {
-  .heroBanner {
-    height: 350px;
-  }
-  .heroTitle {
-    font-size: 2.5rem;
-  }
-  .heroSubtitle {
-    font-size: 1.2rem;
-  }
+.blogSection {
+  background-color: white;
+  padding: 64px 32px;
 }
 
-@media (max-width: 480px) {
-  .heroBanner {
-    height: 250px;
-  }
-  .heroTitle {
-    font-size: 2rem;
-  }
-  .heroSubtitle {
-    font-size: 1rem;
-  }
-  .productsSection {
-    padding: 30px 15px;
+.blogTitle {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 48px;
+  color: #333;
+}
+
+.blogGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .blogGrid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

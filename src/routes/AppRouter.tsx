@@ -11,6 +11,9 @@ import ProfilePage from "../features/forum/pages/ProfilePage";
 import NewFeeds from "../features/forum/pages/NewFeeds";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
+import SchedulesPage from "../features/scheduling/pages/SchedulesPage";
+import ServiceDetail from "../features/scheduling/pages/ServiceDetail";
+import TestScheduling from "../features/scheduling/pages/TestScheduling";
 import CartPage from "../features/shopping/pages/CartPage";
 
 export const routes = {
@@ -26,6 +29,9 @@ export const routes = {
   PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id",
+  SCHEDULING_PATH: "/scheduling",
+  DOCTOR_DETAIL_PATH: "/scheduling/doctor/:id",
+  TEST_SCHEDULING_PATH: "/test-scheduling",
   CART_PATH: "/cart",
 };
 
@@ -41,6 +47,9 @@ export const router = createBrowserRouter([
       { path: routes.PROFILE_PATH, element: <ProfilePage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
+      { path: routes.SCHEDULING_PATH, element: <SchedulesPage /> },
+      { path: routes.DOCTOR_DETAIL_PATH, element: <ServiceDetail /> },
+      { path: routes.TEST_SCHEDULING_PATH, element: <TestScheduling /> },
       { path: routes.CART_PATH, element: <CartPage /> },
     ],
   },
