@@ -329,7 +329,7 @@ interface PostContextType {
   addReply: (
     postId: number,
     commentId: number,
-    reply: Omit<Comment, "id">
+    reply: Omit<ForumComment, "id">
   ) => void;
   refreshPosts: () => void;
   clearAndReloadPosts: () => void;
