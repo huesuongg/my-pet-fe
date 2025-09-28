@@ -24,16 +24,16 @@ export interface Appointment {
   date: string;
   time: string;
   type: string;
-  status: 'active' | 'pending' | 'completed' | 'cancelled';
+  status: 'active' | 'pending' | 'completed' | 'cancelled' | 'confirmed';
   phone: string;
   patientName?: string;
   patientPhone?: string;
   notes?: string;
+  paymentMethod?: string;
 }
 
 export interface DoctorCardProps {
   doctor: Doctor;
-  appointment: Appointment;
   onSchedule?: () => void;
 }
 

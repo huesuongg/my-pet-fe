@@ -18,6 +18,10 @@ import CartPage from "../features/shopping/pages/CartPage";
 import CheckoutPage from "../features/shopping/pages/CheckoutPage";
 import OrdersPage from "../features/shopping/pages/OrdersPage";
 import OrderDetail from "../features/shopping/pages/OrderDetail";
+import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
+import PetProfilePage from "../features/pet/pages/PetProfilePage";
+import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory";
+
 
 export const routes = {
   ALL_PATH: "*",
@@ -39,6 +43,9 @@ export const routes = {
   CHECKOUT_PATH: "/checkout",
   ORDERS_PATH: "/orders",
   ORDER_DETAIL_PATH: "/orders/:id",
+  SCHEDULING_HISTORY_PATH: "/scheduling/history",
+  PET_PROFILE_PATH: "/pet-profile",
+
 };
 
 export const router = createBrowserRouter([
@@ -49,8 +56,6 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: routes.LOGIN_PATH, element: <LoginPage /> },
       { path: routes.ALL_PATH, element: <NotFoundPage /> },
-      { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
-      { path: routes.PROFILE_PATH, element: <ProfilePage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
       { path: routes.SCHEDULING_PATH, element: <SchedulesPage /> },
@@ -60,6 +65,7 @@ export const router = createBrowserRouter([
       { path: routes.CHECKOUT_PATH, element: <CheckoutPage /> },
       { path: routes.ORDERS_PATH, element: <OrdersPage /> },
       { path: routes.ORDER_DETAIL_PATH, element: <OrderDetail /> },
+      { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
     ],
   },
   {
@@ -74,6 +80,23 @@ export const router = createBrowserRouter([
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
       { path: routes.PROJECTS_PATH, element: <AdminDashboard /> },
       { path: routes.PROJECTS_CREATE_PATH, element: <AdminDashboard /> },
+    ],
+  },
+  {
+    path: routes.HOME_PATH,
+    element: (
+      <PrivateRoute>
+        <LandingLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
+      { path: routes.PROFILE_PATH, element: <ProfilePage /> },
+      { path: routes.CART_PATH, element: <CartPage /> },
+      { path: routes.BOOKING_PATH, element: <BookingPage /> },
+      { path: routes.SCHEDULING_HISTORY_PATH, element: <AppointmentHistory /> },
+      { path: routes.PET_PROFILE_PATH, element: <PetProfilePage /> },
     ],
   },
   { path: routes.LOGOUT_PATH, element: <Logout /> },
