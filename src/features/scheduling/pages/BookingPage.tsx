@@ -14,7 +14,12 @@ import {
   Chip,
   Avatar,
   Divider,
-  IconButton
+  IconButton,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  Card
 } from "@mui/material";
 import { 
   ArrowBack, 
@@ -23,7 +28,11 @@ import {
   Person, 
   Phone, 
   Notes,
-  CheckCircle
+  CheckCircle,
+  Payment,
+  CreditCard,
+  AccountBalance,
+  Smartphone
 } from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -38,6 +47,7 @@ interface BookingFormData {
   date: string;
   time: string;
   notes: string;
+  paymentMethod: string;
 }
 
 export default function BookingPage() {
@@ -51,12 +61,14 @@ export default function BookingPage() {
     appointmentType: '',
     date: '',
     time: '',
-    notes: ''
+    notes: '',
+    paymentMethod: 'cash'
   });
   const [availableSlots, setAvailableSlots] = useState<{date: string, time: string, available: boolean}[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [appointmentId, setAppointmentId] = useState<string>('');
 
   const appointmentTypes = [
     "Khám tổng quát",
@@ -116,20 +128,23 @@ export default function BookingPage() {
 
     setIsSubmitting(true);
     try {
-      await createAppointment({
+      const newAppointment = await createAppointment({
         doctorId: doctor.id,
         date: formData.date,
         time: formData.time,
         type: formData.appointmentType,
-        status: 'pending',
+        status: 'confirmed',
         phone: formData.patientPhone,
         patientName: formData.patientName,
         patientPhone: formData.patientPhone,
-        notes: formData.notes
+        notes: formData.notes,
+        paymentMethod: formData.paymentMethod
       });
+      setAppointmentId(newAppointment.id);
       setBookingSuccess(true);
     } catch (err) {
       console.error('Booking failed:', err);
+      alert('Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
@@ -170,6 +185,135 @@ export default function BookingPage() {
         <Alert severity="error" sx={{ maxWidth: 500 }}>
           {error}
         </Alert>
+      </Box>
+    );
+  }
+
+  if (bookingSuccess) {
+    return (
+      <Box
+        sx={{
+          bgcolor: "#F0F9FF",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          p: 4,
+        }}
+      >
+        <Paper
+          sx={{
+            p: 6,
+            maxWidth: 600,
+            textAlign: "center",
+            borderRadius: 4,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
+          }}
+        >
+          {/* Success Icon */}
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              bgcolor: "#22C55E",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mx: "auto",
+              mb: 3,
+            }}
+          >
+            <CheckCircle sx={{ fontSize: 40, color: "white" }} />
+          </Box>
+
+          {/* Success Message */}
+          <Typography variant="h4" fontWeight="bold" color="#1E40AF" gutterBottom>
+            Đặt lịch thành công!
+          </Typography>
+          
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+            Cảm ơn bạn đã tin tưởng dịch vụ của chúng tôi
+          </Typography>
+
+          {/* Appointment Details */}
+          <Card sx={{ p: 3, mb: 4, bgcolor: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Thông tin lịch hẹn
+            </Typography>
+            <Box sx={{ textAlign: "left" }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Bác sĩ:</strong> {doctor?.name}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Chuyên khoa:</strong> {doctor?.specialization}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Ngày:</strong> {formData.date}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Giờ:</strong> {formData.time}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Loại khám:</strong> {formData.appointmentType}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Thanh toán:</strong> {formData.paymentMethod === 'cash' ? 'Tại chỗ' : formData.paymentMethod}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                <strong>Mã lịch hẹn:</strong> #{appointmentId}
+              </Typography>
+            </Box>
+          </Card>
+
+          {/* Action Buttons */}
+          <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate('/scheduling/history')}
+              sx={{
+                bgcolor: "#3B82F6",
+                px: 4,
+                py: 1.5,
+                borderRadius: 3,
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                "&:hover": {
+                  bgcolor: "#2563EB",
+                },
+              }}
+            >
+              Xem lịch sử đặt lịch
+            </Button>
+            
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => navigate('/scheduling')}
+              sx={{
+                borderColor: "#3B82F6",
+                color: "#3B82F6",
+                px: 4,
+                py: 1.5,
+                borderRadius: 3,
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                "&:hover": {
+                  borderColor: "#2563EB",
+                  bgcolor: "#F0F9FF",
+                },
+              }}
+            >
+              Đặt lịch mới
+            </Button>
+          </Box>
+
+          {/* Additional Info */}
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 4 }}>
+            Chúng tôi sẽ gửi thông báo nhắc nhở trước ngày khám 1 ngày
+          </Typography>
+        </Paper>
       </Box>
     );
   }
@@ -391,6 +535,76 @@ export default function BookingPage() {
                         startAdornment: <Notes sx={{ mr: 1, color: "text.secondary", mt: 1 }} />
                       }}
                     />
+                  </Grid>
+
+                  {/* Payment Method */}
+                  <Grid size={{ xs: 12 }}>
+                    <FormControl component="fieldset" fullWidth>
+                      <FormLabel component="legend" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+                        Phương thức thanh toán
+                      </FormLabel>
+                      <RadioGroup
+                        value={formData.paymentMethod}
+                        onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                        sx={{ gap: 1 }}
+                      >
+                        <Card sx={{ p: 2, border: formData.paymentMethod === 'cash' ? '2px solid #3B82F6' : '1px solid #E5E7EB' }}>
+                          <FormControlLabel
+                            value="cash"
+                            control={<Radio />}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Payment sx={{ color: '#22C55E' }} />
+                                <Typography>Thanh toán tại chỗ</Typography>
+                              </Box>
+                            }
+                            sx={{ width: '100%', m: 0 }}
+                          />
+                        </Card>
+                        
+                        <Card sx={{ p: 2, border: formData.paymentMethod === 'card' ? '2px solid #3B82F6' : '1px solid #E5E7EB', opacity: 0.6 }}>
+                          <FormControlLabel
+                            value="card"
+                            control={<Radio disabled />}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <CreditCard sx={{ color: '#6B7280' }} />
+                                <Typography color="text.secondary">Thẻ tín dụng (Sắp có)</Typography>
+                              </Box>
+                            }
+                            sx={{ width: '100%', m: 0 }}
+                          />
+                        </Card>
+                        
+                        <Card sx={{ p: 2, border: formData.paymentMethod === 'bank' ? '2px solid #3B82F6' : '1px solid #E5E7EB', opacity: 0.6 }}>
+                          <FormControlLabel
+                            value="bank"
+                            control={<Radio disabled />}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <AccountBalance sx={{ color: '#6B7280' }} />
+                                <Typography color="text.secondary">Chuyển khoản (Sắp có)</Typography>
+                              </Box>
+                            }
+                            sx={{ width: '100%', m: 0 }}
+                          />
+                        </Card>
+                        
+                        <Card sx={{ p: 2, border: formData.paymentMethod === 'momo' ? '2px solid #3B82F6' : '1px solid #E5E7EB', opacity: 0.6 }}>
+                          <FormControlLabel
+                            value="momo"
+                            control={<Radio disabled />}
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Smartphone sx={{ color: '#6B7280' }} />
+                                <Typography color="text.secondary">Ví điện tử (Sắp có)</Typography>
+                              </Box>
+                            }
+                            sx={{ width: '100%', m: 0 }}
+                          />
+                        </Card>
+                      </RadioGroup>
+                    </FormControl>
                   </Grid>
                 </Grid>
               </form>

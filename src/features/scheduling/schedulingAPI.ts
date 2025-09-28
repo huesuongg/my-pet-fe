@@ -159,7 +159,8 @@ export const schedulingAPI = {
          phone: "+123-456-7890",
          patientName: "John Doe",
          patientPhone: "+123-456-7890",
-         notes: "Regular checkup"
+         notes: "Regular checkup",
+         paymentMethod: "cash"
        },
        {
          id: "2",
@@ -171,7 +172,8 @@ export const schedulingAPI = {
          phone: "+123-456-7891",
          patientName: "Jane Smith",
          patientPhone: "+123-456-7891",
-         notes: "Spay surgery"
+         notes: "Spay surgery",
+         paymentMethod: "cash"
        },
        {
          id: "3",
@@ -179,11 +181,12 @@ export const schedulingAPI = {
          date: "2024-01-17",
          time: "09:00",
          type: "Khám tổng quát",
-         status: "active",
+         status: "pending",
          phone: "+123-456-7892",
          patientName: "Mike Johnson",
          patientPhone: "+123-456-7892",
-         notes: "Follow-up appointment"
+         notes: "Follow-up appointment",
+         paymentMethod: "cash"
        },
        {
          id: "4",
@@ -191,11 +194,12 @@ export const schedulingAPI = {
          date: "2024-01-18",
          time: "10:00",
          type: "Khám da liễu",
-         status: "active",
+         status: "completed",
          phone: "+123-456-7893",
          patientName: "Sarah Wilson",
          patientPhone: "+123-456-7893",
-         notes: "Skin allergy check"
+         notes: "Skin allergy check",
+         paymentMethod: "cash"
        },
        {
          id: "5",
@@ -203,11 +207,12 @@ export const schedulingAPI = {
          date: "2024-01-17",
          time: "08:00",
          type: "Cấp cứu",
-         status: "active",
+         status: "cancelled",
          phone: "+123-456-7894",
          patientName: "Emergency Case",
          patientPhone: "+123-456-7894",
-         notes: "Emergency consultation"
+         notes: "Emergency consultation",
+         paymentMethod: "cash"
        },
        {
          id: "6",
@@ -215,11 +220,12 @@ export const schedulingAPI = {
          date: "2024-01-19",
          time: "09:00",
          type: "Tư vấn dinh dưỡng",
-         status: "active",
+         status: "confirmed",
          phone: "+123-456-7895",
          patientName: "Lisa Brown",
          patientPhone: "+123-456-7895",
-         notes: "Nutrition consultation"
+         notes: "Nutrition consultation",
+         paymentMethod: "cash"
        },
      ];
   },
@@ -231,7 +237,12 @@ export const schedulingAPI = {
     const newAppointment: Appointment = {
       ...appointment,
       id: Date.now().toString(),
+      paymentMethod: appointment.paymentMethod || 'cash',
     };
+    
+    // Add to mock data
+    const appointments = await schedulingAPI.getAppointments();
+    appointments.push(newAppointment);
     
     return newAppointment;
   },

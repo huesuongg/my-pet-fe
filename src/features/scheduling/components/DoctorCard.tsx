@@ -17,35 +17,13 @@ import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import StarIcon from "@mui/icons-material/Star";
 import { DoctorCardProps } from "../types";
 
-export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCardProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return '#FFCA0D'; // Green-500
-      case 'pending':
-        return '#EAB308'; // Yellow-500
-      case 'completed':
-        return '#3B82F6'; // Blue-500
-      case 'cancelled':
-        return '#6B7280'; // Gray-500
-      default:
-        return '#9CA3AF'; // Gray-400
-    }
+export default function DoctorCard({ doctor, onSchedule }: DoctorCardProps) {
+  const getStatusColor = (isActive: boolean) => {
+    return isActive ? '#FFCA0D' : '#6B7280'; // Green-500 for active, Gray-500 for inactive
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Hoạt động';
-      case 'pending':
-        return 'Chờ xử lý';
-      case 'completed':
-        return 'Hoàn thành';
-      case 'cancelled':
-        return 'Đã hủy';
-      default:
-        return status;
-    }
+  const getStatusText = (isActive: boolean) => {
+    return isActive ? 'Đang hoạt động' : 'Không hoạt động';
   };
 
   return (
@@ -62,16 +40,16 @@ export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCa
         position: "relative",
         overflow: "hidden",
         background: "#ffffff",
-        "&:hover": {
-          transform: "translateY(-8px) scale(1.02)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-          "& .doctor-avatar": {
-            transform: "scale(1.1)",
+          "&:hover": {
+            transform: "translateY(-8px) scale(1.02)",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+            "& .doctor-avatar": {
+              transform: "scale(1.1)",
+            },
+            "& .doctor-info-section": {
+              background: "#20BD20",
+            }
           },
-          "& .appointment-section": {
-            background: "#20BD20",
-          }
-        },
       }}
     >
       {/* Decorative gradient overlay */}
@@ -95,10 +73,10 @@ export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCa
         pb: 1
       }}>
         <Chip
-          label={getStatusText(appointment.status)}
+          label={getStatusText(doctor.isActive)}
           size="small"
           sx={{
-            bgcolor: getStatusColor(appointment.status),
+            bgcolor: getStatusColor(doctor.isActive),
             color: "white",
             fontWeight: "bold",
             fontSize: "0.75rem",
@@ -218,9 +196,9 @@ export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCa
 
       <Divider sx={{ mx: 2, opacity: 0.3 }} />
 
-      {/* Appointment Details */}
+      {/* Doctor Contact Information */}
       <Box
-        className="appointment-section"
+        className="doctor-info-section"
         sx={{
           background: "#1395DA",
           color: "white",
@@ -229,34 +207,34 @@ export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCa
         }}
       >
         <Stack spacing={2}>
-          {/* Date and Type Row */}
+          {/* Phone and Address Row */}
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>
-              <CalendarTodayIcon sx={{ fontSize: 18, mr: 1, opacity: 0.9 }} />
+              <PhoneIcon sx={{ fontSize: 18, mr: 1, opacity: 0.9 }} />
               <Box>
                 <Typography variant="caption" sx={{ display: "block", opacity: 0.8, fontSize: "0.7rem" }}>
-                  Ngày nhận
+                  Số điện thoại
                 </Typography>
                 <Typography variant="body2" fontWeight="bold" sx={{ fontSize: "0.85rem" }}>
-                  {appointment.date}
+                  {doctor.phone}
                 </Typography>
               </Box>
             </Box>
             
             <Box sx={{ display: "flex", alignItems: "center", flex: 1, justifyContent: "center" }}>
-              <MedicalServicesIcon sx={{ fontSize: 18, mr: 1, opacity: 0.9 }} />
+              <CalendarTodayIcon sx={{ fontSize: 18, mr: 1, opacity: 0.9 }} />
               <Box>
                 <Typography variant="caption" sx={{ display: "block", opacity: 0.8, fontSize: "0.7rem" }}>
-                  Loại
+                  Địa chỉ
                 </Typography>
                 <Typography variant="body2" fontWeight="bold" sx={{ fontSize: "0.85rem" }}>
-                  {appointment.type}
+                  {doctor.city}
                 </Typography>
               </Box>
             </Box>
           </Box>
 
-          {/* Phone Row */}
+          {/* Specialization Row */}
           <Box sx={{ 
             display: "flex", 
             alignItems: "center", 
@@ -267,9 +245,9 @@ export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCa
             borderRadius: 2,
             backdropFilter: "blur(10px)",
           }}>
-            <PhoneIcon sx={{ fontSize: 16, mr: 1, opacity: 0.9 }} />
+            <MedicalServicesIcon sx={{ fontSize: 16, mr: 1, opacity: 0.9 }} />
             <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.85rem" }}>
-              {appointment.phone}
+              {doctor.specialization}
             </Typography>
           </Box>
         </Stack>

@@ -14,6 +14,7 @@ import ProductDetail from "../features/shopping/pages/ProductDetail";
 import SchedulesPage from "../features/scheduling/pages/SchedulesPage";
 import ServiceDetail from "../features/scheduling/pages/ServiceDetail";
 import BookingPage from "../features/scheduling/pages/BookingPage";
+import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory";
 import TestScheduling from "../features/scheduling/pages/TestScheduling";
 import CartPage from "../features/shopping/pages/CartPage";
 import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
@@ -38,6 +39,7 @@ export const routes = {
   SCHEDULING_PATH: "/scheduling",
   DOCTOR_DETAIL_PATH: "/scheduling/doctor/:id",
   BOOKING_PATH: "/scheduling/booking/:id",
+  APPOINTMENT_HISTORY_PATH: "/scheduling/history",
   TEST_SCHEDULING_PATH: "/test-scheduling",
   CART_PATH: "/cart",
 };
@@ -57,6 +59,7 @@ export const router = createBrowserRouter([
       { path: routes.SCHEDULING_PATH, element: <SchedulesPage /> },
       { path: routes.DOCTOR_DETAIL_PATH, element: <ServiceDetail /> },
       { path: routes.BOOKING_PATH, element: <BookingPage /> },
+      { path: routes.APPOINTMENT_HISTORY_PATH, element: <AppointmentHistory /> },
       { path: routes.TEST_SCHEDULING_PATH, element: <TestScheduling /> },
       { path: routes.CART_PATH, element: <CartPage /> },
       { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
