@@ -20,31 +20,31 @@ import { DoctorCardProps } from "../types";
 export default function DoctorCard({ doctor, appointment, onSchedule }: DoctorCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return '#FFCA0D'; // Green-500
-      case 'pending':
-        return '#EAB308'; // Yellow-500
-      case 'completed':
-        return '#3B82F6'; // Blue-500
-      case 'cancelled':
-        return '#6B7280'; // Gray-500
-      default:
-        return '#9CA3AF'; // Gray-400
+    case 'active':
+      return '#FFCA0D'; // Green-500
+    case 'pending':
+      return '#EAB308'; // Yellow-500
+    case 'completed':
+      return '#3B82F6'; // Blue-500
+    case 'cancelled':
+      return '#6B7280'; // Gray-500
+    default:
+      return '#9CA3AF'; // Gray-400
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'Hoạt động';
-      case 'pending':
-        return 'Chờ xử lý';
-      case 'completed':
-        return 'Hoàn thành';
-      case 'cancelled':
-        return 'Đã hủy';
-      default:
-        return status;
+    case 'active':
+      return 'Hoạt động';
+    case 'pending':
+      return 'Chờ xử lý';
+    case 'completed':
+      return 'Hoàn thành';
+    case 'cancelled':
+      return 'Đã hủy';
+    default:
+      return status;
     }
   };
 

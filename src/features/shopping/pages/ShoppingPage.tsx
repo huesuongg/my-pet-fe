@@ -45,7 +45,7 @@ const ShoppingPage = () => {
     // TODO: Implement blog navigation
   };
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   return (
     <Box>
       <Box

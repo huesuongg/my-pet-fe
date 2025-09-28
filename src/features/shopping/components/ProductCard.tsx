@@ -1,13 +1,13 @@
 ﻿import React from "react";
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating } from "@mui/material";
-import { AddShoppingCart, Visibility, Star } from "@mui/icons-material";
+import { AddShoppingCart, Visibility} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../contexts/CartContext";
 
 interface ProductCardProps {
   id: number;
   name: string;
-  price: number;
+  price: string | number;
   originalPrice?: string;
   image: string;
   rating?: number;
@@ -38,10 +38,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleAddToCart = (event: React.MouseEvent) => {
     event.stopPropagation();
+    
+    // Convert price string to number if it's a string
+    const priceValue = typeof price === 'string' 
+      ? parseFloat(price.replace(/[^\d]/g, '')) 
+      : price;
+      
     dispatch({
       type: "ADD_ITEM",
       payload: {
-        product: { id, name, price, image, brand, weight, color, size },
+        product: { 
+          id, 
+          name, 
+          price: priceValue, 
+          image, 
+          brand, 
+          weight, 
+          color, 
+          size 
+        },
         quantity: 1,
       },
     });
