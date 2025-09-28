@@ -10,19 +10,8 @@ import { faShare } from "@fortawesome/free-solid-svg-icons";
 import { PostData } from "./Post";
 import { usePostContext } from "../context/PostContext";
 
-// Import Comment type from types file
-interface Comment {
-  id: number;
-  author: {
-    name: string;
-    profilePic: string;
-  };
-  content: string;
-  timestamp: string;
-  likes: number;
-  isLiked: boolean;
-  replies?: Comment[];
-}
+// Import ForumComment type from context
+import { ForumComment } from "../context/PostContext";
 
 interface CommentModalProps {
   show: boolean;
@@ -111,7 +100,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
   };
 
   // Component để render comment tree
-  const renderComment = (comment: Comment, isReply = false) => (
+  const renderComment = (comment: ForumComment, isReply = false) => (
     <div key={comment.id} className={`d-flex align-items-start gap-2 mb-3 ${isReply ? 'ms-4' : ''}`}>
       <img
         src={comment.author.profilePic}
@@ -270,7 +259,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
                     >
                       <div className="pb-3">
                         {currentPost.commentsList && Array.isArray(currentPost.commentsList) && currentPost.commentsList.length > 0 ? (
-                          currentPost.commentsList.map((comment: Comment) => (
+                          currentPost.commentsList.map((comment: ForumComment) => (
                             <div key={comment.id}>
                               {/* Main comment */}
                               {renderComment(comment)}
@@ -278,7 +267,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
                               {/* Replies */}
                               {comment.replies && comment.replies.length > 0 && (
                                 <div className="ms-4">
-                                  {comment.replies.map((reply: Comment) => renderComment(reply, true))}
+                                  {comment.replies.map((reply: ForumComment) => renderComment(reply, true))}
                                 </div>
                               )}
                               

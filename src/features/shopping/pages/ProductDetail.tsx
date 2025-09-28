@@ -189,6 +189,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
           weight: selectedWeight.weight,
           color: selectedColor.color,
           size: selectedSize.size,
+          category: { id: 1, name: "Default", slug: "default", image: "", isActive: true },
+          inStock: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         },
         quantity,
       },

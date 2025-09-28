@@ -55,7 +55,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           brand, 
           weight, 
           color, 
-          size 
+          size,
+          category: { id: 1, name: "Default", slug: "default", image: "", isActive: true },
+          inStock: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         },
         quantity: 1,
       },

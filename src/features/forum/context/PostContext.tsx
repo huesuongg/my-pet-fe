@@ -388,7 +388,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({
   const addReply = (
     postId: number,
     commentId: number,
-    reply: Omit<Comment, "id">
+    reply: Omit<ForumComment, "id">
   ) => {
     dispatch({ type: "ADD_REPLY", payload: { postId, commentId, reply } });
   };
