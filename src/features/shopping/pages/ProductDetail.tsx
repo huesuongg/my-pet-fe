@@ -194,7 +194,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
       },
     });
     
-    // Hiển thị thông báo thành công
+    // Show success message
     setOpenSnackbar(true);
     
     console.log("Added to cart:", {
@@ -438,8 +438,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
           ))}
         </Box>
       </Box>
-      
-      {/* Snackbar thông báo */}
+
+      {/* Success Snackbar */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -449,10 +449,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
         <Alert 
           onClose={handleCloseSnackbar} 
           severity="success" 
-          variant="filled"
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontWeight: 500
+          }}
         >
-          Đã thêm {quantity} {product.name} vào giỏ hàng!
+          Đã thêm {product.name} vào giỏ hàng!
         </Alert>
       </Snackbar>
     </Box>

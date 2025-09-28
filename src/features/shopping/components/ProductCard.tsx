@@ -1,6 +1,6 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating, Snackbar, Alert } from "@mui/material";
-import { AddShoppingCart, Visibility } from "@mui/icons-material";
+import { AddShoppingCart, Visibility} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../contexts/CartContext";
 
@@ -60,8 +60,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         quantity: 1,
       },
     });
-    
-    // Hiển thị thông báo thành công
+
+    // Show success message
     setOpenSnackbar(true);
   };
 
@@ -243,8 +243,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </Box>
         </CardContent>
       </Card>
-      
-      {/* Snackbar thông báo */}
+
+      {/* Success Snackbar */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
@@ -254,8 +254,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Alert 
           onClose={handleCloseSnackbar} 
           severity="success" 
-          variant="filled"
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontWeight: 500
+          }}
         >
           Đã thêm {name} vào giỏ hàng!
         </Alert>

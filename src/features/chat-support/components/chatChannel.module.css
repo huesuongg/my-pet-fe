@@ -1,0 +1,95 @@
+/* src/components/chat/chatChannel.module.css */
+
+.container {
+  display: flex;
+  align-items: flex-start;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  text-align: left;
+  border-radius: 10px; /* từ UI.radius */
+  padding: 7px 8px;   /* từ UI.paddingY + UI.paddingX */
+  gap: 8px;
+}
+
+.container:hover {
+  background-color: #f3f4f6; /* hover:bg-gray-100 */
+}
+
+.active {
+  background-color: #E8F0FE;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-right: 13px;
+}
+
+.textBlock {
+  min-width: 0;
+  flex: 1;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 13.5px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 2px 0;
+}
+
+.verified {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
+  background: #2563eb;
+  flex-shrink: 0;
+}
+
+.previewRow {
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.previewBold {
+  font-weight: 600;
+  color: #1f2937; /* gray-800 */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.previewRest {
+  color: #6b7280; /* gray-500 */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dot {
+  margin: 0 4px;
+  color: #9ca3af; /* gray-400 */
+}
+
+.time {
+  color: #9ca3af;
+  white-space: nowrap;
+}
