@@ -10,6 +10,10 @@ interface Product {
   weight?: string;
   color?: string;
   size?: string;
+  category: any;
+  inStock: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Define CartItem interface

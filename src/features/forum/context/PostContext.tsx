@@ -63,7 +63,7 @@ type PostAction =
   | { type: "TOGGLE_FAVORITE"; payload: number }
   | {
       type: "ADD_COMMENT";
-      payload: { postId: number; comment: Omit<Comment, "id"> };
+      payload: { postId: number; comment: Omit<ForumComment, "id"> };
     }
   | { type: "DELETE_COMMENT"; payload: { postId: number; commentId: number } }
   | {
@@ -75,7 +75,7 @@ type PostAction =
       payload: {
         postId: number;
         commentId: number;
-        reply: Omit<Comment, "id">;
+        reply: Omit<ForumComment, "id">;
       };
     }
   | { type: "REFRESH_POSTS" }
@@ -168,7 +168,7 @@ function postReducer(state: PostState, action: PostAction): PostState {
           commentsList: [
             ...(post.commentsList || []),
             {
-              ...action.payload.comment,
+              ...(action.payload.comment as ForumComment),
               id:
                     Math.max(...(post.commentsList || []).map((c) => c.id), 0) +
                     1,
@@ -266,7 +266,7 @@ function postReducer(state: PostState, action: PostAction): PostState {
                 replies: [
                   ...(comment.replies || []),
                   {
-                    ...action.payload.reply,
+                    ...(action.payload.reply as ForumComment),
                     id:
                             Math.max(
                               ...(comment.replies || []).map((r) => r.id),
