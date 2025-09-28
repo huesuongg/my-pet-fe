@@ -4,7 +4,7 @@ import NewsFeedsDashboard from "./NewsFeedsDashboard";
 
 const NewsFeedLeftSideBar: React.FC = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 sticky top-4">
       {/* Weather Section */}
       <WeatherSection />
 

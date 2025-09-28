@@ -8,28 +8,28 @@ export const schedulingAPI = {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     return [
-       {
-         id: "1",
-         name: "Dr. Brain Adam",
-         specialization: "Restoractive Dentist",
-         profileImage: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
-         experience: "25 năm kinh nghiệm",
-         qualifications: ["MBBS", "MD", "MRCOG", "DFSRH"],
-         skills: ["IVF", "IUI", "ICSI", "TESA", "PESA", "IMSI", "Blastocyte Culture", "Cryopreservation", "Laparoscopy", "Hysteroscopy"],
-         biography: "Tiến sĩ Brain Adam là chuyên gia sinh sản được đào tạo quốc tế với hơn 25 năm kinh nghiệm trong lĩnh vực hỗ trợ sinh sản. Ông đã thực hiện thành công hàng nghìn ca IVF và được công nhận là một trong những chuyên gia hàng đầu trong lĩnh vực này.",
-         phone: "+123-456-7890",
-         address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
-         city: "Thành phố Đà Nẵng",
-         isActive: true,
-         availableSlots: [
-           { date: "2024-01-15", time: "09:00", available: true },
-           { date: "2024-01-15", time: "10:00", available: true },
-           { date: "2024-01-15", time: "14:00", available: true },
-           { date: "2024-01-16", time: "09:00", available: true },
-           { date: "2024-01-16", time: "11:00", available: true },
-           { date: "2024-01-16", time: "15:00", available: true }
-         ]
-       },
+      {
+        id: "1",
+        name: "Dr. Brain Adam",
+        specialization: "Restoractive Dentist",
+        profileImage: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
+        experience: "25 năm kinh nghiệm",
+        qualifications: ["MBBS", "MD", "MRCOG", "DFSRH"],
+        skills: ["IVF", "IUI", "ICSI", "TESA", "PESA", "IMSI", "Blastocyte Culture", "Cryopreservation", "Laparoscopy", "Hysteroscopy"],
+        biography: "Tiến sĩ Brain Adam là chuyên gia sinh sản được đào tạo quốc tế với hơn 25 năm kinh nghiệm trong lĩnh vực hỗ trợ sinh sản. Ông đã thực hiện thành công hàng nghìn ca IVF và được công nhận là một trong những chuyên gia hàng đầu trong lĩnh vực này.",
+        phone: "+123-456-7890",
+        address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
+        city: "Thành phố Đà Nẵng",
+        isActive: true,
+        availableSlots: [
+          { date: "2024-01-15", time: "09:00", available: true },
+          { date: "2024-01-15", time: "10:00", available: true },
+          { date: "2024-01-15", time: "14:00", available: true },
+          { date: "2024-01-16", time: "09:00", available: true },
+          { date: "2024-01-16", time: "11:00", available: true },
+          { date: "2024-01-16", time: "15:00", available: true }
+        ]
+      },
       {
         id: "2",
         name: "Dr. Sarah Johnson",
@@ -148,80 +148,80 @@ export const schedulingAPI = {
   getAppointments: async (): Promise<Appointment[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-     return [
-       {
-         id: "1",
-         doctorId: "1",
-         date: "2024-01-15",
-         time: "09:00",
-         type: "Khám tổng quát",
-         status: "active",
-         phone: "+123-456-7890",
-         patientName: "John Doe",
-         patientPhone: "+123-456-7890",
-         notes: "Regular checkup"
-       },
-       {
-         id: "2",
-         doctorId: "2",
-         date: "2024-01-16",
-         time: "14:00",
-         type: "Phẫu thuật",
-         status: "active",
-         phone: "+123-456-7891",
-         patientName: "Jane Smith",
-         patientPhone: "+123-456-7891",
-         notes: "Spay surgery"
-       },
-       {
-         id: "3",
-         doctorId: "3",
-         date: "2024-01-17",
-         time: "09:00",
-         type: "Khám tổng quát",
-         status: "active",
-         phone: "+123-456-7892",
-         patientName: "Mike Johnson",
-         patientPhone: "+123-456-7892",
-         notes: "Follow-up appointment"
-       },
-       {
-         id: "4",
-         doctorId: "4",
-         date: "2024-01-18",
-         time: "10:00",
-         type: "Khám da liễu",
-         status: "active",
-         phone: "+123-456-7893",
-         patientName: "Sarah Wilson",
-         patientPhone: "+123-456-7893",
-         notes: "Skin allergy check"
-       },
-       {
-         id: "5",
-         doctorId: "5",
-         date: "2024-01-17",
-         time: "08:00",
-         type: "Cấp cứu",
-         status: "active",
-         phone: "+123-456-7894",
-         patientName: "Emergency Case",
-         patientPhone: "+123-456-7894",
-         notes: "Emergency consultation"
-       },
-       {
-         id: "6",
-         doctorId: "6",
-         date: "2024-01-19",
-         time: "09:00",
-         type: "Tư vấn dinh dưỡng",
-         status: "active",
-         phone: "+123-456-7895",
-         patientName: "Lisa Brown",
-         patientPhone: "+123-456-7895",
-         notes: "Nutrition consultation"
-       },
-     ];
+    return [
+      {
+        id: "1",
+        doctorId: "1",
+        date: "2024-01-15",
+        time: "09:00",
+        type: "Khám tổng quát",
+        status: "active",
+        phone: "+123-456-7890",
+        patientName: "John Doe",
+        patientPhone: "+123-456-7890",
+        notes: "Regular checkup"
+      },
+      {
+        id: "2",
+        doctorId: "2",
+        date: "2024-01-16",
+        time: "14:00",
+        type: "Phẫu thuật",
+        status: "active",
+        phone: "+123-456-7891",
+        patientName: "Jane Smith",
+        patientPhone: "+123-456-7891",
+        notes: "Spay surgery"
+      },
+      {
+        id: "3",
+        doctorId: "3",
+        date: "2024-01-17",
+        time: "09:00",
+        type: "Khám tổng quát",
+        status: "active",
+        phone: "+123-456-7892",
+        patientName: "Mike Johnson",
+        patientPhone: "+123-456-7892",
+        notes: "Follow-up appointment"
+      },
+      {
+        id: "4",
+        doctorId: "4",
+        date: "2024-01-18",
+        time: "10:00",
+        type: "Khám da liễu",
+        status: "active",
+        phone: "+123-456-7893",
+        patientName: "Sarah Wilson",
+        patientPhone: "+123-456-7893",
+        notes: "Skin allergy check"
+      },
+      {
+        id: "5",
+        doctorId: "5",
+        date: "2024-01-17",
+        time: "08:00",
+        type: "Cấp cứu",
+        status: "active",
+        phone: "+123-456-7894",
+        patientName: "Emergency Case",
+        patientPhone: "+123-456-7894",
+        notes: "Emergency consultation"
+      },
+      {
+        id: "6",
+        doctorId: "6",
+        date: "2024-01-19",
+        time: "09:00",
+        type: "Tư vấn dinh dưỡng",
+        status: "active",
+        phone: "+123-456-7895",
+        patientName: "Lisa Brown",
+        patientPhone: "+123-456-7895",
+        notes: "Nutrition consultation"
+      },
+    ];
   },
 
   // Create appointment

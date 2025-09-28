@@ -1,23 +1,23 @@
-// src/components/PostModal.tsx
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import profilePic from "../../../assets/profile-pic.jpg";
-import { usePostContext } from "../context/PostContext";
+import { PostData } from "./Post";
 
-interface PostModalProps {
+interface EditPostModalProps {
+  post: PostData;
   onClose: () => void;
+  onSave: (updatedPost: PostData) => void;
 }
 
-const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
+const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const { addPost } = usePostContext();
   
   // State for post content
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(post.content);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const [selectedEmotion, setSelectedEmotion] = useState<string>("");
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string>(post.image || "");
+  const [selectedEmotion, setSelectedEmotion] = useState<string>(post.emotion || "");
+  const [selectedLocation, setSelectedLocation] = useState<string>(post.location || "");
   const [showEmotionPicker, setShowEmotionPicker] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   
@@ -93,38 +93,24 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
     setShowLocationPicker(false);
   };
 
-  // Handle post submission
-  const handleSubmit = () => {
-    if (!content.trim() && !selectedImage) return;
+  // Handle save
+  const handleSave = () => {
+    if (!content.trim() && !imagePreview) return;
 
-    const now = new Date();
-    const timestamp = now.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-
-    const newPost = {
-      author: {
-        name: 'Quốc Huy',
-        profilePic: profilePic,
-      },
-      timestamp,
+    const updatedPost: PostData = {
+      ...post,
       content: content.trim(),
       image: imagePreview,
       location: selectedLocation,
       emotion: selectedEmotion,
     };
 
-    addPost(newPost);
+    onSave(updatedPost);
     onClose();
   };
 
-  // Check if post can be submitted
-  const canSubmit = content.trim() || selectedImage;
+  // Check if post can be saved
+  const canSave = content.trim() || imagePreview;
 
   const overlay = (
     <div
@@ -132,7 +118,7 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
       style={{ backgroundColor: "rgba(0,0,0,0.5)", display: "block" }}
       role="dialog"
       aria-modal="true"
-      aria-label="Tạo bài viết"
+      aria-label="Chỉnh sửa bài viết"
       onMouseDown={onOverlayMouseDown}
     >
       <div
@@ -144,7 +130,7 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
           {/* Header */}
           <div className="modal-header border-0 pb-0" style={{ padding: "16px 20px 0" }}>
             <div className="d-flex align-items-center justify-content-between w-100">
-              <h5 className="modal-title mb-0 fw-bold">Tạo bài viết</h5>
+              <h5 className="modal-title mb-0 fw-bold">Chỉnh sửa bài viết</h5>
               <button
                 type="button"
                 className="btn-close"
@@ -417,19 +403,33 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
 
           {/* Footer */}
           <div className="modal-footer border-0 pt-0" style={{ padding: "0 20px 20px" }}>
-            <button 
-              type="button" 
-              className={`btn w-100 py-2 fw-semibold ${canSubmit ? 'btn-primary' : 'btn-secondary disabled'}`}
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              style={{ 
-                borderRadius: '8px',
-                fontSize: '16px',
-                height: '40px'
-              }}
-            >
-              Đăng
-            </button>
+            <div className="d-flex gap-2 w-100">
+              <button 
+                type="button" 
+                className="btn btn-secondary flex-grow-1 py-2 fw-semibold"
+                onClick={onClose}
+                style={{ 
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  height: '40px'
+                }}
+              >
+                Hủy
+              </button>
+              <button 
+                type="button" 
+                className={`btn flex-grow-1 py-2 fw-semibold ${canSave ? 'btn-primary' : 'btn-secondary disabled'}`}
+                onClick={handleSave}
+                disabled={!canSave}
+                style={{ 
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  height: '40px'
+                }}
+              >
+                Lưu thay đổi
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -439,4 +439,4 @@ const PostModal: React.FC<PostModalProps> = ({ onClose }) => {
   return createPortal(overlay, document.body);
 };
 
-export default PostModal;
+export default EditPostModal;

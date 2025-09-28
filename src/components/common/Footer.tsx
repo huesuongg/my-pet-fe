@@ -21,9 +21,9 @@ export const Footer = () => {
         <Grid size={4}>
           <Box display="flex" alignItems="center" mb={2}>
             <PetsIcon sx={{ color: "#FFD43B", fontSize: 32, mr: 1 }} />
-             <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "'Inter', sans-serif" }}>
-               My Pet
-             </Typography>
+            <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "'Inter', sans-serif" }}>
+              My Pet
+            </Typography>
           </Box>
           <Typography variant="body1" sx={{ mb: 2 }}>
             Đăng ký để nhận thông tin khuyến mãi và tin tức mới nhất.

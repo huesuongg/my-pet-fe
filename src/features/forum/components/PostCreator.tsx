@@ -27,17 +27,26 @@ const PostCreator: React.FC = () => {
         </div>
       </div>
       <div className="flex justify-around border-t pt-4">
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
-          <span className="text-red-500">🔴</span>
-          <span>Live Video</span>
+        <button 
+          className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+          onClick={handleOpenModal}
+        >
+          <span className="text-blue-500 text-2xl" style={{ paddingBottom: '10px' }}>📷</span>
+          <span className="font-medium">Ảnh</span>
         </button>
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
-          <span className="text-green-500">📸</span>
-          <span>Photo/Video</span>
+        <button 
+          className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+          onClick={handleOpenModal}
+        >
+          <span className="text-green-500 text-2xl">😊</span>
+          <span className="font-medium">Cảm xúc</span>
         </button>
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-700">
-          <span className="text-yellow-500">😀</span>
-          <span>Cảm xúc/Hoạt động</span>
+        <button 
+          className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+          onClick={handleOpenModal}
+        >
+          <span className="text-cyan-500 text-2xl">📍</span>
+          <span className="font-medium">Vị trí</span>
         </button>
       </div>
       {isModalOpen && <PostModal onClose={handleCloseModal} />}

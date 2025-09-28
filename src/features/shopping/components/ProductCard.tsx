@@ -121,17 +121,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Price */}
         <Box sx={{ mb: 3 }}>
-        <Typography
-          variant="h6"
-          color="#1E40AF"
-          fontWeight="700"
-          sx={{
-            fontSize: "1.1rem",
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          {`${price.toLocaleString("vi-VN")} VNĐ`}
-        </Typography>
+          <Typography
+            variant="h6"
+            color="#1E40AF"
+            fontWeight="700"
+            sx={{
+              fontSize: "1.1rem",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            {`${price.toLocaleString("vi-VN")} VNĐ`}
+          </Typography>
           {originalPrice && (
             <Typography 
               variant="body2" 

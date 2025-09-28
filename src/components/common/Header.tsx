@@ -63,8 +63,8 @@ export const Header = () => {
 
   const handleNotificationMenuClose = () => {
     setNotificationAnchor(null);
-  }
-    
+  };
+
   const handleCartClick = () => {
     navigate("/cart");
   };
@@ -91,7 +91,7 @@ export const Header = () => {
       >
         {/* Logo */}
         <Box display="flex" alignItems="center" sx={{ cursor: "pointer" }} onClick={() => navigate("/")}>
-        <PetsIcon sx={{ color: "#FDE047", fontSize: 40, mr: 1.5 }} />
+          <PetsIcon sx={{ color: "#FDE047", fontSize: 40, mr: 1.5 }} />
           <Typography
             variant="h5"
             noWrap
@@ -161,7 +161,7 @@ export const Header = () => {
           >
             <Badge badgeContent={2} color="error">
               <NotificationsIcon />
-              </Badge>
+            </Badge>
           </IconButton>
           <IconButton size="large" sx={{ color: "white" }} onClick={handleCartClick}>
             <Badge badgeContent={cartState.totalItems} color="info">
