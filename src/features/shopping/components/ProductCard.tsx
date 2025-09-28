@@ -1,13 +1,12 @@
 ﻿import React from "react";
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating } from "@mui/material";
-import { AddShoppingCart, Visibility} from "@mui/icons-material";
+import { AddShoppingCart, Visibility } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../contexts/CartContext";
-
 interface ProductCardProps {
   id: number;
   name: string;
-  price: string | number;
+  price: number | string;
   originalPrice?: string;
   image: string;
   rating?: number;
@@ -165,7 +164,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            {price}
+            {typeof price === 'number' ? `${price.toLocaleString("vi-VN")} VNĐ` : price}
           </Typography>
           {originalPrice && (
             <Typography 
@@ -208,7 +207,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <Visibility sx={{ mr: 1, fontSize: "1.1rem" }} />
             Xem
           </IconButton>
-          <IconButton
+          {/* <IconButton
             onClick={handleAddToCart}
             sx={{
               bgcolor: "#22C55E",
@@ -228,7 +227,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           >
             <AddShoppingCart sx={{ mr: 1, fontSize: "1.1rem" }} />
             Mua
-          </IconButton>
+          </IconButton> */}
         </Box>
       </CardContent>
     </Card>

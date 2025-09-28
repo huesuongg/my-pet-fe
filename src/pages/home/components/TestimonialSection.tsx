@@ -58,7 +58,7 @@ export default function TestimonialSection() {
         {/* Testimonial Cards */}
         <Grid container spacing={4} justifyContent="center">
           {testimonials.map((testimonial) => (
-            <Grid item xs={12} md={6} key={testimonial.id}>
+            <Grid xs={12} md={6} key={testimonial.id}>
               <Card
                 sx={{
                   bgcolor: testimonial.bgColor,

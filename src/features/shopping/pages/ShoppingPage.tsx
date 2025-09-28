@@ -3,27 +3,47 @@ import CategoryCard from "../components/CategoryCard";
 import ProductCard from "../components/ProductCard";
 import BlogCard from "../components/BlogCard";
 import styles from "./ShoppingPage.module.css";
-import { useNavigate } from "react-router-dom";
 import { productCategories } from "../constants";
 import { blogArticles } from "../constants";
 import { productsData } from "../constants";
 
-// Helper function to get products by category
-export const getProductsByCategory = () => {
-  const products = Object.values(productsData);
-  const categories = {};
+// Define product type
+interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  rating: number;
+  review: number;
+  category: string;
+  weight: string;
+  color: string;
+  size: string;
+  description: string;
+  weightOptions: Array<{ id: number; weight: string; price: number; selected: boolean }>;
+  colorOptions: Array<{ id: number; color: string; selected: boolean }>;
+  sizeOptions: Array<{ id: number; size: string; selected: boolean }>;
+  reviews: Array<{ id: number; name: string; avatar: string; rating: number; comment: string; date: string }>;
+}
 
-  products.forEach((product) => {
+// Helper function to get products by category
+export const getProductsByCategory = (): Record<string, Product[]> => {
+  const products = Object.values(productsData) as Product[];
+  const categories: Record<string, Product[]> = {};
+
+  products.forEach((product: Product) => {
     if (!categories[product.category]) {
       categories[product.category] = [];
     }
     categories[product.category].push({
       ...product,
-      price: `${product.price.toLocaleString("vi-VN")} VNĐ`,
+      price: product.price, // Keep as number for ProductCard component
       originalPrice: product.originalPrice
         ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ`
         : undefined,
-    });
+    } as Product & { originalPrice?: string });
   });
 
   return categories;
@@ -31,7 +51,7 @@ export const getProductsByCategory = () => {
 
 // Helper function to get product by ID
 export const getProductById = (id: number) => {
-  return productsData[id];
+  return productsData[id as keyof typeof productsData];
 };
 
 const ShoppingPage = () => {
@@ -44,8 +64,8 @@ const ShoppingPage = () => {
     console.log("Blog article clicked:", articleId);
     // TODO: Implement blog navigation
   };
+ const navigate = useNavigate();
 
-  // const navigate = useNavigate();
   return (
     <Box>
       <Box
@@ -274,7 +294,7 @@ const ShoppingPage = () => {
         </Box>
 
         {/* CSS Animations */}
-        <style jsx>{`
+        <style>{`
           @keyframes float {
             0%,
             100% {
@@ -379,8 +399,8 @@ const ShoppingPage = () => {
                   key={product.id}
                   id={product.id}
                   name={product.name}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
+                  price={typeof product.price === 'number' ? product.price : product.price}
+                  originalPrice={typeof product.originalPrice === 'number' ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ` : product.originalPrice}
                   image={product.image}
                   rating={product.rating}
                   reviews={product.review}
