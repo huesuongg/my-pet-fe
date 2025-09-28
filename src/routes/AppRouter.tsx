@@ -11,6 +11,7 @@ import ProfilePage from "../features/forum/pages/ProfilePage";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
 import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
+import UserManagementPage from "../features/admin/pages/UserManagementPage";
 
 
 export const routes = {
@@ -27,7 +28,8 @@ export const routes = {
   // chat support path
   CHAT_SUPPORT_PATH: "/chat-support",
   SHOPPING_PATH: "/shopping",
-  PRODUCT_DETAIL_PATH: "/product/:id"
+  PRODUCT_DETAIL_PATH: "/product/:id",
+  USER_MANAGEMENT_PATH: "/dashboard/user-management"
 
 };
 
@@ -43,6 +45,7 @@ export const router = createBrowserRouter([
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
       { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
+      { path: routes.USER_MANAGEMENT_PATH, element: <UserManagementPage /> },
     ],
   },
   {
@@ -57,6 +60,7 @@ export const router = createBrowserRouter([
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
       { path: routes.PROJECTS_PATH, element: <AdminDashboard /> },
       { path: routes.PROJECTS_CREATE_PATH, element: <AdminDashboard /> },
+      
     ],
   },
   { path: routes.LOGOUT_PATH, element: <Logout /> },
