@@ -13,6 +13,8 @@ import {
   TextField,
   Card,
   Chip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -151,6 +153,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState(0);
   const { dispatch } = useCart();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -190,6 +193,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
         quantity,
       },
     });
+    
+    // Hiển thị thông báo thành công
+    setOpenSnackbar(true);
+    
     console.log("Added to cart:", {
       productId: product.id,
       weight: selectedWeight.weight,
@@ -198,6 +205,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
       quantity,
       totalPrice: selectedWeight.price * quantity,
     });
+  };
+
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   const totalPrice = selectedWeight.price * quantity;
@@ -424,6 +438,23 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
           ))}
         </Box>
       </Box>
+      
+      {/* Snackbar thông báo */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity="success" 
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          Đã thêm {quantity} {product.name} vào giỏ hàng!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import { Box, Typography, Button, InputBase, IconButton, Badge, Avatar, Menu, MenuItem } from "@mui/material";
+﻿import { Box, Typography, Button, InputBase, IconButton, Badge, Avatar, Menu, MenuItem } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -34,6 +34,9 @@ export const Header = () => {
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
   const { cartState } = useCart();
+  
+  // Tính tổng số lượng sản phẩm trong giỏ hàng
+  const totalItems = cartState.items.reduce((total, item) => total + item.quantity, 0);
 
   const navigationItems = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
@@ -164,7 +167,7 @@ export const Header = () => {
             </Badge>
           </IconButton>
           <IconButton size="large" sx={{ color: "white" }} onClick={handleCartClick}>
-            <Badge badgeContent={cartState.totalItems} color="info">
+            <Badge badgeContent={totalItems} color="info">
               <ShoppingCart />
             </Badge>
           </IconButton>
