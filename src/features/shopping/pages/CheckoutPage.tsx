@@ -27,6 +27,9 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../contexts/CartContext";
+import { useDispatch } from "react-redux";
+import { addOrder } from "../shoppingSlice";
+import { Order, OrderStatus, cartItemsToOrderItems, ShippingInfo, ShippingOption } from "../types/order";
 import styles from "./CheckoutPage.module.css";
 
 // Steps for the checkout process
@@ -80,7 +83,8 @@ const shippingOptions = [
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cartState, dispatch } = useCart();
+  const { cartState, dispatch: cartDispatch } = useCart();
+  const dispatch = useDispatch();
   const [activeStep, setActiveStep] = useState(0);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
@@ -181,17 +185,34 @@ const CheckoutPage: React.FC = () => {
       const generatedOrderNumber = Math.floor(100000 + Math.random() * 900000).toString();
       setOrderNumber(generatedOrderNumber);
       
-      console.log("Order placed:", {
+      // Create order object
+      const newOrder: Order = {
+        id: Date.now(),
         orderNumber: generatedOrderNumber,
-        items: cartState.items,
-        shippingInfo,
-        shippingOption: selectedShipping,
+        date: new Date().toISOString(),
+        status: OrderStatus.PENDING,
+        items: cartItemsToOrderItems(cartState.items),
+        shippingInfo: shippingInfo as ShippingInfo,
+        shippingOption: selectedShipping as ShippingOption,
         paymentMethod: selectedPayment,
+        subtotal,
+        shippingFee,
         total,
-      });
+      };
+      
+      // Save to Redux store
+      dispatch(addOrder(newOrder));
+      
+      // Save to localStorage
+      const savedOrders = localStorage.getItem('orders');
+      const orders = savedOrders ? JSON.parse(savedOrders) : [];
+      orders.push(newOrder);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      console.log("Order placed:", newOrder);
       
       // Clear cart after successful order
-      dispatch({ type: "CLEAR_CART" });
+      cartDispatch({ type: "CLEAR_CART" });
       
       setOrderComplete(true);
       return;
@@ -210,6 +231,10 @@ const CheckoutPage: React.FC = () => {
 
   const handleGoToShopping = () => {
     navigate("/shopping");
+  };
+
+  const handleViewOrders = () => {
+    navigate("/orders");
   };
 
   // Render content based on active step
@@ -720,14 +745,21 @@ const CheckoutPage: React.FC = () => {
           <Typography variant="body1" paragraph>
             Chúng tôi sẽ gửi email xác nhận đơn hàng và thông tin vận chuyển cho bạn trong thời gian sớm nhất.
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleGoToShopping}
-            sx={{ marginTop: "1rem" }}
-          >
-            Tiếp tục mua sắm
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, mt: 3, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleGoToShopping}
+            >
+              Tiếp tục mua sắm
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleViewOrders}
+            >
+              Xem đơn hàng của tôi
+            </Button>
+          </Box>
         </Box>
       </Paper>
     );

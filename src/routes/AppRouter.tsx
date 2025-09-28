@@ -16,6 +16,8 @@ import ServiceDetail from "../features/scheduling/pages/ServiceDetail";
 import TestScheduling from "../features/scheduling/pages/TestScheduling";
 import CartPage from "../features/shopping/pages/CartPage";
 import CheckoutPage from "../features/shopping/pages/CheckoutPage";
+import OrdersPage from "../features/shopping/pages/OrdersPage";
+import OrderDetail from "../features/shopping/pages/OrderDetail";
 
 export const routes = {
   ALL_PATH: "*",
@@ -35,6 +37,8 @@ export const routes = {
   TEST_SCHEDULING_PATH: "/test-scheduling",
   CART_PATH: "/cart",
   CHECKOUT_PATH: "/checkout",
+  ORDERS_PATH: "/orders",
+  ORDER_DETAIL_PATH: "/orders/:id",
 };
 
 export const router = createBrowserRouter([
@@ -54,6 +58,8 @@ export const router = createBrowserRouter([
       { path: routes.TEST_SCHEDULING_PATH, element: <TestScheduling /> },
       { path: routes.CART_PATH, element: <CartPage /> },
       { path: routes.CHECKOUT_PATH, element: <CheckoutPage /> },
+      { path: routes.ORDERS_PATH, element: <OrdersPage /> },
+      { path: routes.ORDER_DETAIL_PATH, element: <OrderDetail /> },
     ],
   },
   {

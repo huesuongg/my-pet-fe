@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Shop2 } from "@mui/icons-material";
 import { useCart } from "../../contexts/CartContext";
-import { ShoppingCart } from "@mui/icons-material";
+import { ShoppingCart, Receipt as ReceiptIcon } from "@mui/icons-material";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -67,6 +67,11 @@ export const Header = () => {
     
   const handleCartClick = () => {
     navigate("/cart");
+  };
+
+  const handleOrdersClick = () => {
+    navigate("/orders");
+    handleProfileMenuClose();
   };
 
   return (
@@ -211,6 +216,10 @@ export const Header = () => {
         <MenuItem onClick={handleProfileMenuClose}>
           <CalendarTodayIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Lịch hẹn của tôi
+        </MenuItem>
+        <MenuItem onClick={handleOrdersClick}>
+          <ReceiptIcon sx={{ mr: 1, color: "#3B82F6" }} />
+          Đơn hàng của tôi
         </MenuItem>
         <MenuItem onClick={handleProfileMenuClose}>
           <PetsIcon sx={{ mr: 1, color: "#3B82F6" }} />
