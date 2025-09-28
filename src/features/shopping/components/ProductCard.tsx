@@ -1,20 +1,17 @@
 ﻿import React from "react";
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating } from "@mui/material";
-import { AddShoppingCart, Visibility } from "@mui/icons-material";
+import { Visibility } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../contexts/CartContext";
+
 interface ProductCardProps {
   id: number;
   name: string;
-  price: number | string;
+  price: number;
   originalPrice?: string;
   image: string;
   rating?: number;
   reviews?: number;
-  brand?: string;
-  weight?: string;
-  color?: string;
-  size?: string;
   onAddToCart?: (id: number) => void;
 }
 
@@ -26,14 +23,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   rating = 0,
   reviews = 0,
-  brand = "Thương hiệu",
-  weight = "400g",
-  color = "Xanh",
-  size = "M",
 }) => {
   const navigate = useNavigate();
-
-  const { dispatch } = useCart();
 
   const handleAddToCart = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -66,7 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const discountPercentage = originalPrice 
-    ? Math.round(((parseFloat(originalPrice.replace(/[^\d]/g, '')) - parseFloat(price.toString().replace(/[^\d]/g, ''))) / parseFloat(originalPrice.replace(/[^\d]/g, '')) * 100))
+    ? Math.round(((parseFloat(originalPrice.replace(/[^\d]/g, '')) - price) / parseFloat(originalPrice.replace(/[^\d]/g, '')) * 100))
     : 0;
 
   return (
@@ -155,17 +146,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Price */}
         <Box sx={{ mb: 3 }}>
-          <Typography 
-            variant="h6" 
-            color="#1E40AF" 
-            fontWeight="700"
-            sx={{ 
-              fontSize: "1.1rem",
-              fontFamily: "'Inter', sans-serif",
-            }}
-          >
-            {typeof price === 'number' ? `${price.toLocaleString("vi-VN")} VNĐ` : price}
-          </Typography>
+        <Typography
+          variant="h6"
+          color="#1E40AF"
+          fontWeight="700"
+          sx={{
+            fontSize: "1.1rem",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          {`${price.toLocaleString("vi-VN")} VNĐ`}
+        </Typography>
           {originalPrice && (
             <Typography 
               variant="body2" 
