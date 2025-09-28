@@ -403,10 +403,6 @@ const ShoppingPage = () => {
                   image={product.image}
                   rating={product.rating}
                   reviews={product.review}
-                  brand={product.brand}
-                  weight={product.weight}
-                  color={product.color}
-                  size={product.size}
                 />
               ))}
             </Box>
