@@ -12,8 +12,7 @@ import {
   Typography,
   Alert,
   CircularProgress,
-  Avatar,
-  IconButton
+  Avatar
 } from '@mui/material';
 import { PhotoCamera as PhotoCameraIcon } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../../store';

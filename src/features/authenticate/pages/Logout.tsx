@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../authSlice";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,6 @@ export const Logout = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const [isLoggingOut, setIsLoggingOut] = useState(true);
 
   useEffect(() => {
     const performLogout = async () => {

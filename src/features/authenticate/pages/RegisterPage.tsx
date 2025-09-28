@@ -190,7 +190,7 @@ export const RegisterPage = (): JSX.Element => {
             {/* Form */}
             <Grid container spacing={3}>
               {/* Username */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Tên đăng nhập"
@@ -209,7 +209,7 @@ export const RegisterPage = (): JSX.Element => {
               </Grid>
 
               {/* Email */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Email"
@@ -229,7 +229,7 @@ export const RegisterPage = (): JSX.Element => {
               </Grid>
 
               {/* Full Name */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Họ và tên"
@@ -248,7 +248,7 @@ export const RegisterPage = (): JSX.Element => {
               </Grid>
 
               {/* Phone */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Số điện thoại"
@@ -267,7 +267,7 @@ export const RegisterPage = (): JSX.Element => {
               </Grid>
 
               {/* Password */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Mật khẩu"
@@ -297,7 +297,7 @@ export const RegisterPage = (): JSX.Element => {
               </Grid>
 
               {/* Confirm Password */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
                   label="Xác nhận mật khẩu"
