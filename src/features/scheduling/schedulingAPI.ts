@@ -21,14 +21,21 @@ export const schedulingAPI = {
          address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
          city: "Thành phố Đà Nẵng",
          isActive: true,
-         availableSlots: [
-           { date: "2024-01-15", time: "09:00", available: true },
-           { date: "2024-01-15", time: "10:00", available: true },
-           { date: "2024-01-15", time: "14:00", available: true },
-           { date: "2024-01-16", time: "09:00", available: true },
-           { date: "2024-01-16", time: "11:00", available: true },
-           { date: "2024-01-16", time: "15:00", available: true }
-         ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "09:00", available: true },
+              { date: dateStr, time: "10:00", available: true },
+              { date: dateStr, time: "14:00", available: true }
+            );
+          }
+          return slots;
+        })()
        },
       {
         id: "2",
@@ -43,12 +50,20 @@ export const schedulingAPI = {
         address: "123 Pet Care Street, District 1",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "08:00", available: true },
-          { date: "2024-01-15", time: "13:00", available: true },
-          { date: "2024-01-16", time: "09:00", available: true },
-          { date: "2024-01-16", time: "14:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "08:00", available: true },
+              { date: dateStr, time: "13:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "3",
@@ -63,12 +78,20 @@ export const schedulingAPI = {
         address: "456 Animal Health Ave, District 3",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "10:00", available: true },
-          { date: "2024-01-15", time: "15:00", available: true },
-          { date: "2024-01-17", time: "09:00", available: true },
-          { date: "2024-01-17", time: "11:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "10:00", available: true },
+              { date: dateStr, time: "15:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "4",
@@ -83,12 +106,20 @@ export const schedulingAPI = {
         address: "789 Skin Care Blvd, District 7",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-16", time: "09:00", available: true },
-          { date: "2024-01-16", time: "14:00", available: true },
-          { date: "2024-01-18", time: "10:00", available: true },
-          { date: "2024-01-18", time: "15:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "09:00", available: true },
+              { date: dateStr, time: "14:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "5",
@@ -103,12 +134,20 @@ export const schedulingAPI = {
         address: "321 Emergency Lane, District 2",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "08:00", available: true },
-          { date: "2024-01-15", time: "16:00", available: true },
-          { date: "2024-01-17", time: "08:00", available: true },
-          { date: "2024-01-17", time: "16:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "08:00", available: true },
+              { date: dateStr, time: "16:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "6",
@@ -123,12 +162,20 @@ export const schedulingAPI = {
         address: "654 Behavior Street, District 4",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-16", time: "10:00", available: true },
-          { date: "2024-01-16", time: "15:00", available: true },
-          { date: "2024-01-19", time: "09:00", available: true },
-          { date: "2024-01-19", time: "14:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "10:00", available: true },
+              { date: dateStr, time: "15:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
     ];
   },

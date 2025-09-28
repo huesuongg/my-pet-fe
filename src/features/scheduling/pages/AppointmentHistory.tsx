@@ -18,7 +18,6 @@ import {
   AccessTime, 
   Person, 
   Phone, 
-  Notes,
   CheckCircle,
   Schedule,
   Cancel

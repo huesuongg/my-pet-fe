@@ -1,4 +1,4 @@
-import { Box, Typography, Button, InputBase, IconButton, Badge, Avatar, Menu, MenuItem } from "@mui/material";
+import { Box, Typography, Button, InputBase, IconButton, Badge, Avatar, Menu, MenuItem, Divider } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -7,11 +7,15 @@ import PersonIcon from "@mui/icons-material/Person";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MenuIcon from "@mui/icons-material/Menu";
 import PetsIcon from "@mui/icons-material/Pets";
+import LogoutIcon from "@mui/icons-material/Logout";
+import LoginIcon from "@mui/icons-material/Login";
+// import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Shop2 } from "@mui/icons-material";
 import { useCart } from "../../contexts/CartContext";
 import { ShoppingCart } from "@mui/icons-material";
+import { useAuth } from "../../features/authenticate/hooks/useAuth";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -34,19 +38,24 @@ export const Header = () => {
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
   const { cartState } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navigationItems = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
     { label: "Đặt lịch", path: "/scheduling", icon: <CalendarTodayIcon /> },
     { label: "Sản phẩm", path: "/shopping", icon: <Shop2 /> },
     { label: "Mạng xã hội", path: "/news-feeds", icon: <PersonIcon /> },
-    {label: "Hồ sơ thú cưng", path: "#", icon: <PetsIcon />},
+    { label: "Hồ sơ thú cưng", path: "/pet-profile", icon: <PetsIcon /> },
   ];
 
   const handleNavigation = (path: string) => {
-    if (path !== "#") {
-      navigate(path);
-    }
+    navigate(path);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setProfileAnchor(null);
+    navigate("/");
   };
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -169,16 +178,53 @@ export const Header = () => {
             </Badge>
           </IconButton>
 
-          {/* Profile */}
-          <IconButton
-            size="large"
-            onClick={handleProfileMenuOpen}
-            sx={{ color: "white" }}
-          >
-            <Avatar sx={{ width: 32, height: 32, bgcolor: "#FDE047" }}>
-              <PersonIcon sx={{ color: "#3B82F6" }} />
-            </Avatar>
-          </IconButton>
+          {/* Profile or Auth Buttons */}
+          {isAuthenticated ? (
+            <IconButton
+              size="large"
+              onClick={handleProfileMenuOpen}
+              sx={{ color: "white" }}
+            >
+              <Avatar 
+                src={user?.avatar} 
+                sx={{ width: 32, height: 32, bgcolor: "#FDE047" }}
+              >
+                <PersonIcon sx={{ color: "#3B82F6" }} />
+              </Avatar>
+            </IconButton>
+          ) : (
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={<LoginIcon />}
+                onClick={() => navigate("/login")}
+                sx={{
+                  color: "white",
+                  borderColor: "white",
+                  "&:hover": {
+                    borderColor: "#FDE047",
+                    bgcolor: "rgba(253, 224, 71, 0.1)",
+                  },
+                }}
+              >
+                Đăng nhập
+              </Button>
+              {/* <Button
+                variant="contained"
+                startIcon={<PersonAddIcon />}
+                onClick={() => navigate("/register")}
+                sx={{
+                  bgcolor: "#FDE047",
+                  color: "#3B82F6",
+                  "&:hover": {
+                    bgcolor: "#F2BA05",
+                  },
+                }}
+              >
+                Đăng ký
+              </Button> */}
+            </Box>
+          )}
 
           {/* Mobile Menu */}
           <IconButton
@@ -198,25 +244,53 @@ export const Header = () => {
         sx={{
           "& .MuiPaper-root": {
             mt: 1,
-            minWidth: 200,
+            minWidth: 250,
             borderRadius: 2,
             boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
           },
         }}
       >
-        <MenuItem onClick={handleProfileMenuClose}>
+        {/* User Info */}
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Avatar 
+              src={user?.avatar} 
+              sx={{ width: 40, height: 40, bgcolor: "#3B82F6" }}
+            >
+              <PersonIcon />
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" fontWeight="bold">
+                {user?.fullName || "User"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {user?.email}
+              </Typography>
+              <Typography variant="caption" color="primary">
+                {user?.role === 'admin' ? 'Quản trị viên' : 
+                 user?.role === 'doctor' ? 'Bác sĩ' : 'Người dùng'}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <MenuItem onClick={() => { handleProfileMenuClose(); navigate("/profile"); }}>
           <PersonIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Hồ sơ cá nhân
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={() => { handleProfileMenuClose(); navigate("/scheduling/history"); }}>
           <CalendarTodayIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Lịch hẹn của tôi
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={() => { handleProfileMenuClose(); navigate("/pet-profile"); }}>
           <PetsIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Hồ sơ thú cưng
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose} sx={{ color: "#EF4444" }}>
+        
+        <Divider />
+        
+        <MenuItem onClick={handleLogout} sx={{ color: "#EF4444" }}>
+          <LogoutIcon sx={{ mr: 1 }} />
           Đăng xuất
         </MenuItem>
       </Menu>

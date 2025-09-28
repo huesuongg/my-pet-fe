@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../authThunk";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../../store";
 import { Loading } from "../../../components/Loading";
 import { isBlank } from "../../../utils/stringUtils";
@@ -38,9 +38,9 @@ export const LoginPage = (): JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const status = useSelector((state: RootState) => state.auth.status);
   const error = useSelector((state: RootState) => state.auth.error);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
-  const isAuthenticated = localStorage.getItem("token") !== null;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -68,14 +68,16 @@ export const LoginPage = (): JSX.Element => {
     if (!submitted) return;
     if (status === "success" && isAuthenticated) {
       setLoadingBackdropOpen(false);
+      toast.success("Đăng nhập thành công! Chào mừng bạn trở lại!");
       navigate(routes.HOME_PATH);
     } else if (status === "error") {
       setLoadingBackdropOpen(false);
-      toast.error(`Error happened: ${error}`);
+      toast.error(`Lỗi: ${error}`);
+      setSubmitted(false); // Reset submitted state to allow retry
     } else if (status === "loading") {
       setLoadingBackdropOpen(true);
     }
-  }, [status]);
+  }, [status, isAuthenticated, navigate, error]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -158,6 +160,23 @@ export const LoginPage = (): JSX.Element => {
             >
               Đăng nhập
             </Button>
+
+            {/* Register Link */}
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                Chưa có tài khoản?{" "}
+                <Link 
+                  to="/register" 
+                  style={{ 
+                    color: theme.palette.primary.main, 
+                    textDecoration: "none",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Đăng ký ngay
+                </Link>
+              </Typography>
+            </Box>
           </Paper>
         </Container>
       </Box>
