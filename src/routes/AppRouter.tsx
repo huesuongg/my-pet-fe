@@ -21,7 +21,7 @@ import OrderDetail from "../features/shopping/pages/OrderDetail";
 import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
 import PetProfilePage from "../features/pet/pages/PetProfilePage";
 import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory";
-
+import BookingPage from "../features/scheduling/pages/BookingPage";
 
 export const routes = {
   ALL_PATH: "*",
@@ -45,7 +45,8 @@ export const routes = {
   ORDER_DETAIL_PATH: "/orders/:id",
   SCHEDULING_HISTORY_PATH: "/scheduling/history",
   PET_PROFILE_PATH: "/pet-profile",
-
+  CHAT_SUPPORT_PATH: "/chat-support",
+  BOOKING_PATH: "/scheduling/booking/:id",
 };
 
 export const router = createBrowserRouter([
