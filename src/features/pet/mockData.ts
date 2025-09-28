@@ -1,4 +1,4 @@
-import { Pet, VaccinationRecord, MedicalRecord } from './types';
+import { Pet } from './types';
 
 export const mockPets: Pet[] = [
   {

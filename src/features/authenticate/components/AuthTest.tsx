@@ -52,17 +52,17 @@ export const AuthTest: React.FC = () => {
       </Typography>
       
       <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="body2" color="text.secondary">
             <strong>Email:</strong> {user?.email}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="body2" color="text.secondary">
             <strong>Phone:</strong> {user?.phone}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="body2" color="text.secondary">
             <strong>Role:</strong> 
             <Chip 
@@ -73,7 +73,7 @@ export const AuthTest: React.FC = () => {
             />
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="body2" color="text.secondary">
             <strong>Status:</strong> {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
           </Typography>

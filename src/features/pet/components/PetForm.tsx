@@ -12,8 +12,7 @@ import {
   Typography,
   Alert,
   CircularProgress,
-  Avatar,
-  IconButton
+  Avatar
 } from '@mui/material';
 import { PhotoCamera as PhotoCameraIcon } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../../store';
@@ -123,7 +122,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
 
       <Grid container spacing={3}>
         {/* Profile Image */}
-        <Grid item xs={12} sx={{ textAlign: 'center' }}>
+        <Grid size={{ xs: 12 }} sx={{ textAlign: 'center' }}>
           <Avatar
             src={formData.profileImage}
             sx={{ width: 120, height: 120, mx: 'auto', mb: 2 }}
@@ -136,7 +135,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Name */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Tên thú cưng *"
@@ -148,7 +147,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Species */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <FormControl fullWidth error={!!formErrors.species}>
             <InputLabel>Loài *</InputLabel>
             <Select
@@ -166,7 +165,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Breed */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Giống loài *"
@@ -178,7 +177,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Gender */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <FormControl fullWidth>
             <InputLabel>Giới tính *</InputLabel>
             <Select
@@ -196,7 +195,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Age */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Tuổi (năm) *"
@@ -210,7 +209,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Weight */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Cân nặng (kg) *"
@@ -224,7 +223,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Color */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Màu sắc *"
@@ -236,7 +235,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Microchip ID */}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             fullWidth
             label="Mã chip (tùy chọn)"
@@ -246,7 +245,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Profile Image URL */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
             label="Link ảnh đại diện (tùy chọn)"
@@ -257,7 +256,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         </Grid>
 
         {/* Notes */}
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
             label="Ghi chú (tùy chọn)"
