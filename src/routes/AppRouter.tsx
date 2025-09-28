@@ -17,7 +17,8 @@ import BookingPage from "../features/scheduling/pages/BookingPage";
 import TestScheduling from "../features/scheduling/pages/TestScheduling";
 import CartPage from "../features/shopping/pages/CartPage";
 import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
-
+import PetProfilePage from "../features/pet/pages/PetProfilePage";
+import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory";
 
 export const routes = {
   ALL_PATH: "*",
@@ -40,6 +41,8 @@ export const routes = {
   BOOKING_PATH: "/scheduling/booking/:id",
   TEST_SCHEDULING_PATH: "/test-scheduling",
   CART_PATH: "/cart",
+  SCHEDULING_HISTORY_PATH: "/scheduling/history",
+  PET_PROFILE_PATH: "/pet-profile",
 };
 
 export const router = createBrowserRouter([
@@ -50,15 +53,11 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: routes.LOGIN_PATH, element: <LoginPage /> },
       { path: routes.ALL_PATH, element: <NotFoundPage /> },
-      { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
-      { path: routes.PROFILE_PATH, element: <ProfilePage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
       { path: routes.SCHEDULING_PATH, element: <SchedulesPage /> },
       { path: routes.DOCTOR_DETAIL_PATH, element: <ServiceDetail /> },
-      { path: routes.BOOKING_PATH, element: <BookingPage /> },
       { path: routes.TEST_SCHEDULING_PATH, element: <TestScheduling /> },
-      { path: routes.CART_PATH, element: <CartPage /> },
       { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
     ],
   },
@@ -74,6 +73,23 @@ export const router = createBrowserRouter([
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
       { path: routes.PROJECTS_PATH, element: <AdminDashboard /> },
       { path: routes.PROJECTS_CREATE_PATH, element: <AdminDashboard /> },
+    ],
+  },
+  {
+    path: routes.HOME_PATH,
+    element: (
+      <PrivateRoute>
+        <LandingLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
+      { path: routes.PROFILE_PATH, element: <ProfilePage /> },
+      { path: routes.CART_PATH, element: <CartPage /> },
+      { path: routes.BOOKING_PATH, element: <BookingPage /> },
+      { path: routes.SCHEDULING_HISTORY_PATH, element: <AppointmentHistory /> },
+      { path: routes.PET_PROFILE_PATH, element: <PetProfilePage /> },
     ],
   },
   { path: routes.LOGOUT_PATH, element: <Logout /> },

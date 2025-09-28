@@ -7,6 +7,7 @@ import HeroSection from "./components/HeroSection";
 import ServiceSection from "./components/ServiceSection";
 import ProductSection from "./components/ProductSection";
 import TestimonialSection from "./components/TestimonialSection";
+import AuthTest from "../../features/authenticate/components/AuthTest";
 
 export const HomePage = () => {
   const [open, setOpen] = useState(false);
@@ -17,6 +18,7 @@ export const HomePage = () => {
       <HeroSection2 />
       <ProductSection />
       <TestimonialSection />
+      <AuthTest />
       <>
         <ChatBot
           open={open}

@@ -5,7 +5,7 @@ import { useScheduling } from "../hook/useScheduling";
 import { useNavigate } from "react-router-dom";
 
 export default function SchedulesPage() {
-  const { doctors, loading, error, getAppointmentByDoctorId } = useScheduling();
+  const { doctors, loading, error } = useScheduling();
   const navigate = useNavigate();
 
   const handleViewMore = () => {
@@ -77,20 +77,16 @@ export default function SchedulesPage() {
         </Typography>
 
         <Grid container spacing={3} justifyContent="center">
-          {doctors.map((doctor) => {
-            const appointment = getAppointmentByDoctorId(doctor.id);
-            if (!appointment) return null;
-            
-            return (
+          {doctors
+            .filter(doctor => doctor.isActive)
+            .map((doctor) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={doctor.id}>
                 <DoctorCard
                   doctor={doctor}
-                  appointment={appointment}
                   onSchedule={() => handleDoctorSelect(doctor)}
                 />
               </Grid>
-            );
-          })}
+            ))}
         </Grid>
 
         <Box sx={{ textAlign: "center", mt: 6 }}>

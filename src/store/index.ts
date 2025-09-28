@@ -1,23 +1,21 @@
 ﻿import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/authenticate/authSlice";
+import petReducer from "../features/pet/petSlice";
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { combineReducers } from 'redux';
-import projectReducer from '../features/manage-project/manageProjectSlice';
-import projectMetaReducer from '../features/manage-project/projectMetaSlice';
 import shoppingReducer from '../features/shopping/shoppingSlice';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth'] ,
+  whitelist: ['auth', 'pet'] ,
   
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  projects: projectReducer,
-  projectMeta: projectMetaReducer,
+  pet: petReducer,
   shopping: shoppingReducer,
 });
 

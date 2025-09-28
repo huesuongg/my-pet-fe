@@ -8,28 +8,35 @@ export const schedulingAPI = {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     return [
-      {
-        id: "1",
-        name: "Dr. Brain Adam",
-        specialization: "Restoractive Dentist",
-        profileImage: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
-        experience: "25 năm kinh nghiệm",
-        qualifications: ["MBBS", "MD", "MRCOG", "DFSRH"],
-        skills: ["IVF", "IUI", "ICSI", "TESA", "PESA", "IMSI", "Blastocyte Culture", "Cryopreservation", "Laparoscopy", "Hysteroscopy"],
-        biography: "Tiến sĩ Brain Adam là chuyên gia sinh sản được đào tạo quốc tế với hơn 25 năm kinh nghiệm trong lĩnh vực hỗ trợ sinh sản. Ông đã thực hiện thành công hàng nghìn ca IVF và được công nhận là một trong những chuyên gia hàng đầu trong lĩnh vực này.",
-        phone: "+123-456-7890",
-        address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
-        city: "Thành phố Đà Nẵng",
-        isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "09:00", available: true },
-          { date: "2024-01-15", time: "10:00", available: true },
-          { date: "2024-01-15", time: "14:00", available: true },
-          { date: "2024-01-16", time: "09:00", available: true },
-          { date: "2024-01-16", time: "11:00", available: true },
-          { date: "2024-01-16", time: "15:00", available: true }
-        ]
-      },
+       {
+         id: "1",
+         name: "Dr. Brain Adam",
+         specialization: "Restoractive Dentist",
+         profileImage: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
+         experience: "25 năm kinh nghiệm",
+         qualifications: ["MBBS", "MD", "MRCOG", "DFSRH"],
+         skills: ["IVF", "IUI", "ICSI", "TESA", "PESA", "IMSI", "Blastocyte Culture", "Cryopreservation", "Laparoscopy", "Hysteroscopy"],
+         biography: "Tiến sĩ Brain Adam là chuyên gia sinh sản được đào tạo quốc tế với hơn 25 năm kinh nghiệm trong lĩnh vực hỗ trợ sinh sản. Ông đã thực hiện thành công hàng nghìn ca IVF và được công nhận là một trong những chuyên gia hàng đầu trong lĩnh vực này.",
+         phone: "+123-456-7890",
+         address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
+         city: "Thành phố Đà Nẵng",
+         isActive: true,
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "09:00", available: true },
+              { date: dateStr, time: "10:00", available: true },
+              { date: dateStr, time: "14:00", available: true }
+            );
+          }
+          return slots;
+        })()
+       },
       {
         id: "2",
         name: "Dr. Sarah Johnson",
@@ -43,12 +50,20 @@ export const schedulingAPI = {
         address: "123 Pet Care Street, District 1",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "08:00", available: true },
-          { date: "2024-01-15", time: "13:00", available: true },
-          { date: "2024-01-16", time: "09:00", available: true },
-          { date: "2024-01-16", time: "14:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "08:00", available: true },
+              { date: dateStr, time: "13:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "3",
@@ -63,12 +78,20 @@ export const schedulingAPI = {
         address: "456 Animal Health Ave, District 3",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "10:00", available: true },
-          { date: "2024-01-15", time: "15:00", available: true },
-          { date: "2024-01-17", time: "09:00", available: true },
-          { date: "2024-01-17", time: "11:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "10:00", available: true },
+              { date: dateStr, time: "15:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "4",
@@ -83,12 +106,20 @@ export const schedulingAPI = {
         address: "789 Skin Care Blvd, District 7",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-16", time: "09:00", available: true },
-          { date: "2024-01-16", time: "14:00", available: true },
-          { date: "2024-01-18", time: "10:00", available: true },
-          { date: "2024-01-18", time: "15:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "09:00", available: true },
+              { date: dateStr, time: "14:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "5",
@@ -103,12 +134,20 @@ export const schedulingAPI = {
         address: "321 Emergency Lane, District 2",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-15", time: "08:00", available: true },
-          { date: "2024-01-15", time: "16:00", available: true },
-          { date: "2024-01-17", time: "08:00", available: true },
-          { date: "2024-01-17", time: "16:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "08:00", available: true },
+              { date: dateStr, time: "16:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
       {
         id: "6",
@@ -123,12 +162,20 @@ export const schedulingAPI = {
         address: "654 Behavior Street, District 4",
         city: "Ho Chi Minh City",
         isActive: true,
-        availableSlots: [
-          { date: "2024-01-16", time: "10:00", available: true },
-          { date: "2024-01-16", time: "15:00", available: true },
-          { date: "2024-01-19", time: "09:00", available: true },
-          { date: "2024-01-19", time: "14:00", available: true }
-        ]
+        availableSlots: (() => {
+          const slots = [];
+          const today = new Date();
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            slots.push(
+              { date: dateStr, time: "10:00", available: true },
+              { date: dateStr, time: "15:00", available: true }
+            );
+          }
+          return slots;
+        })()
       },
     ];
   },
@@ -148,80 +195,86 @@ export const schedulingAPI = {
   getAppointments: async (): Promise<Appointment[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    return [
-      {
-        id: "1",
-        doctorId: "1",
-        date: "2024-01-15",
-        time: "09:00",
-        type: "Khám tổng quát",
-        status: "active",
-        phone: "+123-456-7890",
-        patientName: "John Doe",
-        patientPhone: "+123-456-7890",
-        notes: "Regular checkup"
-      },
-      {
-        id: "2",
-        doctorId: "2",
-        date: "2024-01-16",
-        time: "14:00",
-        type: "Phẫu thuật",
-        status: "active",
-        phone: "+123-456-7891",
-        patientName: "Jane Smith",
-        patientPhone: "+123-456-7891",
-        notes: "Spay surgery"
-      },
-      {
-        id: "3",
-        doctorId: "3",
-        date: "2024-01-17",
-        time: "09:00",
-        type: "Khám tổng quát",
-        status: "active",
-        phone: "+123-456-7892",
-        patientName: "Mike Johnson",
-        patientPhone: "+123-456-7892",
-        notes: "Follow-up appointment"
-      },
-      {
-        id: "4",
-        doctorId: "4",
-        date: "2024-01-18",
-        time: "10:00",
-        type: "Khám da liễu",
-        status: "active",
-        phone: "+123-456-7893",
-        patientName: "Sarah Wilson",
-        patientPhone: "+123-456-7893",
-        notes: "Skin allergy check"
-      },
-      {
-        id: "5",
-        doctorId: "5",
-        date: "2024-01-17",
-        time: "08:00",
-        type: "Cấp cứu",
-        status: "active",
-        phone: "+123-456-7894",
-        patientName: "Emergency Case",
-        patientPhone: "+123-456-7894",
-        notes: "Emergency consultation"
-      },
-      {
-        id: "6",
-        doctorId: "6",
-        date: "2024-01-19",
-        time: "09:00",
-        type: "Tư vấn dinh dưỡng",
-        status: "active",
-        phone: "+123-456-7895",
-        patientName: "Lisa Brown",
-        patientPhone: "+123-456-7895",
-        notes: "Nutrition consultation"
-      },
-    ];
+     return [
+       {
+         id: "1",
+         doctorId: "1",
+         date: "2024-01-15",
+         time: "09:00",
+         type: "Khám tổng quát",
+         status: "active",
+         phone: "+123-456-7890",
+         patientName: "John Doe",
+         patientPhone: "+123-456-7890",
+         notes: "Regular checkup",
+         paymentMethod: "cash"
+       },
+       {
+         id: "2",
+         doctorId: "2",
+         date: "2024-01-16",
+         time: "14:00",
+         type: "Phẫu thuật",
+         status: "active",
+         phone: "+123-456-7891",
+         patientName: "Jane Smith",
+         patientPhone: "+123-456-7891",
+         notes: "Spay surgery",
+         paymentMethod: "cash"
+       },
+       {
+         id: "3",
+         doctorId: "3",
+         date: "2024-01-17",
+         time: "09:00",
+         type: "Khám tổng quát",
+         status: "pending",
+         phone: "+123-456-7892",
+         patientName: "Mike Johnson",
+         patientPhone: "+123-456-7892",
+         notes: "Follow-up appointment",
+         paymentMethod: "cash"
+       },
+       {
+         id: "4",
+         doctorId: "4",
+         date: "2024-01-18",
+         time: "10:00",
+         type: "Khám da liễu",
+         status: "completed",
+         phone: "+123-456-7893",
+         patientName: "Sarah Wilson",
+         patientPhone: "+123-456-7893",
+         notes: "Skin allergy check",
+         paymentMethod: "cash"
+       },
+       {
+         id: "5",
+         doctorId: "5",
+         date: "2024-01-17",
+         time: "08:00",
+         type: "Cấp cứu",
+         status: "cancelled",
+         phone: "+123-456-7894",
+         patientName: "Emergency Case",
+         patientPhone: "+123-456-7894",
+         notes: "Emergency consultation",
+         paymentMethod: "cash"
+       },
+       {
+         id: "6",
+         doctorId: "6",
+         date: "2024-01-19",
+         time: "09:00",
+         type: "Tư vấn dinh dưỡng",
+         status: "confirmed",
+         phone: "+123-456-7895",
+         patientName: "Lisa Brown",
+         patientPhone: "+123-456-7895",
+         notes: "Nutrition consultation",
+         paymentMethod: "cash"
+       },
+     ];
   },
 
   // Create appointment
@@ -231,7 +284,12 @@ export const schedulingAPI = {
     const newAppointment: Appointment = {
       ...appointment,
       id: Date.now().toString(),
+      paymentMethod: appointment.paymentMethod || 'cash',
     };
+    
+    // Add to mock data
+    const appointments = await schedulingAPI.getAppointments();
+    appointments.push(newAppointment);
     
     return newAppointment;
   },
