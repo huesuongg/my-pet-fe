@@ -17,7 +17,6 @@ import {
   Payment as PaymentIcon,
   Receipt as ReceiptIcon,
 } from '@mui/icons-material';
-import { useSelector } from 'react-redux';
 import styles from './OrderDetail.module.css';
 import { Order, OrderStatus } from '../types/order';
 

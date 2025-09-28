@@ -17,6 +17,7 @@ interface CartItem {
   id: number; // Unique ID for the cart item itself
   product: Product;
   quantity: number;
+  addedAt: string;
 }
 
 // Define CartState interface
@@ -63,6 +64,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         id: Date.now(),
         product,
         quantity,
+        addedAt: new Date().toISOString(),
       };
       const updatedItems = [...state.items, newItem];
       return { ...state, items: updatedItems, ...calculateTotals(updatedItems) };

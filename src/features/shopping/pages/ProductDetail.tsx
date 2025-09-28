@@ -207,7 +207,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
     });
   };
 
-  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }

@@ -3,7 +3,6 @@ import CategoryCard from "../components/CategoryCard";
 import ProductCard from "../components/ProductCard";
 import BlogCard from "../components/BlogCard";
 import styles from "./ShoppingPage.module.css";
-import { useNavigate } from "react-router-dom";
 import { productCategories } from "../constants";
 import { blogArticles } from "../constants";
 import { productsData } from "../constants";
@@ -11,9 +10,9 @@ import { productsData } from "../constants";
 // Helper function to get products by category
 export const getProductsByCategory = () => {
   const products = Object.values(productsData);
-  const categories = {};
+  const categories: { [key: string]: any[] } = {};
 
-  products.forEach((product) => {
+  products.forEach((product: any) => {
     if (!categories[product.category]) {
       categories[product.category] = [];
     }
@@ -31,7 +30,7 @@ export const getProductsByCategory = () => {
 
 // Helper function to get product by ID
 export const getProductById = (id: number) => {
-  return productsData[id];
+  return productsData[id as keyof typeof productsData];
 };
 
 const ShoppingPage = () => {
@@ -274,7 +273,7 @@ const ShoppingPage = () => {
         </Box>
 
         {/* CSS Animations */}
-        <style jsx>{`
+        <style>{`
           @keyframes float {
             0%,
             100% {
@@ -374,7 +373,7 @@ const ShoppingPage = () => {
             </Box>
 
             <Box className={styles.productsGrid}>
-              {products.map((product) => (
+              {products.map((product: any) => (
                 <ProductCard
                   key={product.id}
                   id={product.id}

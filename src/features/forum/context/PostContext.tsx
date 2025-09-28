@@ -7,7 +7,7 @@ import {
   clearAllPosts,
 } from "../services/postStorage";
 
-export interface Comment {
+export interface ForumComment {
   id: number;
   author: {
     name: string;
@@ -17,7 +17,7 @@ export interface Comment {
   timestamp: string;
   likes: number;
   isLiked: boolean;
-  replies?: Comment[];
+  replies?: ForumComment[];
 }
 
 export interface PostData {
@@ -36,7 +36,7 @@ export interface PostData {
   favorites: number;
   isLiked: boolean;
   isFavorited: boolean;
-  commentsList: Comment[];
+  commentsList: ForumComment[];
 }
 
 interface PostState {
@@ -323,7 +323,7 @@ interface PostContextType {
   deletePost: (id: number) => void;
   toggleLike: (id: number) => void;
   toggleFavorite: (id: number) => void;
-  addComment: (postId: number, comment: Omit<Comment, "id">) => void;
+  addComment: (postId: number, comment: Omit<ForumComment, "id">) => void;
   deleteComment: (postId: number, commentId: number) => void;
   toggleCommentLike: (postId: number, commentId: number) => void;
   addReply: (
@@ -373,7 +373,7 @@ export const PostProvider: React.FC<{ children: ReactNode }> = ({
     dispatch({ type: "TOGGLE_FAVORITE", payload: id });
   };
 
-  const addComment = (postId: number, comment: Omit<Comment, "id">) => {
+  const addComment = (postId: number, comment: Omit<ForumComment, "id">) => {
     dispatch({ type: "ADD_COMMENT", payload: { postId, comment } });
   };
 

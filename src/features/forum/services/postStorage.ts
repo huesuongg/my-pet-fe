@@ -15,7 +15,7 @@ export const getStoredPosts = (): PostData[] => {
       // Đảm bảo tất cả posts đều có commentsList
       return posts.map((post: PostData) => ({
         ...post,
-        commentsList: (post.commentsList || []).map((comment: Comment) => ({
+        commentsList: (post.commentsList || []).map((comment: any) => ({
           ...comment,
           isLiked: comment.isLiked || false,
           replies: comment.replies || []

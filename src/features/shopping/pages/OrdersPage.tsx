@@ -16,7 +16,7 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styles from './OrdersPage.module.css';
 import OrderCard from '../components/OrderCard';
 import { Order, OrderStatus } from '../types/order';

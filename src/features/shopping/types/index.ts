@@ -13,6 +13,9 @@ export interface Product {
   inStock: boolean;
   stockQuantity?: number;
   tags?: string[];
+  weight?: string;
+  color?: string;
+  size?: string;
   createdAt: string;
   updatedAt: string;
 }
