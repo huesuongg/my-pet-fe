@@ -42,7 +42,7 @@ export default function ServiceDetail() {
 
   const handleSchedule = () => {
     console.log("Schedule appointment with", doctor?.name);
-    // Navigate to appointment booking page
+    navigate(`/scheduling/booking/${id}`);
   };
 
   const handleClose = () => {
@@ -511,7 +511,7 @@ export default function ServiceDetail() {
           </Grid>
 
           {/* CSS Animations */}
-          <style jsx>{`
+          {/* <style jsx>{`
             @keyframes float {
               0%, 100% { transform: translateY(0px) rotate(0deg); }
               50% { transform: translateY(-20px) rotate(5deg); }
@@ -524,7 +524,7 @@ export default function ServiceDetail() {
               from { transform: rotate(0deg); }
               to { transform: rotate(360deg); }
             }
-          `}</style>
+          `}</style> */}
         </Box>
         {/* Experience and Skills Section */}
         <Grid container spacing={4} sx={{ mb: 4 }}>

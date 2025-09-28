@@ -1,13 +1,13 @@
 ﻿import React from "react";
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating } from "@mui/material";
-import { AddShoppingCart, Visibility, Star } from "@mui/icons-material";
+import { AddShoppingCart, Visibility } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../contexts/CartContext";
 
 interface ProductCardProps {
   id: number;
   name: string;
-  price: number;
+  price: number | string;
   originalPrice?: string;
   image: string;
   rating?: number;
@@ -150,7 +150,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            {price}
+            {typeof price === 'number' ? `${price.toLocaleString("vi-VN")} VNĐ` : price}
           </Typography>
           {originalPrice && (
             <Typography 

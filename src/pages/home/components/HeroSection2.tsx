@@ -1,6 +1,5 @@
-import { Box, Button, Typography, Stack } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import Vector1 from "../../../assets/vector1.svg"; // vàng (đường nét cong)
 import Vector2 from "../../../assets/vector2.svg"; // xanh nhạt (dashed line)
 import Paw1 from "../../../assets/paw1.svg"; // paw dấu chân to
 
@@ -33,17 +32,19 @@ export default function HeroSection2() {
 
         <Typography
           variant="body1"
-          sx={{ 
+          sx={{
             fontFamily: "Poppins",
-            color: "black", 
-            mt: 3, 
-            maxWidth: 600, 
+            color: "black",
+            mt: 3,
+            maxWidth: 600,
             fontStyle: "italic",
             fontSize: "1rem",
-            lineHeight: 1.6
+            lineHeight: 1.6,
           }}
         >
-          "Yêu thú cưng là yêu một trái tim nhỏ bé nhưng đầy chân thành – một trái tim không bao giờ phản bội, luôn chờ đợi bạn mỗi ngày, và chỉ cần sự hiện diện của bạn để cảm thấy hạnh phúc."
+          "Yêu thú cưng là yêu một trái tim nhỏ bé nhưng đầy chân thành – một
+          trái tim không bao giờ phản bội, luôn chờ đợi bạn mỗi ngày, và chỉ cần
+          sự hiện diện của bạn để cảm thấy hạnh phúc."
         </Typography>
 
         <Button

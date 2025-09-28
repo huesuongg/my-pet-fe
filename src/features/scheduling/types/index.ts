@@ -11,15 +11,24 @@ export interface Doctor {
   address: string;
   city: string;
   isActive: boolean;
+  availableSlots?: Array<{
+    date: string;
+    time: string;
+    available: boolean;
+  }>;
 }
 
 export interface Appointment {
   id: string;
   doctorId: string;
   date: string;
+  time: string;
   type: string;
   status: 'active' | 'pending' | 'completed' | 'cancelled';
   phone: string;
+  patientName?: string;
+  patientPhone?: string;
+  notes?: string;
 }
 
 export interface DoctorCardProps {

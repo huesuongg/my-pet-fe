@@ -13,6 +13,7 @@ import ShoppingPage from "../features/shopping/pages/ShoppingPage";
 import ProductDetail from "../features/shopping/pages/ProductDetail";
 import SchedulesPage from "../features/scheduling/pages/SchedulesPage";
 import ServiceDetail from "../features/scheduling/pages/ServiceDetail";
+import BookingPage from "../features/scheduling/pages/BookingPage";
 import TestScheduling from "../features/scheduling/pages/TestScheduling";
 import CartPage from "../features/shopping/pages/CartPage";
 import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
@@ -36,6 +37,7 @@ export const routes = {
   PRODUCT_DETAIL_PATH: "/product/:id",
   SCHEDULING_PATH: "/scheduling",
   DOCTOR_DETAIL_PATH: "/scheduling/doctor/:id",
+  BOOKING_PATH: "/scheduling/booking/:id",
   TEST_SCHEDULING_PATH: "/test-scheduling",
   CART_PATH: "/cart",
 };
@@ -54,6 +56,7 @@ export const router = createBrowserRouter([
       { path: routes.PRODUCT_DETAIL_PATH, element: <ProductDetail /> },
       { path: routes.SCHEDULING_PATH, element: <SchedulesPage /> },
       { path: routes.DOCTOR_DETAIL_PATH, element: <ServiceDetail /> },
+      { path: routes.BOOKING_PATH, element: <BookingPage /> },
       { path: routes.TEST_SCHEDULING_PATH, element: <TestScheduling /> },
       { path: routes.CART_PATH, element: <CartPage /> },
       { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
