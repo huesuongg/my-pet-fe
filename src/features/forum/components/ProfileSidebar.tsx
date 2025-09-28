@@ -1,39 +1,88 @@
 // src/components/ProfileSidebar.tsx
-import React from "react";
+import React, { useState } from "react";
 
-const ProfileSidebar: React.FC = () => {
+export interface ProfileData {
+  intro: string;
+  workplace: string;
+  education: string;
+  studied: string;
+  lives: string;
+  from: string;
+  avatar?: string;
+  background?: string;
+}
+
+interface ProfileSidebarProps {
+  profileData?: ProfileData;
+  onProfileUpdate?: (data: ProfileData) => void;
+}
+
+const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ 
+  profileData: externalProfileData
+}) => {
+  // Default profile data
+  const defaultProfileData: ProfileData = {
+    intro: "Believe in yourself and you can do unbelievable things. 😊",
+    workplace: "99media ltd",
+    education: "Amity University",
+    studied: "DPS Delhi",
+    lives: "Bangalore, India",
+    from: "Bangalore, India"
+  };
+
+  // Use external data if provided, otherwise use internal state
+  const [internalProfileData, setInternalProfileData] = useState<ProfileData>(defaultProfileData);
+  
+  const profileData = externalProfileData || internalProfileData;
+
+  // Update internal state when external data changes
+  React.useEffect(() => {
+    if (externalProfileData) {
+      setInternalProfileData(externalProfileData);
+    }
+  }, [externalProfileData]);
   return (
     <div className="space-y-4">
       {/* Intro Section */}
       <div className="bg-white p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-2">Intro</h2>
         <p className="text-gray-600 mb-4">
-          Believe in yourself and you can do unbelievable things. 😊
+          {profileData.intro}
         </p>
         <ul
           className="space-y-2 text-gray-700"
           style={{ listStyleType: "none", paddingLeft: 0 }}
         >
-          <li className="flex items-center">
-            <span className="mr-2">🏢Làm việc tại</span>
-            <span className="font-medium"> 99media ltd</span>
-          </li>
-          <li className="flex items-center">
-            <span className="mr-2">🎓Học tại</span>
-            <span className="font-medium"> Amity University</span>
-          </li>
-          <li className="flex items-center">
-            <span className="mr-2">🏫Đã học</span>
-            <span className="font-medium"> DPS Delhi</span>
-          </li>
-          <li className="flex items-center">
-            <span className="mr-2">🏡Sống tại</span>
-            <span className="font-medium">Bangalore, India</span>
-          </li>
-          <li className="flex items-center">
-            <span className="mr-2">📍Từ</span>
-            <span className="font-medium"> Bangalore, India</span>
-          </li>
+          {profileData.workplace && (
+            <li className="flex items-center">
+              <span className="mr-2">🏢Làm việc tại</span>
+              <span className="font-medium">{profileData.workplace}</span>
+            </li>
+          )}
+          {profileData.education && (
+            <li className="flex items-center">
+              <span className="mr-2">🎓Học tại</span>
+              <span className="font-medium">{profileData.education}</span>
+            </li>
+          )}
+          {profileData.studied && (
+            <li className="flex items-center">
+              <span className="mr-2">🏫Đã học</span>
+              <span className="font-medium">{profileData.studied}</span>
+            </li>
+          )}
+          {profileData.lives && (
+            <li className="flex items-center">
+              <span className="mr-2">🏡Sống tại</span>
+              <span className="font-medium">{profileData.lives}</span>
+            </li>
+          )}
+          {profileData.from && (
+            <li className="flex items-center">
+              <span className="mr-2">📍Từ</span>
+              <span className="font-medium">{profileData.from}</span>
+            </li>
+          )}
         </ul>
       </div>
 

@@ -12,7 +12,7 @@ export default function SchedulesPage() {
     console.log("View more doctors");
   };
 
-  const handleDoctorSelect = (doctor: any) => {
+  const handleDoctorSelect = (doctor: { id: string; name: string }) => {
     console.log("Selected doctor:", doctor);
     console.log("Navigating to:", `/scheduling/doctor/${doctor.id}`);
     navigate(`/scheduling/doctor/${doctor.id}`);

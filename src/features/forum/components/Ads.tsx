@@ -15,7 +15,7 @@ const defaultAds: AdItem[] = [
     id: 1,
     image:
       "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=800&auto=format&fit=crop",
-    category: "FINANCE",
+    category: "PETCARE",
     title: "Giảm 30% gói bảo hiểm thú cưng",
     excerpt:
       "Bảo vệ thú cưng toàn diện, bồi thường nhanh – đối tác nhiều phòng khám.",
@@ -25,7 +25,7 @@ const defaultAds: AdItem[] = [
     id: 2,
     image:
       "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=800&auto=format&fit=crop",
-    category: "POLITICS",
+    category: "VOUCHER",
     title: "Tặng voucher tiêm phòng khi nhận nuôi",
     excerpt:
       "Chương trình nhận nuôi có trách nhiệm – miễn phí chip ID và sổ sức khỏe.",
