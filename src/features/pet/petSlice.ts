@@ -54,7 +54,7 @@ const petSlice = createSlice({
       .addCase(getPetsByUserId.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to fetch pets';
       })
       
       // Get pet by ID
@@ -70,7 +70,7 @@ const petSlice = createSlice({
       .addCase(getPetById.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to fetch pet';
       })
       
       // Create pet
@@ -87,7 +87,7 @@ const petSlice = createSlice({
       .addCase(createPet.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to create pet';
       })
       
       // Update pet
@@ -110,7 +110,7 @@ const petSlice = createSlice({
       .addCase(updatePet.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to update pet';
       })
       
       // Delete pet
@@ -130,7 +130,7 @@ const petSlice = createSlice({
       .addCase(deletePet.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to delete pet';
       })
       
       // Add vaccination record
@@ -153,7 +153,7 @@ const petSlice = createSlice({
       .addCase(addVaccinationRecord.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to add vaccination record';
       })
       
       // Add medical record
@@ -176,7 +176,7 @@ const petSlice = createSlice({
       .addCase(addMedicalRecord.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload as RejectPayload;
-        state.error = payload.message;
+        state.error = payload?.message || 'Failed to add medical record';
       });
   }
 });
