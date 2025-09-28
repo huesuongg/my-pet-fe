@@ -111,13 +111,7 @@ const CartPage: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    console.log("Proceed to checkout:", {
-      items: cartState.items,
-      shipping: selectedShipping,
-      payment: selectedPayment,
-      total,
-    });
-    // TODO: Implement checkout functionality
+    navigate("/checkout");
   };
 
   const handleApplyPromo = () => {

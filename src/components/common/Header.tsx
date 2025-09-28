@@ -1,4 +1,15 @@
-import { Box, Typography, Button, InputBase, IconButton, Badge, Avatar, Menu, MenuItem, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  InputBase,
+  IconButton,
+  Badge,
+  Avatar,
+  Menu,
+  MenuItem,
+  Divider,
+} from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -14,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Shop2 } from "@mui/icons-material";
 import { useCart } from "../../contexts/CartContext";
-import { ShoppingCart } from "@mui/icons-material";
+import { ShoppingCart, Receipt as ReceiptIcon } from "@mui/icons-material";
 import { useAuth } from "../../features/authenticate/hooks/useAuth";
 
 const Search = styled("div")(({ theme }) => ({
@@ -36,7 +47,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export const Header = () => {
   const navigate = useNavigate();
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
-  const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
+  const [notificationAnchor, setNotificationAnchor] =
+    useState<null | HTMLElement>(null);
   const { cartState } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -72,10 +84,15 @@ export const Header = () => {
 
   const handleNotificationMenuClose = () => {
     setNotificationAnchor(null);
-  }
-    
+  };
+
   const handleCartClick = () => {
     navigate("/cart");
+  };
+
+  const handleOrdersClick = () => {
+    navigate("/orders");
+    handleProfileMenuClose();
   };
 
   return (
@@ -83,7 +100,7 @@ export const Header = () => {
       position="static"
       color="transparent"
       sx={{
-        bgcolor: "#2f80ed", 
+        bgcolor: "#2f80ed",
         boxShadow: "0 4px 20px rgba(59, 130, 246, 0.3)",
         px: 2,
       }}
@@ -99,13 +116,18 @@ export const Header = () => {
         }}
       >
         {/* Logo */}
-        <Box display="flex" alignItems="center" sx={{ cursor: "pointer" }} onClick={() => navigate("/")}>
-        <PetsIcon sx={{ color: "#FDE047", fontSize: 40, mr: 1.5 }} />
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        >
+          <PetsIcon sx={{ color: "#FDE047", fontSize: 40, mr: 1.5 }} />
           <Typography
             variant="h5"
             noWrap
-            sx={{ 
-              fontWeight: "bold", 
+            sx={{
+              fontWeight: "bold",
               color: "white",
               fontSize: "1.8rem",
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
@@ -163,16 +185,20 @@ export const Header = () => {
           </Search>
 
           {/* Notifications */}
-          <IconButton 
-            size="large" 
+          <IconButton
+            size="large"
             sx={{ color: "white" }}
             onClick={handleNotificationMenuOpen}
           >
             <Badge badgeContent={2} color="error">
               <NotificationsIcon />
-              </Badge>
+            </Badge>
           </IconButton>
-          <IconButton size="large" sx={{ color: "white" }} onClick={handleCartClick}>
+          <IconButton
+            size="large"
+            sx={{ color: "white" }}
+            onClick={handleCartClick}
+          >
             <Badge badgeContent={cartState.totalItems} color="info">
               <ShoppingCart />
             </Badge>
@@ -185,8 +211,8 @@ export const Header = () => {
               onClick={handleProfileMenuOpen}
               sx={{ color: "white" }}
             >
-              <Avatar 
-                src={user?.avatar} 
+              <Avatar
+                src={user?.avatar}
                 sx={{ width: 32, height: 32, bgcolor: "#FDE047" }}
               >
                 <PersonIcon sx={{ color: "#3B82F6" }} />
@@ -253,8 +279,8 @@ export const Header = () => {
         {/* User Info */}
         <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar 
-              src={user?.avatar} 
+            <Avatar
+              src={user?.avatar}
               sx={{ width: 40, height: 40, bgcolor: "#3B82F6" }}
             >
               <PersonIcon />
@@ -267,28 +293,50 @@ export const Header = () => {
                 {user?.email}
               </Typography>
               <Typography variant="caption" color="primary">
-                {user?.role === 'admin' ? 'Quản trị viên' : 
-                 user?.role === 'doctor' ? 'Bác sĩ' : 'Người dùng'}
+                {user?.role === "admin"
+                  ? "Quản trị viên"
+                  : user?.role === "doctor"
+                    ? "Bác sĩ"
+                    : "Người dùng"}
               </Typography>
             </Box>
           </Box>
         </Box>
 
-        <MenuItem onClick={() => { handleProfileMenuClose(); navigate("/profile"); }}>
+        <MenuItem
+          onClick={() => {
+            handleProfileMenuClose();
+            navigate("/profile");
+          }}
+        >
           <PersonIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Hồ sơ cá nhân
         </MenuItem>
-        <MenuItem onClick={() => { handleProfileMenuClose(); navigate("/scheduling/history"); }}>
+        <MenuItem
+          onClick={() => {
+            handleProfileMenuClose();
+            navigate("/scheduling/history");
+          }}
+        >
           <CalendarTodayIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Lịch hẹn của tôi
         </MenuItem>
-        <MenuItem onClick={() => { handleProfileMenuClose(); navigate("/pet-profile"); }}>
+        <MenuItem onClick={handleOrdersClick}>
+          <ReceiptIcon sx={{ mr: 1, color: "#3B82F6" }} />
+          Đơn hàng của tôi
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleProfileMenuClose();
+            navigate("/pet-profile");
+          }}
+        >
           <PetsIcon sx={{ mr: 1, color: "#3B82F6" }} />
           Hồ sơ thú cưng
         </MenuItem>
-        
+
         <Divider />
-        
+
         <MenuItem onClick={handleLogout} sx={{ color: "#EF4444" }}>
           <LogoutIcon sx={{ mr: 1 }} />
           Đăng xuất
@@ -310,7 +358,10 @@ export const Header = () => {
         }}
       >
         <MenuItem onClick={handleNotificationMenuClose}>
-          <Typography variant="subtitle2" sx={{ fontWeight: "bold", color: "#3B82F6" }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: "bold", color: "#3B82F6" }}
+          >
             Thông báo mới
           </Typography>
         </MenuItem>

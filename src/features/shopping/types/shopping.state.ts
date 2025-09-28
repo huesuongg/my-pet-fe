@@ -1,22 +1,26 @@
 ﻿// Shopping state types
 import { Product, ProductCategory, BlogArticle, Cart } from './index';
+import { Order } from './order';
 
 export interface ShoppingState {
   products: Product[];
   categories: ProductCategory[];
   blogArticles: BlogArticle[];
   cart: Cart;
+  orders: Order[];
   loading: {
     products: boolean;
     categories: boolean;
     blogArticles: boolean;
     cart: boolean;
+    orders: boolean;
   };
   error: {
     products: string | null;
     categories: string | null;
     blogArticles: string | null;
     cart: string | null;
+    orders: string | null;
   };
   filters: {
     categoryId?: number;
