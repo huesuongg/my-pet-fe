@@ -1,5 +1,6 @@
 ﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ShoppingState, Product, ProductCategory, BlogArticle, Cart, CartItem, ShoppingFilters } from './types';
+import { Order } from './types/order';
 
 const initialState: ShoppingState = {
   products: [],
@@ -11,17 +12,20 @@ const initialState: ShoppingState = {
     totalPrice: 0,
     lastUpdated: new Date().toISOString(),
   },
+  orders: [],
   loading: {
     products: false,
     categories: false,
     blogArticles: false,
     cart: false,
+    orders: false,
   },
   error: {
     products: null,
     categories: null,
     blogArticles: null,
     cart: null,
+    orders: null,
   },
   filters: {
     categoryId: undefined,
@@ -120,6 +124,26 @@ const shoppingSlice = createSlice({
       state.error.cart = action.payload;
     },
 
+    // Orders actions
+    setOrders: (state, action: PayloadAction<Order[]>) => {
+      state.orders = action.payload;
+    },
+    addOrder: (state, action: PayloadAction<Order>) => {
+      state.orders.unshift(action.payload); // Add new order at the beginning
+    },
+    updateOrderStatus: (state, action: PayloadAction<{ orderId: number; status: string }>) => {
+      const order = state.orders.find(order => order.id === action.payload.orderId);
+      if (order) {
+        order.status = action.payload.status as any;
+      }
+    },
+    setOrdersLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading.orders = action.payload;
+    },
+    setOrdersError: (state, action: PayloadAction<string | null>) => {
+      state.error.orders = action.payload;
+    },
+
     // Filters actions
     setFilters: (state, action: PayloadAction<Partial<ShoppingFilters>>) => {
       state.filters = { ...state.filters, ...action.payload };
@@ -161,6 +185,11 @@ export const {
   clearCart,
   setCartLoading,
   setCartError,
+  setOrders,
+  addOrder,
+  updateOrderStatus,
+  setOrdersLoading,
+  setOrdersError,
   setFilters,
   clearFilters,
   setPagination,

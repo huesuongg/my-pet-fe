@@ -22,7 +22,7 @@ export const Footer = () => {
           <Box display="flex" alignItems="center" mb={2}>
             <PetsIcon sx={{ color: "#FFD43B", fontSize: 32, mr: 1 }} />
             <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "'Inter', sans-serif" }}>
-              My Pet
+               My Pet
             </Typography>
           </Box>
           <Typography variant="body1" sx={{ mb: 2 }}>

@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Vector1 from "../../../assets/vector1.svg"; // vàng (đường nét cong)
 import Vector2 from "../../../assets/vector2.svg"; // xanh nhạt (dashed line)
 import Paw1 from "../../../assets/paw1.svg"; // paw dấu chân to
 
