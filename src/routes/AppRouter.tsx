@@ -22,12 +22,14 @@ import ChatSupportPage from "../features/chat-support/pages/ChatSupportPage";
 import PetProfilePage from "../features/pet/pages/PetProfilePage";
 import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory";
 import BookingPage from "../features/scheduling/pages/BookingPage";
+import RegisterPage from "../features/authenticate/pages/RegisterPage";
 
 export const routes = {
   ALL_PATH: "*",
   HOME_PATH: "/",
   LOGIN_PATH: "/login",
   LOGOUT_PATH: "/logout",
+  REGISTER_PATH: "/register",
   DASHBOARD_PATH: "/dashboard",
   ADMIN_PROFILE_PATH: "/dashboard/admin-profile",
   PROJECTS_PATH: "/dashboard/project",
@@ -55,6 +57,7 @@ export const router = createBrowserRouter([
     element: <LandingLayout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: routes.REGISTER_PATH, element: <RegisterPage /> },
       { path: routes.LOGIN_PATH, element: <LoginPage /> },
       { path: routes.ALL_PATH, element: <NotFoundPage /> },
       { path: routes.SHOPPING_PATH, element: <ShoppingPage /> },
