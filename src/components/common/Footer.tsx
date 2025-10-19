@@ -22,7 +22,7 @@ export const Footer = () => {
           <Box display="flex" alignItems="center" mb={2}>
             <PetsIcon sx={{ color: "#FFD43B", fontSize: 32, mr: 1 }} />
             <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "'Inter', sans-serif" }}>
-               My Pet
+              My Pet
             </Typography>
           </Box>
           <Typography variant="body1" sx={{ mb: 2 }}>
@@ -82,10 +82,10 @@ export const Footer = () => {
           <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
             Thông tin liên hệ
           </Typography>
-          <Typography sx={{ mb: 1 }}>Email: info@agencyname.com</Typography>
-          <Typography sx={{ mb: 1 }}>Điện thoại: +1 123 456 7890</Typography>
+          <Typography sx={{ mb: 1 }}>Email: mypet3605@gmail.com</Typography>
+          <Typography sx={{ mb: 1 }}>Điện thoại: 083 403 1004</Typography>
           <Typography sx={{ mb: 2 }}>
-            Địa chỉ: 123 Anywhere St., Any City, ST 12345
+            Địa chỉ: Khu đô thị FPT, Da Nang, Vietnam
           </Typography>
 
           {/* Social Icons */}
