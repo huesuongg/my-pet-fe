@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register, getUserById } from "./authThunk";
+import { login, register, getUserById, verifyRegister, logoutThunk } from "./authThunk";
 import { RejectPayload } from "../../types";
 import { RequestStatus } from "../../types";
 import { User } from "./types";
@@ -7,7 +7,7 @@ import { User } from "./types";
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  userId: number;
+  userId: string;
   status: RequestStatus;
   error: string | undefined;
 }
@@ -15,7 +15,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
-  userId: 0,
+  userId: "",
   status: "idle",
   error: undefined
 };
@@ -26,10 +26,11 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       state.user = null;
       state.isAuthenticated = false;
-      state.userId = 0;
+      state.userId = "";
       state.error = undefined;
       state.status = "idle";
     },
@@ -51,15 +52,16 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.status = "success";
-        const { authResult, user } = action.payload;
+        const { user, accessToken, refreshToken } = action.payload;
         state.user = user;
         state.isAuthenticated = true;
         state.userId = user.id;
         state.error = undefined;
-        if (authResult.accessToken) {
-          localStorage.setItem("token", authResult.accessToken);
-          localStorage.setItem("user", JSON.stringify(user));
-        }
+        
+        // Store tokens in localStorage
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "error";
@@ -72,17 +74,9 @@ const authSlice = createSlice({
         state.status = "loading";
         state.error = undefined;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.status = "success";
-        const { authResult, user } = action.payload;
-        state.user = user;
-        state.isAuthenticated = true;
-        state.userId = user.id;
         state.error = undefined;
-        if (authResult.accessToken) {
-          localStorage.setItem("token", authResult.accessToken);
-          localStorage.setItem("user", JSON.stringify(user));
-        }
       })
       .addCase(register.rejected, (state, action) => {
         state.status = "error";
@@ -105,6 +99,49 @@ const authSlice = createSlice({
         state.status = "error";
         const payload = action.payload as RejectPayload;
         state.error = payload.message;
+      })
+    // verifyRegister action
+      .addCase(verifyRegister.pending, (state) => {
+        state.status = "loading";
+        state.error = undefined;
+      })
+      .addCase(verifyRegister.fulfilled, (state, action) => {
+        state.status = "success";
+        const { user, accessToken, refreshToken } = action.payload;
+        state.user = user;
+        state.isAuthenticated = true;
+        state.userId = user.id;
+        state.error = undefined;
+        
+        // Store tokens in localStorage
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
+      })
+      .addCase(verifyRegister.rejected, (state, action) => {
+        state.status = "error";
+        const payload = action.payload as RejectPayload;
+        state.error = payload.message;
+        state.isAuthenticated = false;
+      })
+    // logoutThunk action
+      .addCase(logoutThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(logoutThunk.fulfilled, (state) => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        state.user = null;
+        state.isAuthenticated = false;
+        state.userId = "";
+        state.error = undefined;
+        state.status = "idle";
+      })
+      .addCase(logoutThunk.rejected, (state, action) => {
+        const payload = action.payload as RejectPayload;
+        state.error = payload.message;
+        state.status = "error";
       });
   },
 });

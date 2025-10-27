@@ -13,23 +13,48 @@ export interface RegisterPayload {
     phone: string
 }
 
+// API request types
+export interface RegisterRequestPayload {
+    fullname: string,
+    username: string,
+    email: string,
+    password: string
+}
+
+export interface VerifyRegisterPayload {
+    email: string,
+    otp: string
+}
+
+export interface LoginRequestPayload {
+    usernameOrEmail: string,
+    password: string
+}
+
 export type AuthResult = {
     accessToken: string;
+    refreshToken: string;
     encryptedAccessToken: string;
     expireInSeconds: number;
     userId: number;
 };
 
+export interface LoginResponse {
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+}
+
 export interface User {
-    id: number;
+    id: string;
     username: string;
     email: string;
-    fullName: string;
-    phone: string;
-    role: 'admin' | 'user' | 'doctor';
+    fullName?: string;
+    phone?: string;
+    role: 'admin' | 'customer' | 'doctor' | 'user';
     avatar?: string;
-    isActive: boolean;
-    createdAt: string;
+    isActive?: boolean;
+    createdAt?: string;
 }
 
 export interface AuthState {

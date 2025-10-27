@@ -8,19 +8,19 @@ export const schedulingAPI = {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     return [
-       {
-         id: "1",
-         name: "Bs Nguyễn Văn Nam",
-         specialization: "Restoractive Dentist",
-         profileImage: "https://tse2.mm.bing.net/th/id/OIP.EBs96VuSZqY6_HsuZGzl-gHaJ7?rs=1&pid=ImgDetMain&o=7&rm=3",
-         experience: "25 năm kinh nghiệm",
-         qualifications: ["MBBS", "MD", "MRCOG", "DFSRH"],
-         skills: ["IVF", "IUI", "ICSI", "TESA", "PESA", "IMSI", "Blastocyte Culture", "Cryopreservation", "Laparoscopy", "Hysteroscopy"],
-         biography: "Tiến sĩ Nguyễn Văn Nam là chuyên gia sinh sản được đào tạo quốc tế với hơn 25 năm kinh nghiệm trong lĩnh vực hỗ trợ sinh sản. Ông đã thực hiện thành công hàng nghìn ca IVF và được công nhận là một trong những chuyên gia hàng đầu trong lĩnh vực này.",
-         phone: "+123-456-7890",
-         address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
-         city: "Thành phố Đà Nẵng",
-         isActive: true,
+      {
+        id: "1",
+        name: "Bs Nguyễn Văn Nam",
+        specialization: "Restoractive Dentist",
+        profileImage: "https://tse2.mm.bing.net/th/id/OIP.EBs96VuSZqY6_HsuZGzl-gHaJ7?rs=1&pid=ImgDetMain&o=7&rm=3",
+        experience: "25 năm kinh nghiệm",
+        qualifications: ["MBBS", "MD", "MRCOG", "DFSRH"],
+        skills: ["IVF", "IUI", "ICSI", "TESA", "PESA", "IMSI", "Blastocyte Culture", "Cryopreservation", "Laparoscopy", "Hysteroscopy"],
+        biography: "Tiến sĩ Nguyễn Văn Nam là chuyên gia sinh sản được đào tạo quốc tế với hơn 25 năm kinh nghiệm trong lĩnh vực hỗ trợ sinh sản. Ông đã thực hiện thành công hàng nghìn ca IVF và được công nhận là một trong những chuyên gia hàng đầu trong lĩnh vực này.",
+        phone: "+123-456-7890",
+        address: "03 Hoàng Văn Thụ, Phường Phước Ninh, Quận Hải Châu",
+        city: "Thành phố Đà Nẵng",
+        isActive: true,
         availableSlots: (() => {
           const slots = [];
           const today = new Date();
@@ -36,7 +36,7 @@ export const schedulingAPI = {
           }
           return slots;
         })()
-       },
+      },
       {
         id: "2",
         name: "Bs Trần Hà",
@@ -195,86 +195,86 @@ export const schedulingAPI = {
   getAppointments: async (): Promise<Appointment[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-     return [
-       {
-         id: "1",
-         doctorId: "1",
-         date: "2024-01-15",
-         time: "09:00",
-         type: "Khám tổng quát",
-         status: "active",
-         phone: "+123-456-7890",
-         patientName: "John Doe",
-         patientPhone: "+123-456-7890",
-         notes: "Regular checkup",
-         paymentMethod: "cash"
-       },
-       {
-         id: "2",
-         doctorId: "2",
-         date: "2024-01-16",
-         time: "14:00",
-         type: "Phẫu thuật",
-         status: "active",
-         phone: "+123-456-7891",
-         patientName: "Jane Smith",
-         patientPhone: "+123-456-7891",
-         notes: "Spay surgery",
-         paymentMethod: "cash"
-       },
-       {
-         id: "3",
-         doctorId: "3",
-         date: "2024-01-17",
-         time: "09:00",
-         type: "Khám tổng quát",
-         status: "pending",
-         phone: "+123-456-7892",
-         patientName: "Mike Johnson",
-         patientPhone: "+123-456-7892",
-         notes: "Follow-up appointment",
-         paymentMethod: "cash"
-       },
-       {
-         id: "4",
-         doctorId: "4",
-         date: "2024-01-18",
-         time: "10:00",
-         type: "Khám da liễu",
-         status: "completed",
-         phone: "+123-456-7893",
-         patientName: "Sarah Wilson",
-         patientPhone: "+123-456-7893",
-         notes: "Skin allergy check",
-         paymentMethod: "cash"
-       },
-       {
-         id: "5",
-         doctorId: "5",
-         date: "2024-01-17",
-         time: "08:00",
-         type: "Cấp cứu",
-         status: "cancelled",
-         phone: "+123-456-7894",
-         patientName: "Emergency Case",
-         patientPhone: "+123-456-7894",
-         notes: "Emergency consultation",
-         paymentMethod: "cash"
-       },
-       {
-         id: "6",
-         doctorId: "6",
-         date: "2024-01-19",
-         time: "09:00",
-         type: "Tư vấn dinh dưỡng",
-         status: "confirmed",
-         phone: "+123-456-7895",
-         patientName: "Lisa Brown",
-         patientPhone: "+123-456-7895",
-         notes: "Nutrition consultation",
-         paymentMethod: "cash"
-       },
-     ];
+    return [
+      {
+        id: "1",
+        doctorId: "1",
+        date: "2024-01-15",
+        time: "09:00",
+        type: "Khám tổng quát",
+        status: "active",
+        phone: "+123-456-7890",
+        patientName: "John Doe",
+        patientPhone: "+123-456-7890",
+        notes: "Regular checkup",
+        paymentMethod: "cash"
+      },
+      {
+        id: "2",
+        doctorId: "2",
+        date: "2024-01-16",
+        time: "14:00",
+        type: "Phẫu thuật",
+        status: "active",
+        phone: "+123-456-7891",
+        patientName: "Jane Smith",
+        patientPhone: "+123-456-7891",
+        notes: "Spay surgery",
+        paymentMethod: "cash"
+      },
+      {
+        id: "3",
+        doctorId: "3",
+        date: "2024-01-17",
+        time: "09:00",
+        type: "Khám tổng quát",
+        status: "pending",
+        phone: "+123-456-7892",
+        patientName: "Mike Johnson",
+        patientPhone: "+123-456-7892",
+        notes: "Follow-up appointment",
+        paymentMethod: "cash"
+      },
+      {
+        id: "4",
+        doctorId: "4",
+        date: "2024-01-18",
+        time: "10:00",
+        type: "Khám da liễu",
+        status: "completed",
+        phone: "+123-456-7893",
+        patientName: "Sarah Wilson",
+        patientPhone: "+123-456-7893",
+        notes: "Skin allergy check",
+        paymentMethod: "cash"
+      },
+      {
+        id: "5",
+        doctorId: "5",
+        date: "2024-01-17",
+        time: "08:00",
+        type: "Cấp cứu",
+        status: "cancelled",
+        phone: "+123-456-7894",
+        patientName: "Emergency Case",
+        patientPhone: "+123-456-7894",
+        notes: "Emergency consultation",
+        paymentMethod: "cash"
+      },
+      {
+        id: "6",
+        doctorId: "6",
+        date: "2024-01-19",
+        time: "09:00",
+        type: "Tư vấn dinh dưỡng",
+        status: "confirmed",
+        phone: "+123-456-7895",
+        patientName: "Lisa Brown",
+        patientPhone: "+123-456-7895",
+        notes: "Nutrition consultation",
+        paymentMethod: "cash"
+      },
+    ];
   },
 
   // Create appointment

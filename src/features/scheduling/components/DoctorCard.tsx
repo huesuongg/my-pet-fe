@@ -40,16 +40,16 @@ export default function DoctorCard({ doctor, onSchedule }: DoctorCardProps) {
         position: "relative",
         overflow: "hidden",
         background: "#ffffff",
-          "&:hover": {
-            transform: "translateY(-8px) scale(1.02)",
-            boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-            "& .doctor-avatar": {
-              transform: "scale(1.1)",
-            },
-            "& .doctor-info-section": {
-              background: "#20BD20",
-            }
+        "&:hover": {
+          transform: "translateY(-8px) scale(1.02)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+          "& .doctor-avatar": {
+            transform: "scale(1.1)",
           },
+          "& .doctor-info-section": {
+            background: "#20BD20",
+          }
+        },
       }}
     >
       {/* Decorative gradient overlay */}

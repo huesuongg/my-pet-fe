@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../store';
-import { login, register } from '../authThunk';
-import { logout, clearError } from '../authSlice';
+import { login, register, verifyRegister, logoutThunk } from '../authThunk';
+import { clearError } from '../authSlice';
 import { LoginPayload, RegisterPayload } from '../types';
 
 export const useAuth = () => {
@@ -17,7 +17,11 @@ export const useAuth = () => {
   };
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutThunk());
+  };
+
+  const handleVerifyRegister = (email: string, otp: string) => {
+    dispatch(verifyRegister({ email, otp }));
   };
 
   const clearAuthError = () => {
@@ -28,6 +32,7 @@ export const useAuth = () => {
     ...authState,
     login: handleLogin,
     register: handleRegister,
+    verifyRegister: handleVerifyRegister,
     logout: handleLogout,
     clearError: clearAuthError,
   };

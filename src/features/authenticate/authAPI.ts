@@ -1,90 +1,58 @@
-import { LoginPayload, RegisterPayload, User, AuthResult } from "./types";
-import { mockUsers, mockCredentials } from "./mockData";
+import axiosInstance from "../../services/axiosInstance";
+import { LoginPayload, RegisterPayload, User, RegisterRequestPayload, VerifyRegisterPayload, LoginRequestPayload, LoginResponse } from "./types";
 
-// Simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export const loginAPI = async (data: LoginPayload): Promise<{ data: { result: AuthResult } }> => {
-  await delay(1000); // Simulate network delay
+export const loginAPI = async (data: LoginPayload): Promise<LoginResponse> => {
+  const payload: LoginRequestPayload = {
+    usernameOrEmail: data.username,
+    password: data.password
+  };
   
-  const user = mockUsers.find(u => 
-    (u.username === data.username || u.email === data.username) && 
-    mockCredentials[u.username as keyof typeof mockCredentials] === data.password
-  );
-
-  if (!user || !user.isActive) {
-    throw new Error('Invalid credentials');
-  }
-
-  const token = `mock_token_${user.id}_${Date.now()}`;
+  const response = await axiosInstance.post('/api/auth/login', payload);
   
   return {
-    data: {
-      result: {
-        accessToken: token,
-        encryptedAccessToken: token,
-        expireInSeconds: 3600,
-        userId: user.id
-      }
-    }
+    user: response.data.user,
+    accessToken: response.data.accessToken,
+    refreshToken: response.data.refreshToken
   };
 };
 
-export const registerAPI = async (data: RegisterPayload): Promise<{ data: { result: AuthResult } }> => {
-  await delay(1000); // Simulate network delay
-  
-  // Check if user already exists
-  const existingUser = mockUsers.find(u => 
-    u.username === data.username || u.email === data.email
-  );
-
-  if (existingUser) {
-    throw new Error('User already exists');
-  }
-
-  // Check password confirmation
-  if (data.password !== data.confirmPassword) {
-    throw new Error('Passwords do not match');
-  }
-
-  // Create new user
-  const newUser: User = {
-    id: mockUsers.length + 1,
+export const registerAPI = async (data: RegisterPayload): Promise<void> => {
+  // Send register request to get OTP
+  const registerPayload: RegisterRequestPayload = {
+    fullname: data.fullName,
     username: data.username,
     email: data.email,
-    fullName: data.fullName,
-    phone: data.phone,
-    role: 'user',
-    isActive: true,
-    createdAt: new Date().toISOString()
+    password: data.password
   };
+  
+  await axiosInstance.post('/api/auth/register-request', registerPayload);
+};
 
-  // Add to mock data
-  mockUsers.push(newUser);
-  mockCredentials[data.username as keyof typeof mockCredentials] = data.password;
-
-  const token = `mock_token_${newUser.id}_${Date.now()}`;
+export const verifyRegisterAPI = async (data: VerifyRegisterPayload): Promise<LoginResponse> => {
+  const payload: VerifyRegisterPayload = {
+    email: data.email,
+    otp: data.otp
+  };
+  
+  const response = await axiosInstance.post('/api/auth/verify-register', payload);
   
   return {
-    data: {
-      result: {
-        accessToken: token,
-        encryptedAccessToken: token,
-        expireInSeconds: 3600,
-        userId: newUser.id
-      }
-    }
+    user: response.data.user,
+    accessToken: response.data.accessToken,
+    refreshToken: response.data.refreshToken
   };
+};
+
+export const logoutAPI = async (): Promise<void> => {
+  await axiosInstance.post('/api/auth/logout');
 };
 
 export const getUserByIdAPI = async (userId: number): Promise<{ data: User }> => {
-  await delay(500);
+  const response = await axiosInstance.get(`/api/users/${userId}`);
   
-  const user = mockUsers.find(u => u.id === userId);
-  
-  if (!user) {
+  if (!response.data) {
     throw new Error('User not found');
   }
 
-  return { data: user };
+  return { data: response.data };
 };

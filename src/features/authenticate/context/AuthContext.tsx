@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../store';
 import { setUser, logout } from '../authSlice';
+import { logoutThunk } from '../authThunk';
 import { User } from '../types';
 
 interface AuthContextType {
@@ -49,7 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [dispatch]);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutThunk());
   };
 
   const value: AuthContextType = {
