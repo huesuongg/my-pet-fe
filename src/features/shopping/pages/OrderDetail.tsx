@@ -71,52 +71,52 @@ const OrderDetail: React.FC = () => {
 
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
-      case OrderStatus.PENDING:
-        return '#FFA500'; // Orange
-      case OrderStatus.PROCESSING:
-        return '#3B82F6'; // Blue
-      case OrderStatus.SHIPPED:
-        return '#8B5CF6'; // Purple
-      case OrderStatus.DELIVERED:
-        return '#22C55E'; // Green
-      case OrderStatus.CANCELLED:
-        return '#EF4444'; // Red
-      default:
-        return '#6B7280'; // Gray
+    case OrderStatus.PENDING:
+      return '#FFA500'; // Orange
+    case OrderStatus.PROCESSING:
+      return '#3B82F6'; // Blue
+    case OrderStatus.SHIPPED:
+      return '#8B5CF6'; // Purple
+    case OrderStatus.DELIVERED:
+      return '#22C55E'; // Green
+    case OrderStatus.CANCELLED:
+      return '#EF4444'; // Red
+    default:
+      return '#6B7280'; // Gray
     }
   };
 
   const getStatusText = (status: OrderStatus) => {
     switch (status) {
-      case OrderStatus.PENDING:
-        return 'Chờ xác nhận';
-      case OrderStatus.PROCESSING:
-        return 'Đang xử lý';
-      case OrderStatus.SHIPPED:
-        return 'Đang giao hàng';
-      case OrderStatus.DELIVERED:
-        return 'Đã giao hàng';
-      case OrderStatus.CANCELLED:
-        return 'Đã hủy';
-      default:
-        return 'Không xác định';
+    case OrderStatus.PENDING:
+      return 'Chờ xác nhận';
+    case OrderStatus.PROCESSING:
+      return 'Đang xử lý';
+    case OrderStatus.SHIPPED:
+      return 'Đang giao hàng';
+    case OrderStatus.DELIVERED:
+      return 'Đã giao hàng';
+    case OrderStatus.CANCELLED:
+      return 'Đã hủy';
+    default:
+      return 'Không xác định';
     }
   };
 
   const getActiveStep = (status: OrderStatus) => {
     switch (status) {
-      case OrderStatus.PENDING:
-        return 0;
-      case OrderStatus.PROCESSING:
-        return 1;
-      case OrderStatus.SHIPPED:
-        return 2;
-      case OrderStatus.DELIVERED:
-        return 3;
-      case OrderStatus.CANCELLED:
-        return -1; // Special case for cancelled
-      default:
-        return 0;
+    case OrderStatus.PENDING:
+      return 0;
+    case OrderStatus.PROCESSING:
+      return 1;
+    case OrderStatus.SHIPPED:
+      return 2;
+    case OrderStatus.DELIVERED:
+      return 3;
+    case OrderStatus.CANCELLED:
+      return -1; // Special case for cancelled
+    default:
+      return 0;
     }
   };
 

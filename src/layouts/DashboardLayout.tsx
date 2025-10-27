@@ -24,15 +24,23 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import "./DashboardLayout.css";
-import Logo from "../assets/logo.png";
+import PetsIcon from "@mui/icons-material/Pets";
 import { useState } from "react";
 
 const drawerWidth = 280;
 const collapsedDrawerWidth = 80;
 
 const navigationItems = [
-  { title: "Admin profile", icon: <PersonIcon />, path: "/dashboard/admin-profile" },
-  { title: "Schedule management", icon: <CalendarTodayIcon />, path: "/dashboard/project" },
+  {
+    title: "Admin profile",
+    icon: <PersonIcon />,
+    path: "/dashboard/admin-profile",
+  },
+  {
+    title: "Schedule management",
+    icon: <CalendarTodayIcon />,
+    path: "/dashboard/project",
+  },
   { title: "User management", icon: <GroupIcon />, path: "#" },
   { title: "Finance management", icon: <BarChartIcon />, path: "#" },
   { title: "Logout", icon: <LogoutIcon />, path: "/logout" },
@@ -114,16 +122,16 @@ export default function DashboardLayoutBasic() {
       >
         {isExpanded && (
           <>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <img src={Logo} alt="Logo" style={{ height: "40px" }} />
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ color: "#b8192b", fontWeight: "bold" }}
-              >
-                TimeSheet
-              </Typography>
+            <Box display="flex" alignItems="center" mb={4}>
+              <PetsIcon sx={{ fontSize: 48, color: "#FFD43B", mr: 2 }} />
+              <Box>
+                <Typography variant="h4" fontWeight="bold" color="#2F80ED">
+                  My Pet
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Admin Dashboard
+                </Typography>
+              </Box>
             </Box>
           </>
         )}

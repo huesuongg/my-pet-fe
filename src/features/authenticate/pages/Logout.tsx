@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../authSlice";
+import { logoutThunk } from "../authThunk";
 import { useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../../store";
 import { routes } from "../../../routes/AppRouter";
@@ -16,7 +16,7 @@ export const Logout = () => {
     const performLogout = async () => {
       if (isAuthenticated) {
         try {
-          dispatch(logout());
+          await dispatch(logoutThunk());
           toast.success("Đăng xuất thành công! Hẹn gặp lại bạn!");
           setTimeout(() => {
             navigate(routes.HOME_PATH);

@@ -1,8 +1,8 @@
-import { useDispatch, useSelector } from "react-redux";
-import { register } from "../authThunk";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import type { AppDispatch, RootState } from "../../../store";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../../store";
+import { setUser } from "../authSlice";
 import { Loading } from "../../../components/Loading";
 import { isBlank } from "../../../utils/stringUtils";
 import { toast } from "react-toastify";
@@ -26,7 +26,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { routes } from "../../../routes/AppRouter";
+import axiosInstance from "../../../services/axiosInstance";
 
 const theme = createTheme({
   palette: {
@@ -43,13 +43,12 @@ const theme = createTheme({
 });
 
 export const RegisterPage = (): JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
-  const status = useSelector((state: RootState) => state.auth.status);
-  const error = useSelector((state: RootState) => state.auth.error);
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
-  const [isLoadingBackdropOpen, setLoadingBackdropOpen] = useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showOTP, setShowOTP] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
 
   const [formData, setFormData] = useState({
     username: "",
@@ -59,6 +58,8 @@ export const RegisterPage = (): JSX.Element => {
     fullName: "",
     phone: ""
   });
+
+  const [otp, setOtp] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -115,36 +116,79 @@ export const RegisterPage = (): JSX.Element => {
 
   const handleRegister = async () => {
     if (validateForm()) {
-      dispatch(register(formData));
-      setSubmitted(true);
+      setIsLoading(true);
+      setError("");
+      
+      try {
+        const response = await axiosInstance.post('/api/auth/register-request', {
+          fullname: formData.fullName,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        });
+        
+        if (response.status === 200) {
+          setUserEmail(formData.email);
+          setShowOTP(true);
+          toast.success("Mã OTP đã được gửi đến email của bạn!");
+        }
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.message || "Đăng ký thất bại";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated && !submitted) {
-      toast.info("Bạn đã đăng nhập!");
-      navigate(routes.HOME_PATH);
+  const handleVerifyOTP = async () => {
+    if (!otp || otp.length !== 6) {
+      toast.error("Mã OTP phải có 6 chữ số");
+      return;
     }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (!submitted) return;
-    if (status === "success" && isAuthenticated) {
-      setLoadingBackdropOpen(false);
-      toast.success("Đăng ký thành công! Chào mừng bạn đến với My Pet!");
-      navigate(routes.HOME_PATH);
-    } else if (status === "error") {
-      setLoadingBackdropOpen(false);
-      toast.error(`Lỗi: ${error}`);
-      setSubmitted(false); // Reset submitted state to allow retry
-    } else if (status === "loading") {
-      setLoadingBackdropOpen(true);
+    
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const response = await axiosInstance.post('/api/auth/verify-register', {
+        email: userEmail,
+        otp: otp
+      });
+      
+      // Lưu user data và tokens vào localStorage
+      const { user, accessToken, refreshToken } = response.data || {};
+      
+      if (user && accessToken && refreshToken) {
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
+        
+        // Cập nhật Redux state
+        dispatch(setUser(user));
+        
+        toast.success("Đăng ký thành công! Chào mừng bạn đến với My Pet!");
+        
+        // Navigate đến trang chủ
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } else {
+        throw new Error("Dữ liệu phản hồi không đầy đủ");
+      }
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || "Xác thực OTP thất bại";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-  }, [status, isAuthenticated, navigate, error]);
+  };
 
   return (
     <ThemeProvider theme={theme}>
-      <Loading isOpen={isLoadingBackdropOpen} />
+      <Loading isOpen={isLoading} />
       <Box
         sx={{
           minHeight: "100vh",
@@ -178,7 +222,7 @@ export const RegisterPage = (): JSX.Element => {
             </Box>
 
             <Typography variant="h5" mb={3} fontWeight="bold">
-              Đăng ký tài khoản mới 🐾
+              {showOTP ? "Xác thực Email" : "Đăng ký tài khoản mới 🐾"}
             </Typography>
 
             {error && (
@@ -187,179 +231,219 @@ export const RegisterPage = (): JSX.Element => {
               </Alert>
             )}
 
-            {/* Form */}
-            <Grid container spacing={3}>
-              {/* Username */}
-              <Grid size={{ xs: 12, sm: 6 }}>
+            {showOTP ? (
+              /* OTP Verification */
+              <Box sx={{ my: 3 }}>
+                <Typography variant="body1" mb={2} color="text.secondary">
+                  Mã OTP đã được gửi đến email: <strong>{userEmail}</strong>
+                </Typography>
                 <TextField
                   fullWidth
-                  label="Tên đăng nhập"
-                  value={formData.username}
-                  onChange={(e) => handleInputChange('username', e.target.value)}
-                  error={!!formErrors.username}
-                  helperText={formErrors.username}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
+                  label="Mã OTP (6 chữ số)"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  inputProps={{ maxLength: 6 }}
+                  placeholder="Nhập mã OTP"
+                  sx={{ mb: 3 }}
                 />
-              </Grid>
+                <Box display="flex" gap={2}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => setShowOTP(false)}
+                  >
+                    Quay lại
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="success"
+                    size="large"
+                    sx={{ borderRadius: 8, fontWeight: "bold", py: 1.5 }}
+                    onClick={handleVerifyOTP}
+                  >
+                    Xác thực
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              /* Registration Form */
+              <>
+                {/* Form */}
+                <Grid container spacing={3}>
+                  {/* Username */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Tên đăng nhập"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange('username', e.target.value)}
+                      error={!!formErrors.username}
+                      helperText={formErrors.username}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
 
-              {/* Email */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
+                  {/* Email */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      error={!!formErrors.email}
+                      helperText={formErrors.email}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EmailIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  {/* Full Name */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Họ và tên"
+                      value={formData.fullName}
+                      onChange={(e) => handleInputChange('fullName', e.target.value)}
+                      error={!!formErrors.fullName}
+                      helperText={formErrors.fullName}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  {/* Phone */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Số điện thoại"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      error={!!formErrors.phone}
+                      helperText={formErrors.phone}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PhoneIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  {/* Password */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Mật khẩu"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      error={!!formErrors.password}
+                      helperText={formErrors.password}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon color="action" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+
+                  {/* Confirm Password */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Xác nhận mật khẩu"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                      error={!!formErrors.confirmPassword}
+                      helperText={formErrors.confirmPassword}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon color="action" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+                {/* Register Button */}
+                <Button
                   fullWidth
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  error={!!formErrors.email}
-                  helperText={formErrors.email}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon color="action" />
-                      </InputAdornment>
-                    ),
+                  variant="contained"
+                  color="success"
+                  size="large"
+                  sx={{ 
+                    borderRadius: 8, 
+                    fontWeight: "bold",
+                    mt: 3,
+                    py: 1.5
                   }}
-                />
-              </Grid>
-
-              {/* Full Name */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Họ và tên"
-                  value={formData.fullName}
-                  onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  error={!!formErrors.fullName}
-                  helperText={formErrors.fullName}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              {/* Phone */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Số điện thoại"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  error={!!formErrors.phone}
-                  helperText={formErrors.phone}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PhoneIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              {/* Password */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Mật khẩu"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  error={!!formErrors.password}
-                  helperText={formErrors.password}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="action" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              {/* Confirm Password */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Xác nhận mật khẩu"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  error={!!formErrors.confirmPassword}
-                  helperText={formErrors.confirmPassword}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="action" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          edge="end"
-                        >
-                          {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
-
-            {/* Register Button */}
-            <Button
-              fullWidth
-              variant="contained"
-              color="success"
-              size="large"
-              sx={{ 
-                borderRadius: 8, 
-                fontWeight: "bold",
-                mt: 3,
-                py: 1.5
-              }}
-              onClick={handleRegister}
-            >
-              Đăng ký
-            </Button>
-
-            {/* Login Link */}
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                Đã có tài khoản?{" "}
-                <Link 
-                  to="/login" 
-                  style={{ 
-                    color: theme.palette.primary.main, 
-                    textDecoration: "none",
-                    fontWeight: "bold"
-                  }}
+                  onClick={handleRegister}
                 >
+              Đăng ký
+                </Button>
+
+                {/* Login Link */}
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="body2" color="text.secondary">
+                Đã có tài khoản?{" "}
+                    <Link 
+                      to="/login" 
+                      style={{ 
+                        color: theme.palette.primary.main, 
+                        textDecoration: "none",
+                        fontWeight: "bold"
+                      }}
+                    >
                   Đăng nhập ngay
-                </Link>
-              </Typography>
-            </Box>
+                    </Link>
+                  </Typography>
+                </Box>
+              </>
+            )}
           </Paper>
         </Container>
       </Box>

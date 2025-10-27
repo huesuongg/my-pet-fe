@@ -3,9 +3,9 @@ import { mockPets, delay } from './mockData';
 
 export const petAPI = {
   // Get pets by user ID
-  getPetsByUserId: async (userId: number): Promise<Pet[]> => {
+  getPetsByUserId: async (userId: string): Promise<Pet[]> => {
     await delay(500);
-    return mockPets.filter(pet => pet.userId === userId && pet.isActive);
+    return mockPets.filter(pet => pet.userId.toString() === userId && pet.isActive);
   },
 
   // Get pet by ID

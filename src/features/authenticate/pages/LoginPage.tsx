@@ -64,12 +64,20 @@ export const LoginPage = (): JSX.Element => {
     }
   }, [isAuthenticated]);
 
+  const user = useSelector((state: RootState) => state.auth.user);
+
   useEffect(() => {
     if (!submitted) return;
     if (status === "success" && isAuthenticated) {
       setLoadingBackdropOpen(false);
       toast.success("Đăng nhập thành công! Chào mừng bạn trở lại!");
-      navigate(routes.HOME_PATH);
+      
+      // Kiểm tra role và redirect
+      if (user?.role === "admin") {
+        navigate(routes.DASHBOARD_PATH);
+      } else {
+        navigate(routes.HOME_PATH);
+      }
     } else if (status === "error") {
       setLoadingBackdropOpen(false);
       toast.error(`Lỗi: ${error}`);
@@ -77,7 +85,7 @@ export const LoginPage = (): JSX.Element => {
     } else if (status === "loading") {
       setLoadingBackdropOpen(true);
     }
-  }, [status, isAuthenticated, navigate, error]);
+  }, [status, isAuthenticated, navigate, error, user]);
 
   return (
     <ThemeProvider theme={theme}>
