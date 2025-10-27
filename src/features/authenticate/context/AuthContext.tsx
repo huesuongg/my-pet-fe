@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../../store';
-import { setUser, logout } from '../authSlice';
-import { logoutThunk } from '../authThunk';
-import { User } from '../types';
+import React, { createContext, useContext, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../../store";
+import { setUser } from "../authSlice";
+import { logoutThunk } from "../authThunk";
+import { User } from "../types";
 
 interface AuthContextType {
   user: User | null;
@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -29,22 +29,24 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
   const status = useSelector((state: RootState) => state.auth.status);
 
   // Initialize auth state from localStorage on app start
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
     if (token && userData) {
       try {
         const parsedUser = JSON.parse(userData);
         dispatch(setUser(parsedUser));
       } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        console.error("Error parsing user data from localStorage:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     }
   }, [dispatch]);
@@ -56,13 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user,
     isAuthenticated,
-    isLoading: status === 'loading',
+    isLoading: status === "loading",
     logout: handleLogout,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

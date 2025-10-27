@@ -1,8 +1,8 @@
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Grid, 
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
   Paper,
   TextField,
   FormControl,
@@ -26,14 +26,14 @@ import {
   Slide,
   Divider,
   Badge,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
-import { 
-  ArrowBack, 
-  CalendarToday, 
-  AccessTime, 
-  Person, 
-  Phone, 
+import {
+  ArrowBack,
+  CalendarToday,
+  AccessTime,
+  Person,
+  Phone,
   Notes,
   CheckCircle,
   Payment,
@@ -43,7 +43,7 @@ import {
   LocationOn,
   Schedule,
   LocalHospital,
-  Verified
+  Verified,
 } from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -69,35 +69,40 @@ export default function BookingPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { getDoctorById, createAppointment, doctorLoading, error } = useScheduling();
+  const { getDoctorById, createAppointment, doctorLoading, error } =
+    useScheduling();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { pets, loading: petsLoading } = useSelector((state: RootState) => state.pet);
+  const { pets, loading: petsLoading } = useSelector(
+    (state: RootState) => state.pet
+  );
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [formData, setFormData] = useState<BookingFormData>({
-    patientName: '',
-    patientPhone: '',
-    appointmentType: '',
-    date: '',
-    time: '',
-    notes: '',
-    paymentMethod: 'cash',
-    petId: ''
+    patientName: "",
+    patientPhone: "",
+    appointmentType: "",
+    date: "",
+    time: "",
+    notes: "",
+    paymentMethod: "cash",
+    petId: "",
   });
-  const [availableSlots, setAvailableSlots] = useState<{date: string, time: string, available: boolean}[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [availableSlots, setAvailableSlots] = useState<
+    { date: string; time: string; available: boolean }[]
+  >([]);
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [appointmentId, setAppointmentId] = useState<string>('');
+  const [appointmentId, setAppointmentId] = useState<string>("");
 
   const appointmentTypes = [
     "Khám tổng quát",
-    "Tiêm phòng", 
+    "Tiêm phòng",
     "Phẫu thuật",
     "Cấp cứu",
     "Tư vấn dinh dưỡng",
     "Khám da liễu",
     "Khám răng miệng",
-    "Xét nghiệm"
+    "Xét nghiệm",
   ];
 
   useEffect(() => {
@@ -115,38 +120,40 @@ export default function BookingPage() {
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(getPetsByUserId(user.id));
+      dispatch(getPetsByUserId(Number(user.id)));
     }
   }, [dispatch, user?.id]);
 
   const handleInputChange = (field: keyof BookingFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
-    setFormData(prev => ({ ...prev, date, time: '' }));
+    setFormData((prev) => ({ ...prev, date, time: "" }));
   };
 
   const handleTimeSelect = (time: string) => {
-    setFormData(prev => ({ ...prev, time }));
+    setFormData((prev) => ({ ...prev, time }));
   };
 
   const getAvailableTimesForDate = (date: string) => {
     const times = availableSlots
-      .filter(slot => slot.date === date && slot.available)
-      .map(slot => slot.time);
+      .filter((slot) => slot.date === date && slot.available)
+      .map((slot) => slot.time);
     // Remove duplicates and sort
     return [...new Set(times)].sort();
   };
 
   const isFormValid = () => {
-    return formData.patientName && 
-           formData.patientPhone && 
-           formData.appointmentType && 
-           formData.date && 
-           formData.time &&
-           formData.petId;
+    return (
+      formData.patientName &&
+      formData.patientPhone &&
+      formData.appointmentType &&
+      formData.date &&
+      formData.time &&
+      formData.petId
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,18 +167,18 @@ export default function BookingPage() {
         date: formData.date,
         time: formData.time,
         type: formData.appointmentType,
-        status: 'confirmed',
+        status: "confirmed",
         phone: formData.patientPhone,
         patientName: formData.patientName,
         patientPhone: formData.patientPhone,
         notes: formData.notes,
-        paymentMethod: formData.paymentMethod
+        paymentMethod: formData.paymentMethod,
       });
       setAppointmentId(newAppointment.id);
       setBookingSuccess(true);
     } catch (err) {
-      console.error('Booking failed:', err);
-      alert('Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.');
+      console.error("Booking failed:", err);
+      alert("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.");
     } finally {
       setIsSubmitting(false);
     }
@@ -227,7 +234,7 @@ export default function BookingPage() {
             animation: "float 3s ease-in-out infinite reverse",
           }}
         />
-        
+
         <Fade in timeout={600}>
           <Paper
             sx={{
@@ -290,7 +297,12 @@ export default function BookingPage() {
             >
               <LocalHospital sx={{ fontSize: 40, color: "white" }} />
             </Box>
-            <Typography variant="h5" fontWeight="bold" color="error" gutterBottom>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="error"
+              gutterBottom
+            >
               Có lỗi xảy ra
             </Typography>
             <Alert severity="error" sx={{ mt: 2 }}>
@@ -352,7 +364,7 @@ export default function BookingPage() {
             animation: "float 4s ease-in-out infinite reverse",
           }}
         />
-        
+
         <Zoom in timeout={800}>
           <Paper
             sx={{
@@ -387,31 +399,39 @@ export default function BookingPage() {
             </Box>
 
             {/* Success Message */}
-            <Typography variant="h4" fontWeight="bold" color="#1E40AF" gutterBottom>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              color="#1E40AF"
+              gutterBottom
+            >
               🎉 Đặt lịch thành công!
             </Typography>
-            
+
             <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
               Cảm ơn bạn đã tin tưởng dịch vụ của chúng tôi
             </Typography>
 
             {/* Appointment Details */}
             <Slide in timeout={1000} direction="up">
-              <Card sx={{ 
-                p: 4, 
-                mb: 4, 
-                background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", 
-                border: "2px solid #cbd5e1",
-                borderRadius: 3,
-                boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
-              }}>
+              <Card
+                sx={{
+                  p: 4,
+                  mb: 4,
+                  background:
+                    "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+                  border: "2px solid #cbd5e1",
+                  borderRadius: 3,
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                }}
+              >
                 <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
                   <Verified sx={{ color: "#22C55E", mr: 1 }} />
                   <Typography variant="h6" fontWeight="bold" color="#1E40AF">
                     Thông tin lịch hẹn
                   </Typography>
                 </Box>
-                
+
                 <Stack spacing={2}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Person sx={{ color: "#3B82F6", fontSize: 20 }} />
@@ -424,7 +444,7 @@ export default function BookingPage() {
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <LocalHospital sx={{ color: "#8B5CF6", fontSize: 20 }} />
                     <Box>
@@ -436,7 +456,7 @@ export default function BookingPage() {
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <CalendarToday sx={{ color: "#F59E0B", fontSize: 20 }} />
                     <Box>
@@ -448,7 +468,7 @@ export default function BookingPage() {
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Schedule sx={{ color: "#10B981", fontSize: 20 }} />
                     <Box>
@@ -460,7 +480,7 @@ export default function BookingPage() {
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Payment sx={{ color: "#EF4444", fontSize: 20 }} />
                     <Box>
@@ -468,20 +488,24 @@ export default function BookingPage() {
                         Thanh toán
                       </Typography>
                       <Typography variant="body1" fontWeight="bold">
-                        {formData.paymentMethod === 'cash' ? 'Tại chỗ' : formData.paymentMethod}
+                        {formData.paymentMethod === "cash"
+                          ? "Tại chỗ"
+                          : formData.paymentMethod}
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   <Divider sx={{ my: 1 }} />
-                  
-                  <Box sx={{ 
-                    p: 2, 
-                    bgcolor: "#3B82F6", 
-                    borderRadius: 2, 
-                    color: "white",
-                    textAlign: "center"
-                  }}>
+
+                  <Box
+                    sx={{
+                      p: 2,
+                      bgcolor: "#3B82F6",
+                      borderRadius: 2,
+                      color: "white",
+                      textAlign: "center",
+                    }}
+                  >
                     <Typography variant="body2" sx={{ opacity: 0.9 }}>
                       Mã lịch hẹn
                     </Typography>
@@ -495,14 +519,22 @@ export default function BookingPage() {
 
             {/* Action Buttons */}
             <Slide in timeout={1200} direction="up">
-              <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 3,
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => navigate('/scheduling/history')}
+                  onClick={() => navigate("/scheduling/history")}
                   startIcon={<Schedule />}
                   sx={{
-                    background: "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
+                    background:
+                      "linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
                     px: 4,
                     py: 2,
                     borderRadius: 3,
@@ -510,7 +542,8 @@ export default function BookingPage() {
                     fontWeight: "bold",
                     boxShadow: "0 8px 25px rgba(59, 130, 246, 0.3)",
                     "&:hover": {
-                      background: "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)",
+                      background:
+                        "linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)",
                       transform: "translateY(-2px)",
                       boxShadow: "0 12px 35px rgba(59, 130, 246, 0.4)",
                     },
@@ -519,11 +552,11 @@ export default function BookingPage() {
                 >
                   Xem lịch sử đặt lịch
                 </Button>
-                
+
                 <Button
                   variant="outlined"
                   size="large"
-                  onClick={() => navigate('/scheduling')}
+                  onClick={() => navigate("/scheduling")}
                   startIcon={<CalendarToday />}
                   sx={{
                     borderColor: "#3B82F6",
@@ -636,16 +669,16 @@ export default function BookingPage() {
           <Box sx={{ p: 4, pb: 0 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 3, mb: 4 }}>
               <Tooltip title="Quay lại">
-                <IconButton 
-                  onClick={handleBack} 
-                  sx={{ 
+                <IconButton
+                  onClick={handleBack}
+                  sx={{
                     bgcolor: "white",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                     "&:hover": {
                       bgcolor: "#f8fafc",
                       transform: "translateY(-2px)",
                     },
-                    transition: "all 0.3s ease"
+                    transition: "all 0.3s ease",
                   }}
                 >
                   <ArrowBack />
@@ -668,7 +701,8 @@ export default function BookingPage() {
                   p: 4,
                   mb: 4,
                   borderRadius: 4,
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   color: "white",
                   boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
                   position: "relative",
@@ -680,24 +714,40 @@ export default function BookingPage() {
                     right: 0,
                     width: "100%",
                     height: "100%",
-                    background: "linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
+                    background:
+                      "linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
                     pointerEvents: "none",
-                  }
+                  },
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 4, position: "relative", zIndex: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
+                    position: "relative",
+                    zIndex: 1,
+                  }}
+                >
                   <Avatar
                     src={doctor.profileImage}
                     alt={doctor.name}
-                    sx={{ 
-                      width: 100, 
-                      height: 100, 
+                    sx={{
+                      width: 100,
+                      height: 100,
                       border: "4px solid rgba(255,255,255,0.3)",
-                      boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
                     }}
                   />
                   <Box sx={{ flex: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        mb: 1,
+                      }}
+                    >
                       <Typography variant="h4" fontWeight="bold">
                         {doctor.name}
                       </Typography>
@@ -716,13 +766,17 @@ export default function BookingPage() {
                       {doctor.experience}
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <LocationOn sx={{ fontSize: 16 }} />
                         <Typography variant="body2" sx={{ opacity: 0.8 }}>
                           {doctor.city}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <Phone sx={{ fontSize: 16 }} />
                         <Typography variant="body2" sx={{ opacity: 0.8 }}>
                           {doctor.phone}
@@ -741,23 +795,35 @@ export default function BookingPage() {
             {/* Left side - Form */}
             <Grid size={{ xs: 12, md: 8 }}>
               <Fade in timeout={1000}>
-                <Paper sx={{ 
-                  p: 4, 
-                  borderRadius: 4,
-                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                  background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                  border: "1px solid #e2e8f0"
-                }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-                    <Box sx={{
-                      width: 40,
-                      height: 40,
-                      bgcolor: "#3B82F6",
-                      borderRadius: "50%",
+                <Paper
+                  sx={{
+                    p: 4,
+                    borderRadius: 4,
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                    background:
+                      "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <Box
+                    sx={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center"
-                    }}>
+                      gap: 2,
+                      mb: 4,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: "#3B82F6",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <Person sx={{ color: "white", fontSize: 20 }} />
                     </Box>
                     <Typography variant="h5" fontWeight="bold" color="#1E40AF">
@@ -773,10 +839,14 @@ export default function BookingPage() {
                           fullWidth
                           label="Họ và tên"
                           value={formData.patientName}
-                          onChange={(e) => handleInputChange('patientName', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("patientName", e.target.value)
+                          }
                           required
                           InputProps={{
-                            startAdornment: <Person sx={{ mr: 1, color: "text.secondary" }} />
+                            startAdornment: (
+                              <Person sx={{ mr: 1, color: "text.secondary" }} />
+                            ),
                           }}
                         />
                       </Grid>
@@ -787,10 +857,14 @@ export default function BookingPage() {
                           fullWidth
                           label="Số điện thoại"
                           value={formData.patientPhone}
-                          onChange={(e) => handleInputChange('patientPhone', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("patientPhone", e.target.value)
+                          }
                           required
                           InputProps={{
-                            startAdornment: <Phone sx={{ mr: 1, color: "text.secondary" }} />
+                            startAdornment: (
+                              <Phone sx={{ mr: 1, color: "text.secondary" }} />
+                            ),
                           }}
                         />
                       </Grid>
@@ -801,7 +875,12 @@ export default function BookingPage() {
                           <InputLabel>Loại khám</InputLabel>
                           <Select
                             value={formData.appointmentType}
-                            onChange={(e) => handleInputChange('appointmentType', e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange(
+                                "appointmentType",
+                                e.target.value
+                              )
+                            }
                             label="Loại khám"
                           >
                             {appointmentTypes.map((type) => (
@@ -819,19 +898,21 @@ export default function BookingPage() {
                           <InputLabel>Chọn thú cưng</InputLabel>
                           <Select
                             value={formData.petId}
-                            onChange={(e) => handleInputChange('petId', e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("petId", e.target.value)
+                            }
                             label="Chọn thú cưng"
                             disabled={petsLoading || pets.length === 0}
                           >
                             {pets.length === 0 ? (
                               <MenuItem disabled>
-                                <Box sx={{ textAlign: 'center', py: 2 }}>
+                                <Box sx={{ textAlign: "center", py: 2 }}>
                                   <Typography color="text.secondary">
                                     Bạn chưa có thú cưng nào
                                   </Typography>
                                   <Button
                                     size="small"
-                                    onClick={() => navigate('/pet-profile')}
+                                    onClick={() => navigate("/pet-profile")}
                                     sx={{ mt: 1 }}
                                   >
                                     Thêm thú cưng
@@ -841,7 +922,13 @@ export default function BookingPage() {
                             ) : (
                               pets.map((pet) => (
                                 <MenuItem key={pet.id} value={pet.id}>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 2,
+                                    }}
+                                  >
                                     <Avatar
                                       src={pet.profileImage}
                                       sx={{ width: 40, height: 40 }}
@@ -849,11 +936,18 @@ export default function BookingPage() {
                                       <PetsIcon />
                                     </Avatar>
                                     <Box>
-                                      <Typography variant="body1" fontWeight="bold">
+                                      <Typography
+                                        variant="body1"
+                                        fontWeight="bold"
+                                      >
                                         {pet.name}
                                       </Typography>
-                                      <Typography variant="body2" color="text.secondary">
-                                        {pet.species} - {pet.breed} - {pet.age} tuổi
+                                      <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                      >
+                                        {pet.species} - {pet.breed} - {pet.age}{" "}
+                                        tuổi
                                       </Typography>
                                     </Box>
                                   </Box>
@@ -863,10 +957,10 @@ export default function BookingPage() {
                           </Select>
                         </FormControl>
                         {pets.length === 0 && (
-                          <Box sx={{ mt: 1, textAlign: 'center' }}>
+                          <Box sx={{ mt: 1, textAlign: "center" }}>
                             <Button
                               variant="outlined"
-                              onClick={() => navigate('/pet-profile')}
+                              onClick={() => navigate("/pet-profile")}
                               startIcon={<PetsIcon />}
                             >
                               Tạo hồ sơ thú cưng
@@ -883,9 +977,15 @@ export default function BookingPage() {
                           multiline
                           rows={3}
                           value={formData.notes}
-                          onChange={(e) => handleInputChange('notes', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("notes", e.target.value)
+                          }
                           InputProps={{
-                            startAdornment: <Notes sx={{ mr: 1, color: "text.secondary", mt: 1 }} />
+                            startAdornment: (
+                              <Notes
+                                sx={{ mr: 1, color: "text.secondary", mt: 1 }}
+                              />
+                            ),
                           }}
                         />
                       </Grid>
@@ -893,42 +993,81 @@ export default function BookingPage() {
                       {/* Payment Method */}
                       <Grid size={{ xs: 12 }}>
                         <FormControl component="fieldset" fullWidth>
-                          <FormLabel component="legend" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+                          <FormLabel
+                            component="legend"
+                            sx={{
+                              mb: 2,
+                              fontWeight: "bold",
+                              color: "text.primary",
+                            }}
+                          >
                             Phương thức thanh toán
                           </FormLabel>
                           <RadioGroup
                             value={formData.paymentMethod}
-                            onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("paymentMethod", e.target.value)
+                            }
                             sx={{ gap: 1 }}
                           >
-                            <Card sx={{ p: 2, border: formData.paymentMethod === 'cash' ? '2px solid #3B82F6' : '1px solid #E5E7EB' }}>
+                            <Card
+                              sx={{
+                                p: 2,
+                                border:
+                                  formData.paymentMethod === "cash"
+                                    ? "2px solid #3B82F6"
+                                    : "1px solid #E5E7EB",
+                              }}
+                            >
                               <FormControlLabel
                                 value="cash"
                                 control={<Radio />}
                                 label={
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Payment sx={{ color: '#22C55E' }} />
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
+                                    <Payment sx={{ color: "#22C55E" }} />
                                     <Typography>Thanh toán tại quầy</Typography>
                                   </Box>
                                 }
-                                sx={{ width: '100%', m: 0 }}
+                                sx={{ width: "100%", m: 0 }}
                               />
                             </Card>
-                                                    
-                            <Card sx={{ p: 2, border: formData.paymentMethod === 'bank' ? '2px solid #3B82F6' : '1px solid #E5E7EB', opacity: 0.6 }}>
+
+                            <Card
+                              sx={{
+                                p: 2,
+                                border:
+                                  formData.paymentMethod === "bank"
+                                    ? "2px solid #3B82F6"
+                                    : "1px solid #E5E7EB",
+                                opacity: 0.6,
+                              }}
+                            >
                               <FormControlLabel
                                 value="bank"
                                 control={<Radio disabled />}
                                 label={
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <AccountBalance sx={{ color: '#6B7280' }} />
-                                    <Typography color="text.secondary">Đặt cọc trước (Sắp có)</Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
+                                    <AccountBalance sx={{ color: "#6B7280" }} />
+                                    <Typography color="text.secondary">
+                                      Đặt cọc trước (Sắp có)
+                                    </Typography>
                                   </Box>
                                 }
-                                sx={{ width: '100%', m: 0 }}
+                                sx={{ width: "100%", m: 0 }}
                               />
                             </Card>
-                            
                           </RadioGroup>
                         </FormControl>
                       </Grid>
@@ -946,10 +1085,12 @@ export default function BookingPage() {
                             fontSize: "1.1rem",
                             fontWeight: "bold",
                             borderRadius: 3,
-                            background: "linear-gradient(45deg, #22C55E 0%, #16A34A 100%)",
+                            background:
+                              "linear-gradient(45deg, #22C55E 0%, #16A34A 100%)",
                             "&:hover": {
-                              background: "linear-gradient(45deg, #16A34A 0%, #15803D 100%)",
-                            }
+                              background:
+                                "linear-gradient(45deg, #16A34A 0%, #15803D 100%)",
+                            },
                           }}
                         >
                           {isSubmitting ? (
@@ -968,26 +1109,38 @@ export default function BookingPage() {
             {/* Right side - Date and Time Selection */}
             <Grid size={{ xs: 12, md: 4 }}>
               <Slide in timeout={1200} direction="left">
-                <Paper sx={{ 
-                  p: 4, 
-                  borderRadius: 4,
-                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                  background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-                  border: "1px solid #bae6fd",
-                  height: "fit-content",
-                  position: "sticky",
-                  top: 20
-                }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-                    <Box sx={{
-                      width: 40,
-                      height: 40,
-                      bgcolor: "#0EA5E9",
-                      borderRadius: "50%",
+                <Paper
+                  sx={{
+                    p: 4,
+                    borderRadius: 4,
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                    background:
+                      "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                    border: "1px solid #bae6fd",
+                    height: "fit-content",
+                    position: "sticky",
+                    top: 20,
+                  }}
+                >
+                  <Box
+                    sx={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center"
-                    }}>
+                      gap: 2,
+                      mb: 4,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: "#0EA5E9",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <CalendarToday sx={{ color: "white", fontSize: 20 }} />
                     </Box>
                     <Typography variant="h5" fontWeight="bold" color="#0C4A6E">
@@ -997,40 +1150,65 @@ export default function BookingPage() {
 
                   {/* Date Selection */}
                   <Box sx={{ mb: 4 }}>
-                    <Typography variant="subtitle1" fontWeight="600" gutterBottom sx={{ color: "#0C4A6E", mb: 2 }}>
-                      <CalendarToday sx={{ mr: 1, verticalAlign: "middle", color: "#0EA5E9" }} />
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight="600"
+                      gutterBottom
+                      sx={{ color: "#0C4A6E", mb: 2 }}
+                    >
+                      <CalendarToday
+                        sx={{
+                          mr: 1,
+                          verticalAlign: "middle",
+                          color: "#0EA5E9",
+                        }}
+                      />
                       Chọn ngày
                     </Typography>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 1.5,
+                        mt: 2,
+                      }}
+                    >
                       {Array.from({ length: 7 }, (_, i) => {
                         const date = new Date();
                         date.setDate(date.getDate() + i);
-                        const dateStr = date.toISOString().split('T')[0];
-                        const isAvailable = availableSlots.some(slot => slot.date === dateStr);
+                        const dateStr = date.toISOString().split("T")[0];
+                        const isAvailable = availableSlots.some(
+                          (slot) => slot.date === dateStr
+                        );
                         const isSelected = selectedDate === dateStr;
-                        
+
                         return (
                           <Chip
                             key={dateStr}
-                            label={date.toLocaleDateString('vi-VN', { 
-                              day: '2-digit', 
-                              month: '2-digit' 
+                            label={date.toLocaleDateString("vi-VN", {
+                              day: "2-digit",
+                              month: "2-digit",
                             })}
-                            onClick={() => isAvailable && handleDateSelect(dateStr)}
+                            onClick={() =>
+                              isAvailable && handleDateSelect(dateStr)
+                            }
                             color={isSelected ? "primary" : "default"}
                             variant={isSelected ? "filled" : "outlined"}
                             disabled={!isAvailable}
                             sx={{
-                              cursor: isAvailable ? 'pointer' : 'not-allowed',
+                              cursor: isAvailable ? "pointer" : "not-allowed",
                               opacity: isAvailable ? 1 : 0.5,
                               fontWeight: isSelected ? "bold" : "normal",
                               fontSize: "0.9rem",
                               py: 2,
                               px: 1,
-                              "&:hover": isAvailable ? {
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 4px 12px rgba(14, 165, 233, 0.3)",
-                              } : {},
+                              "&:hover": isAvailable
+                                ? {
+                                  transform: "translateY(-2px)",
+                                  boxShadow:
+                                      "0 4px 12px rgba(14, 165, 233, 0.3)",
+                                }
+                                : {},
                               transition: "all 0.3s ease",
                             }}
                           />
@@ -1042,21 +1220,44 @@ export default function BookingPage() {
                   {/* Time Selection */}
                   {selectedDate && (
                     <Box>
-                      <Typography variant="subtitle1" fontWeight="600" gutterBottom sx={{ color: "#0C4A6E", mb: 2 }}>
-                        <AccessTime sx={{ mr: 1, verticalAlign: "middle", color: "#0EA5E9" }} />
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="600"
+                        gutterBottom
+                        sx={{ color: "#0C4A6E", mb: 2 }}
+                      >
+                        <AccessTime
+                          sx={{
+                            mr: 1,
+                            verticalAlign: "middle",
+                            color: "#0EA5E9",
+                          }}
+                        />
                         Chọn giờ
                       </Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 2 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1.5,
+                          mt: 2,
+                        }}
+                      >
                         {getAvailableTimesForDate(selectedDate).map((time) => (
                           <Chip
                             key={time}
                             label={time}
                             onClick={() => handleTimeSelect(time)}
-                            color={formData.time === time ? "primary" : "default"}
-                            variant={formData.time === time ? "filled" : "outlined"}
-                            sx={{ 
-                              cursor: 'pointer',
-                              fontWeight: formData.time === time ? "bold" : "normal",
+                            color={
+                              formData.time === time ? "primary" : "default"
+                            }
+                            variant={
+                              formData.time === time ? "filled" : "outlined"
+                            }
+                            sx={{
+                              cursor: "pointer",
+                              fontWeight:
+                                formData.time === time ? "bold" : "normal",
                               fontSize: "0.9rem",
                               py: 2,
                               px: 1,

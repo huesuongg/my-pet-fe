@@ -9,7 +9,7 @@ export const getPetsByUserId = createAsyncThunk<
   { rejectValue: RejectPayload }
 >('pet/getPetsByUserId', async (userId, { rejectWithValue }) => {
   try {
-    const pets = await petAPI.getPetsByUserId(userId);
+    const pets = await petAPI.getPetsByUserId(userId.toString());
     return pets;
   } catch (error) {
     return rejectWithValue({

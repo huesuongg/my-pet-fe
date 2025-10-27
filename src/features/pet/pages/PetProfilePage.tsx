@@ -88,7 +88,7 @@ export default function PetProfilePage() {
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(getPetsByUserId(user.id));
+      dispatch(getPetsByUserId(Number(user.id)));
     }
   }, [dispatch, user?.id]);
 
@@ -118,7 +118,7 @@ export default function PetProfilePage() {
         setDeleteDialog(null);
         // Refresh pets list
         if (user?.id) {
-          dispatch(getPetsByUserId(user.id));
+          dispatch(getPetsByUserId(Number(user.id)));
         }
       } catch (error) {
         toast.error('Có lỗi xảy ra khi xóa thú cưng');
@@ -701,7 +701,7 @@ export default function PetProfilePage() {
             onSuccess={() => {
               setOpenForm(false);
               if (user?.id) {
-                dispatch(getPetsByUserId(user.id));
+                dispatch(getPetsByUserId(Number(user.id)));
               }
             }}
           />
