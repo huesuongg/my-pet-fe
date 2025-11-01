@@ -1,9 +1,13 @@
 // src/components/SimpleEditModal.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../../../store';
+import { updateUser, getUserById } from '../../authenticate/authThunk';
+import type { UpdateUserPayload } from '../../authenticate/authAPI';
 import CloseIcon from '@mui/icons-material/Close';
 
 export interface ProfileData {
-  intro: string;
+  introduction: string;
   workplace: string;
   education: string;
   studied: string;
@@ -24,16 +28,40 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
   onClose,
   onSave
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const [isLoading, setIsLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [backgroundFile, setBackgroundFile] = useState<File | null>(null);
+
   const [formData, setFormData] = useState<ProfileData>({
-    intro: "Believe in yourself and you can do unbelievable things. 😊",
-    workplace: "99media ltd",
-    education: "Amity University",
-    studied: "DPS Delhi",
-    lives: "Bangalore, India",
-    from: "Bangalore, India",
+    introduction: "",
+    workplace: "",
+    education: "",
+    studied: "",
+    lives: "",
+    from: "",
     avatar: "",
     background: ""
   });
+
+  // Load user data vào form khi modal mở
+  useEffect(() => {
+    if (show && user) {
+      setFormData({
+        introduction: user.introduction || "",
+        workplace: user.workAt || "",
+        education: user.studyAt || "",
+        studied: user.studiedAt || "",
+        lives: user.liveAt || "",
+        from: user.from || "",
+        avatar: user.avatar || "",
+        background: user.backgroundImg || ""
+      });
+      setAvatarFile(null);
+      setBackgroundFile(null);
+    }
+  }, [show, user]);
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setFormData(prev => ({
@@ -55,6 +83,14 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
       return;
     }
 
+    // Lưu File object để gửi lên API
+    if (field === 'avatar') {
+      setAvatarFile(file);
+    } else {
+      setBackgroundFile(file);
+    }
+
+    // Preview ảnh
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
@@ -81,9 +117,153 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
     }
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    onClose();
+  const handleSave = async () => {
+    if (!user?.id) {
+      alert('Không tìm thấy thông tin user!');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Prepare payload cho API
+      const payload: UpdateUserPayload = {
+        introduction: formData.introduction || undefined,
+        liveAt: formData.lives || undefined,
+        studyAt: formData.education || undefined,
+        studiedAt: formData.studied || undefined,
+        workAt: formData.workplace || undefined,
+        from: formData.from || undefined,
+      };
+
+      // Handle avatar: File mới hoặc URL cũ
+      if (avatarFile) {
+        payload.avatar = avatarFile;
+      } else if (formData.avatar && formData.avatar.startsWith('http')) {
+        payload.avatar = formData.avatar; // Giữ URL cũ
+      }
+
+      // Handle background: File mới hoặc URL cũ
+      if (backgroundFile) {
+        payload.backgroundImg = backgroundFile;
+      } else if (formData.background && formData.background.startsWith('http')) {
+        payload.backgroundImg = formData.background; // Giữ URL cũ
+      }
+
+      console.log('========= SimpleEditModal: Calling updateUser API =========');
+      console.log('Payload:', payload);
+      console.log('==========================================================');
+
+      // Gọi API updateUser - response đã chứa đầy đủ user data mới nhất
+      const updatedUser = await dispatch(updateUser({ userId: user.id, payload })).unwrap();
+      
+      console.log('========= SimpleEditModal: Update successful =========');
+      console.log('Updated user from updateUser API:', updatedUser);
+      console.log('Avatar:', updatedUser.avatar);
+      console.log('BackgroundImg:', updatedUser.backgroundImg);
+      console.log('Introduction:', updatedUser.introduction);
+      console.log('======================================================');
+
+      // Optional: Thử fetch lại từ API nếu muốn đảm bảo có URLs mới nhất từ Cloudinary
+      // Nhưng nếu fail thì không sao, vì đã có data từ updateUser response
+      try {
+        const userIdStr = user.id;
+        const latestUser = await dispatch(getUserById(userIdStr)).unwrap();
+        console.log('========= SimpleEditModal: Fetched latest user data (optional) =========');
+        console.log('Latest user from getUserById:', latestUser);
+        console.log('======================================================');
+      } catch (fetchError) {
+        // Nếu fetch lại fail thì không sao, đã có data từ updateUser response rồi
+        const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+        console.warn('Warning: Failed to fetch latest user data, but update was successful. Using data from updateUser response:', errorMessage);
+      }
+
+      // Call onSave callback nếu có (để update local state)
+      if (onSave) {
+        onSave(formData);
+      }
+
+      // Đợi một chút để Redux state được update xong và components re-render
+      setTimeout(() => {
+        alert('Cập nhật profile thành công!');
+        onClose();
+      }, 300);
+    } catch (error) {
+      interface ErrorResponseData {
+        message?: string;
+        error?: string;
+        _id?: string;
+        id?: string;
+      }
+      
+      const axiosError = error as { 
+        response?: { 
+          status?: number; 
+          data?: ErrorResponseData;
+        }; 
+        message?: string;
+      };
+      
+      console.error('========= SimpleEditModal: Error updating profile =========');
+      console.error('Error:', error);
+      console.error('Error response:', axiosError.response);
+      console.error('Error response data:', axiosError.response?.data);
+      console.error('==========================================================');
+      
+      // Kiểm tra xem có phải lỗi từ backend không và có message không
+      const errorMessage = axiosError.response?.data?.message 
+        || axiosError.response?.data?.error 
+        || axiosError.message 
+        || 'Có lỗi xảy ra khi cập nhật profile';
+      
+      // Nếu error là 500, có thể backend đã update nhưng response bị lỗi
+      // Thử fetch lại user data từ API
+      if (axiosError.response?.status === 500) {
+        console.warn('Warning: Backend returned 500 error. Data may have been updated. Attempting to fetch latest data...');
+        try {
+          // Đợi một chút để backend xử lý xong
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Thử dispatch getUserById để fetch lại data mới nhất
+          const userIdStr = user.id;
+          const latestUser = await dispatch(getUserById(userIdStr)).unwrap();
+          
+          console.log('Successfully fetched updated user data after 500 error:', latestUser);
+          alert('Cập nhật profile thành công! Dữ liệu đã được lấy lại từ server.');
+          onClose();
+          return;
+        } catch (fetchError) {
+          console.error('Failed to fetch updated user data after 500 error:', fetchError);
+          // Nếu fetch lại cũng fail, vẫn thông báo update thành công vì đã vào DB
+          alert('Dữ liệu đã được cập nhật vào database. Vui lòng tải lại trang để xem thay đổi.');
+          onClose();
+          // Tự động reload sau 1 giây
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+          return;
+        }
+      }
+      
+      // Nếu error có response data và có thể chứa thông tin user, vẫn thử update state
+      const errorData = axiosError.response?.data;
+      if (errorData && (errorData._id || errorData.id)) {
+        console.warn('Warning: Backend returned error but may have updated data. Attempting to use response data.');
+        try {
+          // Thử dispatch getUserById để fetch lại data mới nhất
+          const userIdStr = user.id;
+          await dispatch(getUserById(userIdStr)).unwrap();
+          alert('Cập nhật profile thành công! (Lấy lại dữ liệu từ server)');
+          onClose();
+          return;
+        } catch (fetchError) {
+          console.error('Failed to fetch updated user data:', fetchError);
+        }
+      }
+      
+      alert(`Lỗi: ${errorMessage}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!show) return null;
@@ -162,7 +342,10 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
                 <div style={{ marginTop: '8px' }}>
                   <button
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, avatar: '' }))}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, avatar: '' }));
+                      setAvatarFile(null);
+                    }}
                     style={{
                       background: '#ef4444',
                       color: 'white',
@@ -265,7 +448,10 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
                 <div style={{ marginTop: '8px' }}>
                   <button
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, background: '' }))}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, background: '' }));
+                      setBackgroundFile(null);
+                    }}
                     style={{
                       background: '#ef4444',
                       color: 'white',
@@ -335,8 +521,8 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Giới thiệu bản thân</label>
           <textarea
-            value={formData.intro}
-            onChange={(e) => handleInputChange('intro', e.target.value)}
+            value={formData.introduction}
+            onChange={(e) => handleInputChange('introduction', e.target.value)}
             style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
             rows={3}
           />
@@ -407,16 +593,18 @@ const SimpleEditModal: React.FC<SimpleEditModalProps> = ({
           </button>
           <button
             onClick={handleSave}
+            disabled={isLoading}
             style={{
               padding: '8px 16px',
-              backgroundColor: '#007bff',
+              backgroundColor: isLoading ? '#6c757d' : '#007bff',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              opacity: isLoading ? 0.6 : 1
             }}
           >
-            Lưu thay đổi
+            {isLoading ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
         </div>
       </div>

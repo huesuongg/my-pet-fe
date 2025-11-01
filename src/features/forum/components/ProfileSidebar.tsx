@@ -1,86 +1,92 @@
 // src/components/ProfileSidebar.tsx
-import React, { useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../store";
+import { ProfileData } from "./SimpleEditModal";
 
-export interface ProfileData {
-  intro: string;
-  workplace: string;
-  education: string;
-  studied: string;
-  lives: string;
-  from: string;
-  avatar?: string;
-  background?: string;
-}
+// Re-export ProfileData type for backward compatibility
+export type { ProfileData };
 
 interface ProfileSidebarProps {
   profileData?: ProfileData;
   onProfileUpdate?: (data: ProfileData) => void;
 }
 
+// Default profile data - moved outside component to avoid recreation on each render
+const defaultProfileData: ProfileData = {
+  introduction: "Believe in yourself and you can do unbelievable things. 😊",
+  workplace: "99media ltd",
+  education: "Amity University",
+  studied: "DPS Delhi",
+  lives: "Bangalore, India",
+  from: "Bangalore, India"
+};
+
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ 
   profileData: externalProfileData
 }) => {
-  // Default profile data
-  const defaultProfileData: ProfileData = {
-    intro: "Believe in yourself and you can do unbelievable things. 😊",
-    workplace: "99media ltd",
-    education: "Amity University",
-    studied: "DPS Delhi",
-    lives: "Bangalore, India",
-    from: "Bangalore, India"
-  };
 
-  // Use external data if provided, otherwise use internal state
-  const [internalProfileData, setInternalProfileData] = useState<ProfileData>(defaultProfileData);
+  const user = useSelector((state: RootState) => state.auth.user);
   
-  const profileData = externalProfileData || internalProfileData;
-
-  // Update internal state when external data changes
-  React.useEffect(() => {
-    if (externalProfileData) {
-      setInternalProfileData(externalProfileData);
+  // Luôn ưu tiên user data từ Redux, chỉ dùng externalProfileData nếu không có user data
+  // Merge user data với externalProfileData để đảm bảo luôn có data mới nhất
+  const profileData: ProfileData = React.useMemo(() => {
+    // Ưu tiên user từ Redux (data mới nhất sau khi update)
+    if (user) {
+      return {
+        introduction: user.introduction || externalProfileData?.introduction || defaultProfileData.introduction,
+        workplace: user.workAt || externalProfileData?.workplace || defaultProfileData.workplace,
+        education: user.studyAt || externalProfileData?.education || defaultProfileData.education,
+        studied: user.studiedAt || externalProfileData?.studied || defaultProfileData.studied,
+        lives: user.liveAt || externalProfileData?.lives || defaultProfileData.lives,
+        from: user.from || externalProfileData?.from || defaultProfileData.from,
+        avatar: user.avatar || externalProfileData?.avatar,
+        background: user.backgroundImg || externalProfileData?.background,
+      };
     }
-  }, [externalProfileData]);
+    // Nếu không có user, dùng externalProfileData hoặc default
+    return externalProfileData || defaultProfileData;
+  }, [user, externalProfileData]);
   return (
     <div className="space-y-4">
       {/* Intro Section */}
       <div className="bg-white p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-2">Intro</h2>
         <p className="text-gray-600 mb-4">
-          {profileData.intro}
+          {profileData.introduction || "Chưa có giới thiệu"}
         </p>
         <ul
           className="space-y-2 text-gray-700"
           style={{ listStyleType: "none", paddingLeft: 0 }}
         >
-          {profileData.workplace && (
+          {(profileData.workplace || user?.workAt) && (
             <li className="flex items-center">
               <span className="mr-2">🏢Làm việc tại</span>
-              <span className="font-medium">{profileData.workplace}</span>
+              <span className="font-medium">{profileData.workplace || user?.workAt}</span>
             </li>
           )}
-          {profileData.education && (
+          {(profileData.education || user?.studyAt) && (
             <li className="flex items-center">
               <span className="mr-2">🎓Học tại</span>
-              <span className="font-medium">{profileData.education}</span>
+              <span className="font-medium">{profileData.education || user?.studyAt}</span>
             </li>
           )}
-          {profileData.studied && (
+          {(profileData.studied || user?.studiedAt) && (
             <li className="flex items-center">
               <span className="mr-2">🏫Đã học</span>
-              <span className="font-medium">{profileData.studied}</span>
+              <span className="font-medium">{profileData.studied || user?.studiedAt}</span>
             </li>
           )}
-          {profileData.lives && (
+          {(profileData.lives || user?.liveAt) && (
             <li className="flex items-center">
               <span className="mr-2">🏡Sống tại</span>
-              <span className="font-medium">{profileData.lives}</span>
+              <span className="font-medium">{profileData.lives || user?.liveAt}</span>
             </li>
           )}
-          {profileData.from && (
+          {(profileData.from || user?.from) && (
             <li className="flex items-center">
               <span className="mr-2">📍Từ</span>
-              <span className="font-medium">{profileData.from}</span>
+              <span className="font-medium">{profileData.from || user?.from}</span>
             </li>
           )}
         </ul>
