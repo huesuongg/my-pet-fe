@@ -16,14 +16,24 @@ export const Logout = () => {
     const performLogout = async () => {
       if (isAuthenticated) {
         try {
-          await dispatch(logoutThunk());
+          // unwrap() để có thể catch error khi API thất bại
+          await dispatch(logoutThunk()).unwrap();
           toast.success("Đăng xuất thành công! Hẹn gặp lại bạn!");
           setTimeout(() => {
             navigate(routes.HOME_PATH);
           }, 1500);
         } catch (error) {
-          toast.error("Có lỗi xảy ra khi đăng xuất");
-          navigate(routes.HOME_PATH);
+          console.error("Logout error:", error);
+          // Vẫn xóa token local và chuyển về trang chủ nếu API lỗi
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          toast.info("Đã đăng xuất khỏi thiết bị này");
+          setTimeout(() => {
+            navigate(routes.HOME_PATH);
+            // Reload để clear state
+            window.location.reload();
+          }, 1000);
         }
       } else {
         navigate(routes.HOME_PATH);

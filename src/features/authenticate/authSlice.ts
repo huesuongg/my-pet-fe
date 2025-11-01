@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register, getUserById, verifyRegister, logoutThunk } from "./authThunk";
+import { login, register, getUserById, verifyRegister, logoutThunk, updateUser } from "./authThunk";
 import { RejectPayload } from "../../types";
 import { RequestStatus } from "../../types";
 import { User } from "./types";
@@ -35,9 +35,12 @@ const authSlice = createSlice({
       state.status = "idle";
     },
     setUser: (state, action) => {
-      state.user = action.payload;
+      // Tạo object mới để đảm bảo Redux detect được sự thay đổi
+      state.user = { ...action.payload };
       state.isAuthenticated = true;
       state.userId = action.payload.id;
+      // Cũng update localStorage khi setUser được gọi
+      localStorage.setItem("user", JSON.stringify(action.payload));
     },
     clearError: (state) => {
       state.error = undefined;
@@ -90,10 +93,20 @@ const authSlice = createSlice({
       })
       .addCase(getUserById.fulfilled, (state, action) => {
         state.status = "success";
-        state.user = action.payload;
+        // Tạo object mới để đảm bảo Redux detect được sự thay đổi
+        state.user = { ...action.payload };
         state.isAuthenticated = true;
         state.userId = action.payload.id;
         state.error = undefined;
+        
+        // Update localStorage với user data mới nhất
+        localStorage.setItem("user", JSON.stringify(action.payload));
+        
+        console.log('========= authSlice: getUserById.fulfilled =========');
+        console.log('State.user updated:', state.user);
+        console.log('Avatar:', state.user.avatar);
+        console.log('BackgroundImg:', state.user.backgroundImg);
+        console.log('====================================================');
       })
       .addCase(getUserById.rejected, (state, action) => {
         state.status = "error";
@@ -142,6 +155,33 @@ const authSlice = createSlice({
         const payload = action.payload as RejectPayload;
         state.error = payload.message;
         state.status = "error";
+      })
+    // updateUser action
+      .addCase(updateUser.pending, (state) => {
+        state.status = "loading";
+        state.error = undefined;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.status = "success";
+        // Tạo object mới để đảm bảo Redux detect được sự thay đổi
+        state.user = { ...action.payload };
+        state.isAuthenticated = true;
+        state.userId = action.payload.id;
+        state.error = undefined;
+        
+        // Update user in localStorage
+        localStorage.setItem("user", JSON.stringify(action.payload));
+        
+        console.log('========= authSlice: updateUser.fulfilled =========');
+        console.log('State.user updated:', state.user);
+        console.log('Avatar:', state.user.avatar);
+        console.log('BackgroundImg:', state.user.backgroundImg);
+        console.log('====================================================');
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.status = "error";
+        const payload = action.payload as RejectPayload;
+        state.error = payload.message;
       });
   },
 });

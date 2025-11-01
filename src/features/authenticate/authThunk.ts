@@ -1,6 +1,6 @@
 import { LoginPayload, RegisterPayload, User } from './types';
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginAPI, registerAPI, getUserByIdAPI, verifyRegisterAPI, logoutAPI } from './authAPI';
+import { loginAPI, registerAPI, getUserByIdAPI, verifyRegisterAPI, logoutAPI, updateUserAPI, UpdateUserPayload } from './authAPI';
 import { RejectPayload } from '../../types';
 
 export const login = createAsyncThunk<
@@ -79,12 +79,34 @@ export const logoutThunk = createAsyncThunk<
 
 export const getUserById = createAsyncThunk<
   User, 
-  number,
+  number | string,
   { rejectValue: RejectPayload }
->("auth/getUserById", async(userId: number, {rejectWithValue}) => {
+>("auth/getUserById", async(userId: number | string, {rejectWithValue}) => {
   try{
     const response = await getUserByIdAPI(userId);
-    return response.data;
+    const userData = response.data;
+    
+    // Update localStorage với user data mới nhất
+    localStorage.setItem("user", JSON.stringify(userData));
+    
+    return userData;
+  }catch(err){
+    const error = err as Error;
+    return rejectWithValue({
+      status: 400,
+      message: error.message,
+    });
+  }
+});
+
+export const updateUser = createAsyncThunk<
+  User,
+  { userId: string; payload: UpdateUserPayload },
+  { rejectValue: RejectPayload }
+>("auth/updateUser", async({ userId, payload }, {rejectWithValue}) => {
+  try{
+    const updatedUser = await updateUserAPI(userId, payload);
+    return updatedUser;
   }catch(err){
     const error = err as Error;
     return rejectWithValue({

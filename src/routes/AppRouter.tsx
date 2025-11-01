@@ -23,7 +23,9 @@ import PetProfilePage from "../features/pet/pages/PetProfilePage";
 import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory";
 import BookingPage from "../features/scheduling/pages/BookingPage";
 import RegisterPage from "../features/authenticate/pages/RegisterPage";
+import DoctorAIPage from "../features/doctor-ai";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const routes = {
   ALL_PATH: "*",
   HOME_PATH: "/",
@@ -49,8 +51,10 @@ export const routes = {
   PET_PROFILE_PATH: "/pet-profile",
   CHAT_SUPPORT_PATH: "/chat-support",
   BOOKING_PATH: "/scheduling/booking/:id",
+  DOCTORAI_PATH: "/doctor-ai"
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const router = createBrowserRouter([
   {
     path: routes.HOME_PATH,
@@ -96,6 +100,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: routes.NEWSFEED_PATH, element: <NewFeeds /> },
+      { path: routes.DOCTORAI_PATH, element: <DoctorAIPage /> },
       { path: routes.PROFILE_PATH, element: <ProfilePage /> },
       { path: routes.CART_PATH, element: <CartPage /> },
       { path: routes.BOOKING_PATH, element: <BookingPage /> },

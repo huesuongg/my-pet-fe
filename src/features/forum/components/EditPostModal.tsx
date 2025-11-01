@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import profilePic from "../../../assets/profile-pic.jpg";
-import { PostData } from "./Post";
+import type { PostData } from "../types/forum.types";
 
 interface EditPostModalProps {
   post: PostData;
@@ -9,29 +9,46 @@ interface EditPostModalProps {
   onSave: (updatedPost: PostData) => void;
 }
 
+// Image item với metadata
+interface ImageItem {
+  preview: string;      // URL hoặc base64
+  isExisting: boolean;  // true = ảnh cũ (URL), false = ảnh mới (File)
+  file?: File;          // Chỉ có khi isExisting = false
+}
+
+// Extended PostData for edit operation
+interface UpdatedPostData extends PostData {
+  imageFiles?: File[];   // New files to upload
+  keepImages?: string[]; // Existing URLs to keep
+  address?: string;      // Location address for backend
+}
+
 const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
   
   // State for post content
   const [content, setContent] = useState(post.content);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(post.image || "");
-  const [selectedEmotion, setSelectedEmotion] = useState<string>(post.emotion || "");
-  const [selectedLocation, setSelectedLocation] = useState<string>(post.location || "");
-  const [showEmotionPicker, setShowEmotionPicker] = useState(false);
-  const [showLocationPicker, setShowLocationPicker] = useState(false);
   
-  // Emotion options
-  const emotions = [
-    { emoji: "😊", name: "Hạnh phúc" },
-    { emoji: "😢", name: "Buồn" },
-    { emoji: "😡", name: "Tức giận" },
-    { emoji: "😍", name: "Yêu thích" },
-    { emoji: "🤔", name: "Suy nghĩ" },
-    { emoji: "😴", name: "Buồn ngủ" },
-    { emoji: "🎉", name: "Vui mừng" },
-    { emoji: "❤️", name: "Yêu" },
-  ];
+  // New: Unified image state với metadata
+  const [imageItems, setImageItems] = useState<ImageItem[]>(() => {
+    const existingImages = post.images && post.images.length > 0 
+      ? post.images 
+      : post.image 
+        ? [post.image] 
+        : [];
+    
+    return existingImages.map(url => ({
+      preview: url,
+      isExisting: true,
+    }));
+  });
+  
+  const [tags, setTags] = useState<string[]>(post.tags || []);
+  const [tagInput, setTagInput] = useState<string>("");
+  const [selectedLocation, setSelectedLocation] = useState<string>(post.location || "");
+  const [showTagInput, setShowTagInput] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   // Location options
   const locations = [
@@ -68,23 +85,61 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
     }
   }, [onClose]);
 
-  // Handle image upload
+  // Handle multiple image upload (max 5 images)
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Limit to 5 images total
+    const remainingSlots = 5 - imageItems.length;
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    if (files.length > remainingSlots) {
+      alert(`Chỉ có thể thêm tối đa ${remainingSlots} ảnh nữa (giới hạn 5 ảnh)`);
+    }
+
+    // Generate previews and add to imageItems
+    filesToAdd.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
+        const preview = e.target?.result as string;
+        setImageItems(prev => [...prev, {
+          preview,
+          isExisting: false,
+          file,
+        }]);
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
-  // Handle emotion selection
-  const handleEmotionSelect = (emotion: string) => {
-    setSelectedEmotion(emotion);
-    setShowEmotionPicker(false);
+  // Handle remove specific image
+  const handleRemoveImage = (index: number) => {
+    setImageItems(prev => {
+      const newItems = prev.filter((_, i) => i !== index);
+      console.log('====== EditPostModal.handleRemoveImage ======');
+      console.log('Removed image at index:', index);
+      console.log('Previous imageItems:', prev);
+      console.log('New imageItems after removal:', newItems);
+      console.log('Remaining images count:', newItems.length);
+      console.log('  - Existing (old):', newItems.filter(item => item.isExisting).length);
+      console.log('  - New (files):', newItems.filter(item => !item.isExisting).length);
+      console.log('==========================================');
+      return newItems;
+    });
+  };
+
+  // Handle tag add
+  const handleAddTag = () => {
+    const value = tagInput.trim();
+    if (!value) return;
+    if (tags.includes(value)) return;
+    setTags(prev => [...prev, value]);
+    setTagInput("");
+  };
+
+  const handleRemoveTag = (value: string) => {
+    setTags(prev => prev.filter(t => t !== value));
   };
 
   // Handle location selection
@@ -94,23 +149,62 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
   };
 
   // Handle save
-  const handleSave = () => {
-    if (!content.trim() && !imagePreview) return;
+  const handleSave = async () => {
+    if (!content.trim() && imageItems.length === 0) return;
 
-    const updatedPost: PostData = {
-      ...post,
-      content: content.trim(),
-      image: imagePreview,
-      location: selectedLocation,
-      emotion: selectedEmotion,
-    };
+    setIsUploading(true);
+    try {
+      // Tách ảnh cũ (URLs để giữ) và ảnh mới (Files để upload)
+      const keepImages = imageItems
+        .filter(item => item.isExisting)
+        .map(item => item.preview);
+      
+      const imageFiles = imageItems
+        .filter(item => !item.isExisting && item.file)
+        .map(item => item.file!);
+      
+      const allPreviews = imageItems.map(item => item.preview);
+      
+      console.log('====== EditPostModal.handleSave ======');
+      console.log('✅ Current imageItems state:', imageItems);
+      console.log('✅ keepImages (existing URLs to keep):', keepImages);
+      console.log('✅ imageFiles (new files to upload):', imageFiles.map(f => ({ name: f.name, size: f.size })));
+      console.log('Total items:', imageItems.length, '= Existing:', keepImages.length, '+ New:', imageFiles.length);
+      console.log('====================================');
 
-    onSave(updatedPost);
-    onClose();
+      // Backend sẽ tự upload images mới lên Cloudinary qua multer
+      const updatedPost: UpdatedPostData = {
+        ...post,
+        content: content.trim(),
+        images: allPreviews, // Keep for UI display only
+        location: selectedLocation, // UI hiển thị
+        address: selectedLocation,  // Backend nhận
+        tags,
+        imageFiles, // File objects mới cần upload
+        keepImages, // URLs của ảnh cũ muốn giữ lại
+      };
+
+      console.log('EditPostModal: Calling onSave with payload:', {
+        postId: post.id,
+        content: updatedPost.content,
+        keepImages: updatedPost.keepImages,
+        imageFiles: updatedPost.imageFiles?.map((f: File) => f.name) || [],
+        tags: updatedPost.tags,
+        location: updatedPost.location,
+      });
+      
+      await onSave(updatedPost);
+      onClose();
+    } catch (error) {
+      console.error('Error updating post:', error);
+      alert('Có lỗi xảy ra khi cập nhật bài viết');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // Check if post can be saved
-  const canSave = content.trim() || imagePreview;
+  const canSave = content.trim() || imageItems.length > 0;
 
   const overlay = (
     <div
@@ -155,19 +249,9 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
               <div className="flex-grow-1">
                 <div className="d-flex align-items-center">
                   <span className="fw-semibold me-2">Cristiano Ronaldo</span>
-                  {selectedEmotion && (
-                    <span className="me-2" style={{ fontSize: "18px" }}>{selectedEmotion}</span>
-                  )}
                 </div>
                 <div className="d-flex align-items-center">
-                  <span className="text-muted small me-2">đang</span>
-                  {selectedEmotion ? (
-                    <span className="text-muted small">
-                      {selectedEmotion} cảm thấy {emotions.find(e => e.emoji === selectedEmotion)?.name.toLowerCase()}
-                    </span>
-                  ) : (
-                    <span className="text-muted small">🔒 Chỉ mình tôi</span>
-                  )}
+                  <span className="text-muted small">🔒 Chỉ mình tôi</span>
                 </div>
               </div>
             </div>
@@ -189,37 +273,56 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
               onChange={(e) => setContent(e.target.value)}
             />
 
-            {/* Image Preview */}
-            {imagePreview && (
-              <div className="mb-3 position-relative">
-                <img 
-                  src={imagePreview} 
-                  alt="Preview" 
-                  className="img-fluid rounded"
-                  style={{maxHeight: '200px', width: '100%', objectFit: 'cover'}}
-                />
-                <button 
-                  type="button"
-                  className="btn btn-sm btn-danger position-absolute"
-                  style={{ top: '8px', right: '8px' }}
-                  onClick={() => {
-                    setSelectedImage(null);
-                    setImagePreview("");
-                  }}
-                >
-                  ✕
-                </button>
+            {/* Multiple Image Previews */}
+            {imageItems.length > 0 && (
+              <div className="mb-3">
+                <div className="d-flex flex-wrap gap-2">
+                  {imageItems.map((item, index) => (
+                    <div key={index} className="position-relative" style={{ width: '120px', height: '120px' }}>
+                      <img 
+                        src={item.preview} 
+                        alt={`Preview ${index + 1}`} 
+                        className="rounded"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      <button 
+                        type="button"
+                        className="btn btn-sm btn-danger position-absolute"
+                        style={{ top: '4px', right: '4px', padding: '2px 6px', fontSize: '12px' }}
+                        onClick={() => handleRemoveImage(index)}
+                        title={item.isExisting ? 'Xóa ảnh cũ' : 'Xóa ảnh mới'}
+                      >
+                        ✕
+                      </button>
+                      {/* Badge hiển thị loại ảnh */}
+                      <span 
+                        className="badge position-absolute"
+                        style={{ 
+                          bottom: '4px', 
+                          left: '4px', 
+                          fontSize: '9px',
+                          backgroundColor: item.isExisting ? '#6c757d' : '#28a745'
+                        }}
+                      >
+                        {item.isExisting ? 'Cũ' : 'Mới'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-muted small mt-2">
+                  {imageItems.length} / 5 ảnh
+                </div>
               </div>
             )}
 
-            {/* Selected emotion and location display */}
-            {(selectedEmotion || selectedLocation) && (
-              <div className="mb-3 d-flex gap-2">
-                {selectedEmotion && (
-                  <span className="badge bg-primary rounded-pill px-3 py-2">
-                    {selectedEmotion} Cảm xúc
+            {/* Tags and Location display */}
+            {(tags.length > 0 || selectedLocation) && (
+              <div className="mb-3 d-flex flex-wrap gap-2">
+                {tags.map((t) => (
+                  <span key={t} className="badge bg-primary rounded-pill px-3 py-2">
+                    #{t}
                   </span>
-                )}
+                ))}
                 {selectedLocation && (
                   <span className="badge bg-secondary rounded-pill px-3 py-2">
                     📍 {selectedLocation}
@@ -236,65 +339,70 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
               <div className="d-flex gap-2">
                 <label 
                   className="btn d-flex align-items-center gap-2 px-3 py-2 rounded-pill flex-grow-1" 
-                  title="Thêm ảnh" 
+                  title="Thêm ảnh (tối đa 5)" 
                   aria-label="Thêm ảnh"
                   style={{ 
-                    border: selectedImage ? '2px solid #007bff' : '1px solid #007bff',
-                    backgroundColor: selectedImage ? '#e3f2fd' : 'transparent',
-                    color: selectedImage ? '#007bff' : '#007bff',
+                    border: imageItems.length > 0 ? '2px solid #007bff' : '1px solid #007bff',
+                    backgroundColor: imageItems.length > 0 ? '#e3f2fd' : 'transparent',
+                    color: imageItems.length > 0 ? '#007bff' : '#007bff',
                     transition: 'all 0.3s ease',
-                    cursor: 'pointer'
+                    cursor: imageItems.length >= 5 ? 'not-allowed' : 'pointer',
+                    opacity: imageItems.length >= 5 ? 0.6 : 1
                   }}
                   onMouseEnter={(e) => {
-                    if (!selectedImage) {
+                    if (imageItems.length === 0) {
                       e.currentTarget.style.backgroundColor = '#e3f2fd';
                       e.currentTarget.style.border = '2px solid #007bff';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (!selectedImage) {
+                    if (imageItems.length === 0) {
                       e.currentTarget.style.backgroundColor = 'transparent';
                       e.currentTarget.style.border = '1px solid #007bff';
                     }
                   }}
                 >
                   <span style={{ fontSize: '16px' }}>📷</span>
-                  <span className="fw-medium" style={{ color: 'inherit' }}>Ảnh</span>
+                  <span className="fw-medium" style={{ color: 'inherit' }}>
+                    Ảnh {imageItems.length > 0 ? `(${imageItems.length})` : ''}
+                  </span>
                   <input
                     type="file"
                     accept="image/*"
+                    multiple
                     onChange={handleImageUpload}
+                    disabled={imageItems.length >= 5}
                     style={{ display: 'none' }}
                   />
                 </label>
                 
                 <button 
                   className="btn d-flex align-items-center gap-2 px-3 py-2 rounded-pill flex-grow-1"
-                  title="Chọn cảm xúc" 
-                  aria-label="Chọn cảm xúc"
-                  onClick={() => setShowEmotionPicker(!showEmotionPicker)}
+                  title="Thêm tags" 
+                  aria-label="Thêm tags"
+                  onClick={() => setShowTagInput(!showTagInput)}
                   style={{ 
-                    border: selectedEmotion ? '2px solid #28a745' : '1px solid #28a745',
-                    backgroundColor: selectedEmotion ? '#d4edda' : 'transparent',
-                    color: selectedEmotion ? '#28a745' : '#28a745',
+                    border: tags.length > 0 ? '2px solid #28a745' : '1px solid #28a745',
+                    backgroundColor: tags.length > 0 ? '#d4edda' : 'transparent',
+                    color: tags.length > 0 ? '#28a745' : '#28a745',
                     transition: 'all 0.3s ease',
                     cursor: 'pointer'
                   }}
                   onMouseEnter={(e) => {
-                    if (!selectedEmotion) {
+                    if (tags.length === 0) {
                       e.currentTarget.style.backgroundColor = '#d4edda';
                       e.currentTarget.style.border = '2px solid #28a745';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (!selectedEmotion) {
+                    if (tags.length === 0) {
                       e.currentTarget.style.backgroundColor = 'transparent';
                       e.currentTarget.style.border = '1px solid #28a745';
                     }
                   }}
                 >
-                  <span style={{ fontSize: '16px' }}>{selectedEmotion || '😊'}</span>
-                  <span className="fw-medium" style={{ color: 'inherit' }}>Cảm xúc</span>
+                  <span style={{ fontSize: '16px' }}>#</span>
+                  <span className="fw-medium" style={{ color: 'inherit' }}>Tags</span>
                 </button>
                 
                 <button 
@@ -328,40 +436,51 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
               </div>
             </div>
 
-            {/* Emotion Picker */}
-            {showEmotionPicker && (
+            {/* Tag Input */}
+            {showTagInput && (
               <div className="border rounded p-4 mb-3" style={{ backgroundColor: '#f8f9fa', border: '2px solid #e9ecef' }}>
                 <div className="d-flex align-items-center justify-content-between mb-3">
-                  <h6 className="mb-0 fw-bold text-primary">🎭 Chọn cảm xúc của bạn</h6>
+                  <h6 className="mb-0 fw-bold text-success"># Thêm Tags</h6>
                   <button 
                     className="btn btn-sm btn-outline-secondary"
-                    onClick={() => setShowEmotionPicker(false)}
+                    onClick={() => setShowTagInput(false)}
                   >
                     ✕
                   </button>
                 </div>
-                <div className="d-flex flex-wrap gap-2">
-                  {emotions.map((emotion, index) => (
-                    <button
-                      key={index}
-                      className={`btn btn-sm px-3 py-2 rounded-pill ${
-                        selectedEmotion === emotion.emoji 
-                          ? 'btn-primary' 
-                          : 'btn-outline-primary'
-                      }`}
-                      onClick={() => handleEmotionSelect(emotion.emoji)}
-                      title={emotion.name}
-                      style={{ 
-                        fontSize: '16px',
-                        transition: 'all 0.2s ease',
-                        transform: selectedEmotion === emotion.emoji ? 'scale(1.05)' : 'scale(1)'
-                      }}
-                    >
-                      <span className="me-2" style={{ fontSize: '20px' }}>{emotion.emoji}</span>
-                      {emotion.name}
-                    </button>
-                  ))}
+                <div className="d-flex gap-2">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Nhập tag (VD: pets, veterinary)"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                  />
+                  <button 
+                    type="button"
+                    className="btn btn-success"
+                    onClick={handleAddTag}
+                    disabled={!tagInput.trim()}
+                  >
+                    Thêm
+                  </button>
                 </div>
+                {tags.length > 0 && (
+                  <div className="d-flex flex-wrap gap-2 mt-3">
+                    {tags.map(t => (
+                      <span key={t} className="badge bg-light text-dark border d-flex align-items-center gap-1">
+                        #{t}
+                        <button type="button" className="btn btn-sm btn-link p-0" onClick={() => handleRemoveTag(t)} style={{ fontSize: '12px' }}>✕</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -418,16 +537,23 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, onClose, onSave }) 
               </button>
               <button 
                 type="button" 
-                className={`btn flex-grow-1 py-2 fw-semibold ${canSave ? 'btn-primary' : 'btn-secondary disabled'}`}
+                className={`btn flex-grow-1 py-2 fw-semibold ${canSave && !isUploading ? 'btn-primary' : 'btn-secondary disabled'}`}
                 onClick={handleSave}
-                disabled={!canSave}
+                disabled={!canSave || isUploading}
                 style={{ 
                   borderRadius: '8px',
                   fontSize: '16px',
                   height: '40px'
                 }}
               >
-                Lưu thay đổi
+                {isUploading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Đang lưu...
+                  </>
+                ) : (
+                  'Lưu thay đổi'
+                )}
               </button>
             </div>
           </div>
