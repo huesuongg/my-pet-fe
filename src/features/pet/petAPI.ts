@@ -1,99 +1,152 @@
 import { Pet, PetFormData, VaccinationRecord, MedicalRecord } from './types';
-import { mockPets, delay } from './mockData';
+import axiosInstance from '../../services/axiosInstance';
 
 export const petAPI = {
-  // Get pets by user ID
+  // Get pets by user ID (lấy tất cả pets của user hiện tại)
   getPetsByUserId: async (userId: string): Promise<Pet[]> => {
-    await delay(500);
-    return mockPets.filter(pet => pet.userId.toString() === userId && pet.isActive);
+    try {
+      const response = await axiosInstance.get('/api/pets', {
+        params: userId ? { ownerId: userId } : {}
+      });
+      // Đảm bảo luôn trả về array
+      const data = response.data;
+      if (Array.isArray(data)) {
+        return data;
+      }
+      // Nếu response có format { items: [...] }
+      if (data && Array.isArray(data.items)) {
+        return data.items;
+      }
+      // Nếu không phải array, trả về empty array
+      console.warn('Unexpected response format:', data);
+      return [];
+    } catch (error: any) {
+      console.error('Error fetching pets:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch pets');
+    }
+  },
+
+  // Get all pets (cho user hiện tại)
+  getPets: async (): Promise<Pet[]> => {
+    try {
+      const response = await axiosInstance.get('/api/pets');
+      // Đảm bảo luôn trả về array
+      const data = response.data;
+      if (Array.isArray(data)) {
+        return data;
+      }
+      // Nếu response có format { items: [...] }
+      if (data && Array.isArray(data.items)) {
+        return data.items;
+      }
+      // Nếu không phải array, trả về empty array
+      console.warn('Unexpected response format:', data);
+      return [];
+    } catch (error: any) {
+      console.error('Error fetching pets:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch pets');
+    }
   },
 
   // Get pet by ID
   getPetById: async (petId: string): Promise<Pet | null> => {
-    await delay(300);
-    const pet = mockPets.find(p => p.id === petId);
-    return pet || null;
+    try {
+      const response = await axiosInstance.get(`/api/pets/${petId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching pet:', error);
+      if (error.response?.status === 404) {
+        return null;
+      }
+      throw new Error(error.response?.data?.message || 'Failed to fetch pet');
+    }
   },
 
   // Create new pet
-  createPet: async (userId: number, petData: PetFormData): Promise<Pet> => {
-    await delay(1000);
-    
-    const newPet: Pet = {
-      id: `pet${Date.now()}`,
-      userId,
-      ...petData,
-      vaccinationHistory: [],
-      medicalHistory: [],
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    mockPets.push(newPet);
-    return newPet;
+  createPet: async (_userId: number, petData: PetFormData): Promise<Pet> => {
+    try {
+      const response = await axiosInstance.post('/api/pets', petData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error creating pet:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create pet');
+    }
   },
 
   // Update pet
   updatePet: async (petId: string, petData: Partial<PetFormData>): Promise<Pet | null> => {
-    await delay(800);
-    
-    const petIndex = mockPets.findIndex(p => p.id === petId);
-    if (petIndex === -1) return null;
-
-    mockPets[petIndex] = {
-      ...mockPets[petIndex],
-      ...petData,
-      updatedAt: new Date().toISOString()
-    };
-
-    return mockPets[petIndex];
+    try {
+      if (!petId || petId === 'undefined' || petId.trim() === '') {
+        throw new Error('Pet ID is required for update');
+      }
+      console.log('Updating pet:', petId, petData);
+      const response = await axiosInstance.put(`/api/pets/${petId}`, petData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error updating pet:', error);
+      if (error.response?.status === 404) {
+        return null;
+      }
+      throw new Error(error.response?.data?.message || error.message || 'Failed to update pet');
+    }
   },
 
   // Delete pet (hard delete)
   deletePet: async (petId: string): Promise<boolean> => {
-    await delay(500);
-    
-    const petIndex = mockPets.findIndex(p => p.id === petId);
-    if (petIndex === -1) return false;
-
-    mockPets.splice(petIndex, 1);
-    return true;
+    try {
+      const response = await axiosInstance.delete(`/api/pets/${petId}`);
+      return response.data?.success || true;
+    } catch (error: any) {
+      console.error('Error deleting pet:', error);
+      throw new Error(error.response?.data?.message || 'Failed to delete pet');
+    }
   },
 
-  // Add vaccination record
+  // Add vaccination record (TODO: cần thêm endpoint này ở backend)
   addVaccinationRecord: async (petId: string, record: Omit<VaccinationRecord, 'id'>): Promise<VaccinationRecord | null> => {
-    await delay(600);
-    
-    const pet = mockPets.find(p => p.id === petId);
-    if (!pet) return null;
+    try {
+      // Tạm thời update pet với vaccinationHistory mới
+      const pet = await petAPI.getPetById(petId);
+      if (!pet) return null;
 
-    const newRecord: VaccinationRecord = {
-      id: `vac${Date.now()}`,
-      ...record
-    };
+      const newRecord: VaccinationRecord = {
+        id: `vac_${Date.now()}`,
+        ...record
+      };
 
-    pet.vaccinationHistory.push(newRecord);
-    pet.updatedAt = new Date().toISOString();
-    
-    return newRecord;
+      const updatedHistory = [...pet.vaccinationHistory, newRecord];
+      await axiosInstance.put(`/api/pets/${petId}`, {
+        vaccinationHistory: updatedHistory
+      });
+
+      return newRecord;
+    } catch (error: any) {
+      console.error('Error adding vaccination record:', error);
+      throw new Error(error.response?.data?.message || 'Failed to add vaccination record');
+    }
   },
 
-  // Add medical record
+  // Add medical record (TODO: cần thêm endpoint này ở backend)
   addMedicalRecord: async (petId: string, record: Omit<MedicalRecord, 'id'>): Promise<MedicalRecord | null> => {
-    await delay(600);
-    
-    const pet = mockPets.find(p => p.id === petId);
-    if (!pet) return null;
+    try {
+      // Tạm thời update pet với medicalHistory mới
+      const pet = await petAPI.getPetById(petId);
+      if (!pet) return null;
 
-    const newRecord: MedicalRecord = {
-      id: `med${Date.now()}`,
-      ...record
-    };
+      const newRecord: MedicalRecord = {
+        id: `med_${Date.now()}`,
+        ...record
+      };
 
-    pet.medicalHistory.push(newRecord);
-    pet.updatedAt = new Date().toISOString();
-    
-    return newRecord;
+      const updatedHistory = [...pet.medicalHistory, newRecord];
+      await axiosInstance.put(`/api/pets/${petId}`, {
+        medicalHistory: updatedHistory
+      });
+
+      return newRecord;
+    } catch (error: any) {
+      console.error('Error adding medical record:', error);
+      throw new Error(error.response?.data?.message || 'Failed to add medical record');
+    }
   }
 };
