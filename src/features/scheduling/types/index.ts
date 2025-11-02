@@ -21,6 +21,7 @@ export interface Doctor {
 export interface Appointment {
   id: string;
   doctorId: string;
+  doctor?: Doctor; // Thông tin bác sĩ (nếu có)
   date: string;
   time: string;
   type: string;
@@ -30,6 +31,8 @@ export interface Appointment {
   patientPhone?: string;
   notes?: string;
   paymentMethod?: string;
+  clinicId?: string;
+  petId?: string;
 }
 
 export interface DoctorCardProps {
