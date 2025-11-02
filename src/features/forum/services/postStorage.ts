@@ -1,4 +1,4 @@
-import { PostData } from '../context/PostContext';
+import { PostData } from '../types/forum.types';
 
 const POSTS_STORAGE_KEY = 'forum_posts';
 
