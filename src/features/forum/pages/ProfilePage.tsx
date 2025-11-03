@@ -1,14 +1,16 @@
 // src/components/ProfilePage.tsx
 import React, { useState } from 'react';
 import ProfileHeader from '../components/ProfileHeader';
-import ProfileSidebar, { ProfileData } from '../components/ProfileSidebar';
-import MainContent from '../components/MainContent';
+import ProfileSidebar from '../components/ProfileSidebar';
+import { ProfileData } from '../components/SimpleEditModal';
+import UserPostsContent from '../components/UserPostsContent';
 import { PostProvider } from '../context/PostContext';
+import PostCreator from '../components/PostCreator';
 
 const ProfilePage: React.FC = () => {
   // State để lưu thông tin profile
   const [profileData, setProfileData] = useState<ProfileData>({
-    intro: "Believe in yourself and you can do unbelievable things. 😊",
+    introduction: "Believe in yourself and you can do unbelievable things. 😊",
     workplace: "99media ltd",
     education: "Amity University",
     studied: "DPS Delhi",
@@ -38,7 +40,8 @@ const ProfilePage: React.FC = () => {
               />
             </div>
             <div className="w-full md:w-2/3">
-              <MainContent />
+              <PostCreator/>               
+              <UserPostsContent />
             </div>
           </div>
         </div>

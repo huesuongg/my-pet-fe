@@ -5,13 +5,14 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShare } from "@fortawesome/free-solid-svg-icons";
-import { PostData } from "./Post";
 import { usePostContext } from "../context/PostContext";
-
-// Import ForumComment type from context
-import { ForumComment } from "../context/PostContext";
+import { PostData, ForumComment } from "../types/forum.types";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../../store";
 
 interface CommentModalProps {
   show: boolean;
@@ -21,10 +22,27 @@ interface CommentModalProps {
 
 const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
   const [commentText, setCommentText] = useState("");
-  const { state, toggleLike, toggleFavorite, addComment, toggleCommentLike, addReply } = usePostContext();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { state, fetchPost, toggleLike, toggleFavorite, addComment, toggleCommentLike, editComment, deleteCommentHard } = usePostContext();
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
+  const [optimisticLikeMap, setOptimisticLikeMap] = useState<Record<string, boolean>>({});
+
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userAvatar = user?.avatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzx5O9jN4urn2la1D6ni7Bh9PTVG23AZbEb-mgcWUwwgrsPOZtkS2hGKL_aHZNtCrfa44&usqp=CAU';
   
-  // Lấy post data mới nhất từ context
-  const currentPost = state.posts.find(p => p.id === post.id) || post;
+  // Lấy post data mới nhất từ context (ưu tiên selectedPost nếu trùng id)
+  const currentPost = (state.selectedPost && state.selectedPost.id === post.id)
+    ? state.selectedPost
+    : (state.posts.find(p => p.id === post.id) || post);
+
+  // Reset carousel + tải chi tiết post (đảm bảo comments đã populate)
+  useEffect(() => {
+    if (show) {
+      setCurrentImageIndex(0);
+      fetchPost(post.id);
+    }
+  }, [show, fetchPost, post.id]);
 
   // Khóa scroll body + lắng nghe ESC
   useEffect(() => {
@@ -47,16 +65,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (commentText.trim()) {
-      addComment(currentPost.id, {
-        author: {
-          name: "Current User",
-          profilePic: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=1780&auto=format&fit=crop"
-        },
-        content: commentText.trim(),
-        timestamp: new Date().toLocaleString('vi-VN'),
-        likes: 0,
-        isLiked: false
-      });
+      addComment(currentPost.id, commentText.trim());
       setCommentText("");
     }
   };
@@ -70,79 +79,103 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
   };
 
   const handleCommentLike = (commentId: number) => {
+    setOptimisticLikeMap(prev => ({ ...prev, [String(commentId)]: !(prev[String(commentId)] ?? false) }));
     toggleCommentLike(currentPost.id, commentId);
   };
 
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [replyText, setReplyText] = useState("");
-
-  const handleReply = (commentId: number) => {
-    setReplyingTo(commentId);
+  const handleDeleteComment = (commentId: number) => {
+    if (!window.confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+    deleteCommentHard(currentPost.id, commentId);
   };
 
-  const handleSubmitReply = (e: React.FormEvent) => {
+  const startEditComment = (commentId: number, currentContent: string) => {
+    setEditingCommentId(commentId);
+    setEditText(currentContent);
+  };
+
+  const submitEditComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (replyText.trim() && replyingTo) {
-      addReply(currentPost.id, replyingTo, {
-        author: {
-          name: "Current User",
-          profilePic: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=1780&auto=format&fit=crop"
-        },
-        content: replyText.trim(),
-        timestamp: new Date().toLocaleString('vi-VN'),
-        likes: 0,
-        isLiked: false,
-        replies: []
-      });
-      setReplyText("");
-      setReplyingTo(null);
-    }
+    if (!editingCommentId || !editText.trim()) return;
+    editComment(currentPost.id, editingCommentId, editText.trim());
+    setEditingCommentId(null);
+    setEditText("");
   };
+
+  // XÓA Reply state dư thừa
+
+  // Carousel functions
+  const images = currentPost.images || (currentPost.image ? [currentPost.image] : []);
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  // Bỏ toàn bộ handler Reply
 
   // Component để render comment tree
-  const renderComment = (comment: ForumComment, isReply = false) => (
-    <div key={comment.id} className={`d-flex align-items-start gap-2 mb-3 ${isReply ? 'ms-4' : ''}`}>
-      <img
-        src={comment.author.profilePic}
-        alt="Commenter"
-        className="rounded-circle"
-        style={{ width: 32, height: 32, objectFit: "cover" }}
-      />
-      <div className="bg-light p-2 rounded-3 w-100 position-relative">
-        <div className="fw-semibold small mb-1">
-          {comment.author.name}
-        </div>
-        <div className="small">{comment.content}</div>
-        <div className="d-flex gap-2 text-muted small mt-1">
-          <span className="text-muted">{comment.timestamp}</span>
-          <span
-            role="button"
-            className={`text-decoration-none cursor-pointer ${comment.isLiked ? 'text-primary fw-bold' : 'hover-text-primary'}`}
-            onClick={() => handleCommentLike(comment.id)}
-          >
-            {comment.isLiked ? 'Đã thích' : 'Thích'}
-          </span>
-          {!isReply && (
+  const renderComment = (comment: ForumComment, isReply = false) => {
+    const isOwner = user?.username && comment.author?.name && user.username === comment.author.name;
+    const optimisticFlag = optimisticLikeMap[String(comment.id)];
+    const isLikedUi = typeof optimisticFlag === 'boolean' ? optimisticFlag : !!comment.isLiked;
+    const likeCountUi = isLikedUi
+      ? (comment.isLiked ? (comment.likes || 0) : (comment.likes || 0) + 1)
+      : (comment.isLiked ? Math.max(0, (comment.likes || 0) - 1) : (comment.likes || 0));
+
+    return (
+      <div key={comment.id} className={`d-flex align-items-start gap-2 mb-3 ${isReply ? 'ms-4' : ''}`}>
+        <img
+          src={comment.author.profilePic || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzx5O9jN4urn2la1D6ni7Bh9PTVG23AZbEb-mgcWUwwgrsPOZtkS2hGKL_aHZNtCrfa44&usqp=CAU'}
+          alt="Commenter"
+          className="rounded-circle"
+          style={{ width: 32, height: 32, objectFit: "cover" }}
+        />
+        <div className="bg-light p-2 rounded-3 w-100 position-relative">
+          <div className="fw-semibold small mb-1">
+            {comment.author.name}
+          </div>
+          {editingCommentId === comment.id ? (
+            <form onSubmit={submitEditComment} className="d-flex gap-2">
+              <input className="form-control form-control-sm" value={editText} onChange={(e) => setEditText(e.target.value)} />
+              <button className="btn btn-primary btn-sm" type="submit">Lưu</button>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => { setEditingCommentId(null); setEditText(""); }}>Hủy</button>
+            </form>
+          ) : (
+            <div className="small">{comment.content}</div>
+          )}
+          <div className="d-flex gap-2 text-muted small mt-1">
+            <span className="text-muted">{comment.timestamp}</span>
             <span
               role="button"
-              className="text-decoration-none hover-text-primary cursor-pointer"
-              onClick={() => handleReply(comment.id)}
+              className={`text-decoration-none cursor-pointer ${isLikedUi ? 'text-primary fw-bold' : 'hover-text-primary'}`}
+              onClick={() => handleCommentLike(comment.id)}
             >
-              Trả lời
+              {isLikedUi ? 'Đã thích' : 'Thích'}
             </span>
+            {!isReply && isOwner && (
+              <>
+                <span role="button" className="text-decoration-none hover-text-primary cursor-pointer" onClick={() => startEditComment(comment.id, comment.content)}>
+                Sửa
+                </span>
+                <span role="button" className="text-decoration-none text-danger cursor-pointer" onClick={() => handleDeleteComment(comment.id)}>
+                Xóa
+                </span>
+              </>
+            )}
+          </div>
+          {/* Like count indicator */}
+          {likeCountUi && likeCountUi > 0 && (
+            <div className="position-absolute top-0 end-0 me-2 mt-1">
+              <span className="badge bg-primary rounded-pill">
+              👍 {likeCountUi}
+              </span>
+            </div>
           )}
         </div>
-        {/* Like count indicator */}
-        {comment.likes > 0 && (
-          <div className="position-absolute top-0 end-0 me-2 mt-1">
-            <span className="badge bg-primary rounded-pill">
-              👍 {comment.likes}
-            </span>
-          </div>
-        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   if (!show) return null;
 
@@ -184,19 +217,69 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
             <div className="modal-body p-0">
               <div className="container-fluid h-100">
                 <div className="row g-0 h-100">
-                  {/* Left: Media */}
-                  <div className="col-12 col-md-7 bg-dark d-flex align-items-center justify-content-center">
-                    {currentPost.image ? (
-                      <img
-                        src={currentPost.image}
-                        alt="Post content"
-                        className="img-fluid"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src =
-                            "https://via.placeholder.com/800x600?text=No+Image";
-                        }}
-                        style={{ maxHeight: "78vh", objectFit: "contain" }}
-                      />
+                  {/* Left: Media Carousel */}
+                  <div className="col-12 col-md-7 bg-dark d-flex align-items-center justify-content-center position-relative">
+                    {images.length > 0 ? (
+                      <>
+                        {/* Main Image */}
+                        <img
+                          src={images[currentImageIndex]}
+                          alt={`Post content ${currentImageIndex + 1}`}
+                          className="img-fluid"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src =
+                              'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect width="800" height="600" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial" font-size="24"%3EImage Error%3C/text%3E%3C/svg%3E';
+                          }}
+                          style={{ maxHeight: "78vh", objectFit: "contain" }}
+                        />
+                        
+                        {/* Navigation Arrows */}
+                        {images.length > 1 && (
+                          <>
+                            <button
+                              className="btn btn-light position-absolute start-0 top-50 translate-middle-y ms-2"
+                              onClick={prevImage}
+                              style={{ zIndex: 10 }}
+                            >
+                              <ChevronLeftIcon />
+                            </button>
+                            <button
+                              className="btn btn-light position-absolute end-0 top-50 translate-middle-y me-2"
+                              onClick={nextImage}
+                              style={{ zIndex: 10 }}
+                            >
+                              <ChevronRightIcon />
+                            </button>
+                          </>
+                        )}
+                        
+                        {/* Image Counter */}
+                        {images.length > 1 && (
+                          <div className="position-absolute bottom-0 start-50 translate-middle-x mb-2">
+                            <span className="badge bg-dark bg-opacity-75 text-white">
+                              {currentImageIndex + 1} / {images.length}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Thumbnail Dots */}
+                        {images.length > 1 && (
+                          <div className="position-absolute bottom-0 start-0 end-0 d-flex justify-content-center mb-4">
+                            <div className="d-flex gap-1">
+                              {images.map((_, index) => (
+                                <button
+                                  key={index}
+                                  className={`btn btn-sm rounded-circle ${
+                                    index === currentImageIndex ? 'btn-primary' : 'btn-secondary'
+                                  }`}
+                                  onClick={() => setCurrentImageIndex(index)}
+                                  style={{ width: '8px', height: '8px', padding: 0 }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="text-center text-white">
                         <h4>📝 Bài viết không có ảnh</h4>
@@ -213,7 +296,11 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
                     {/* Post header */}
                     <div className="border-bottom p-3 d-flex align-items-center gap-2">
                       <img
-                        src={currentPost.author.profilePic}
+                        src={
+                          currentPost.author?.avatar ||
+                          currentPost.author?.profilePic ||
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzx5O9jN4urn2la1D6ni7Bh9PTVG23AZbEb-mgcWUwwgrsPOZtkS2hGKL_aHZNtCrfa44&usqp=CAU'
+                        }
                         alt="Profile"
                         className="rounded-circle"
                         style={{ width: 48, height: 48, objectFit: "cover" }}
@@ -244,6 +331,20 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
                         className="text-body"
                         dangerouslySetInnerHTML={{ __html: currentPost.content || "" }}
                       />
+                      
+                      {/* Tags Display */}
+                      {currentPost.tags && currentPost.tags.length > 0 && (
+                        <div className="d-flex flex-wrap gap-1 mt-2">
+                          {currentPost.tags.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="badge bg-primary text-white"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Comments list */}
@@ -271,44 +372,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
                                 </div>
                               )}
                               
-                              {/* Reply input for this comment */}
-                              {replyingTo === comment.id && (
-                                <div className="ms-4 mb-3">
-                                  <form onSubmit={handleSubmitReply} className="d-flex align-items-center gap-2">
-                                    <img
-                                      src={currentPost.author.profilePic}
-                                      alt="User"
-                                      className="rounded-circle"
-                                      style={{ width: 28, height: 28, objectFit: "cover" }}
-                                    />
-                                    <input
-                                      type="text"
-                                      className="form-control rounded-pill"
-                                      placeholder={`Trả lời ${comment.author.name}...`}
-                                      value={replyText}
-                                      onChange={(e) => setReplyText(e.target.value)}
-                                      autoFocus
-                                    />
-                                    <button
-                                      type="submit"
-                                      className="btn btn-primary rounded-pill px-3"
-                                      disabled={!replyText.trim()}
-                                    >
-                                      Đăng
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="btn btn-secondary rounded-pill px-3"
-                                      onClick={() => {
-                                        setReplyingTo(null);
-                                        setReplyText("");
-                                      }}
-                                    >
-                                      Hủy
-                                    </button>
-                                  </form>
-                                </div>
-                              )}
+                              {/* Reply UI removed */}
                             </div>
                           ))
                         ) : (
@@ -370,7 +434,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ show, onClose, post }) => {
                       {/* Input */}
                       <form onSubmit={handleSubmitComment} className="d-flex align-items-center gap-2">
                         <img
-                          src={currentPost.author.profilePic}
+                          src={userAvatar}
                           alt="User"
                           className="rounded-circle"
                           style={{ width: 40, height: 40, objectFit: "cover" }}

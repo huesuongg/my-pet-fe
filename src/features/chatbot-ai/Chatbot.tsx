@@ -9,8 +9,10 @@ import styles from "./chatBot.module.css";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 
-import userAvatar from "../../assets/user.png";
+
 import botAvatar from "../../assets/bot.png";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 
 // --- types ---
@@ -38,7 +40,7 @@ function isQuotable(x: unknown): x is QuotableResponse {
 }
 
 const DEFAULT_SEED: Message[] = [
-  { id: 1, role: "bot", text: "Hey there 👋\nHow can I help you today?", avatar: botAvatar },
+  { id: 1, role: "bot", text: "Xin chào 👋\nMình có thể giúp gì cho bạn ạạ?", avatar: botAvatar },
 ];
 
 const ChatBot: React.FC<Props> = ({
@@ -54,6 +56,10 @@ const ChatBot: React.FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  const user = useSelector((state: RootState) => state.auth.user);
+    
+  const userAvatar = user?.avatar || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzx5O9jN4urn2la1D6ni7Bh9PTVG23AZbEb-mgcWUwwgrsPOZtkS2hGKL_aHZNtCrfa44&usqp=CAU';
 
   useEffect(() => {
     if (!open) return;
@@ -233,11 +239,20 @@ const ChatBot: React.FC<Props> = ({
                     <i className={styles.dot} />
                   </span>
                 ) : (
-                  m.text.split("\n").map((line, i) => (
-                    <p key={i} className={styles.line}>
-                      {line}
-                    </p>
-                  ))
+                  // Nếu text có chứa HTML (từ backend), render nó
+                  m.text.includes('<') && m.text.includes('>') ? (
+                    <div 
+                      className={styles.line}
+                      dangerouslySetInnerHTML={{ __html: m.text }}
+                    />
+                  ) : (
+                    // Nếu không có HTML, render như bình thường
+                    m.text.split("\n").map((line, i) => (
+                      <p key={i} className={styles.line}>
+                        {line}
+                      </p>
+                    ))
+                  )
                 )}
               </div>
             </div>
