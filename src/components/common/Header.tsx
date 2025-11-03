@@ -50,10 +50,11 @@ export const Header = () => {
   const [notificationAnchor, setNotificationAnchor] =
     useState<null | HTMLElement>(null);
   const { cartState } = useCart();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const navigationItems = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
+    { label: "Bác sĩ AI", path: "/doctor-ai", icon: <PersonIcon /> },
     { label: "Đặt lịch", path: "/scheduling", icon: <CalendarTodayIcon /> },
     { label: "Sản phẩm", path: "/shopping", icon: <Shop2 /> },
     { label: "Mạng xã hội", path: "/news-feeds", icon: <PersonIcon /> },
@@ -64,10 +65,10 @@ export const Header = () => {
     navigate(path);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
     setProfileAnchor(null);
-    navigate("/");
+    // Navigate to logout page để xử lý logout logic đúng cách
+    navigate("/logout");
   };
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
