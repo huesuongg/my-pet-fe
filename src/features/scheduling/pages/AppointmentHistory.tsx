@@ -1,8 +1,8 @@
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Grid, 
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
   Paper,
   Card,
   CardContent,
@@ -10,63 +10,87 @@ import {
   Avatar,
   Divider,
   IconButton,
-  Container
+  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
-import { 
-  ArrowBack, 
-  CalendarToday, 
-  AccessTime, 
-  Person, 
-  Phone, 
+import {
+  ArrowBack,
+  CalendarToday,
+  AccessTime,
+  Person,
+  Phone,
   CheckCircle,
   Schedule,
-  Cancel
+  Cancel,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useScheduling } from "../hook/useScheduling";
-import { Appointment, Doctor } from "../types";
+import { Appointment } from "../types";
 
 export default function AppointmentHistory() {
   const navigate = useNavigate();
   const { appointments, doctors, loading, error } = useScheduling();
-  const [appointmentHistory, setAppointmentHistory] = useState<Array<Appointment & { doctor?: Doctor }>>([]);
+  const [appointmentHistory, setAppointmentHistory] = useState<Appointment[]>(
+    []
+  );
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (appointments && doctors) {
-      const historyWithDoctors = appointments.map(appointment => {
-        const doctor = doctors.find(d => d.id === appointment.doctorId);
+    if (appointments) {
+      // Sử dụng doctor từ appointment nếu có, nếu không thì tìm trong mảng doctors
+      const historyWithDoctors = appointments.map((appointment) => {
+        if (appointment.doctor) {
+          return appointment; // Đã có doctor info từ backend
+        }
+        // Fallback: tìm trong mảng doctors
+        const doctor = doctors?.find((d) => d.id === appointment.doctorId);
         return { ...appointment, doctor };
       });
       setAppointmentHistory(historyWithDoctors);
     }
   }, [appointments, doctors]);
 
+  const handleViewDetails = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedAppointment(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
-    case 'confirmed':
-      return '#22C55E';
-    case 'pending':
-      return '#F59E0B';
-    case 'cancelled':
-      return '#EF4444';
-    case 'completed':
-      return '#3B82F6';
+    case "confirmed":
+      return "#22C55E";
+    case "pending":
+      return "#F59E0B";
+    case "cancelled":
+      return "#EF4444";
+    case "completed":
+      return "#3B82F6";
     default:
-      return '#6B7280';
+      return "#6B7280";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-    case 'confirmed':
-      return 'Đã xác nhận';
-    case 'pending':
-      return 'Chờ xác nhận';
-    case 'cancelled':
-      return 'Đã hủy';
-    case 'completed':
-      return 'Hoàn thành';
+    case "confirmed":
+      return "Đã xác nhận";
+    case "pending":
+      return "Chờ xác nhận";
+    case "cancelled":
+      return "Đã hủy";
+    case "completed":
+      return "Hoàn thành";
     default:
       return status;
     }
@@ -74,13 +98,13 @@ export default function AppointmentHistory() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-    case 'confirmed':
+    case "confirmed":
       return <CheckCircle sx={{ fontSize: 16 }} />;
-    case 'pending':
+    case "pending":
       return <Schedule sx={{ fontSize: 16 }} />;
-    case 'cancelled':
+    case "cancelled":
       return <Cancel sx={{ fontSize: 16 }} />;
-    case 'completed':
+    case "completed":
       return <CheckCircle sx={{ fontSize: 16 }} />;
     default:
       return <Schedule sx={{ fontSize: 16 }} />;
@@ -132,14 +156,14 @@ export default function AppointmentHistory() {
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-            <IconButton onClick={() => navigate('/scheduling')} sx={{ mr: 2 }}>
+            <IconButton onClick={() => navigate("/scheduling")} sx={{ mr: 2 }}>
               <ArrowBack />
             </IconButton>
             <Typography variant="h4" fontWeight="bold" color="#1E40AF">
               Lịch sử đặt lịch
             </Typography>
           </Box>
-          
+
           <Typography variant="body1" color="text.secondary">
             Quản lý và theo dõi các lịch hẹn của bạn
           </Typography>
@@ -148,7 +172,9 @@ export default function AppointmentHistory() {
         {/* Appointment List */}
         {appointmentHistory.length === 0 ? (
           <Paper sx={{ p: 6, textAlign: "center", borderRadius: 3 }}>
-            <CalendarToday sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+            <CalendarToday
+              sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
+            />
             <Typography variant="h6" color="text.secondary" gutterBottom>
               Chưa có lịch hẹn nào
             </Typography>
@@ -157,7 +183,7 @@ export default function AppointmentHistory() {
             </Typography>
             <Button
               variant="contained"
-              onClick={() => navigate('/scheduling')}
+              onClick={() => navigate("/scheduling")}
               sx={{
                 bgcolor: "#3B82F6",
                 px: 4,
@@ -190,7 +216,14 @@ export default function AppointmentHistory() {
                 >
                   <CardContent sx={{ p: 3 }}>
                     {/* Header with Status */}
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 2,
+                      }}
+                    >
                       <Typography variant="h6" fontWeight="bold">
                         #{appointment.id}
                       </Typography>
@@ -216,39 +249,56 @@ export default function AppointmentHistory() {
                       />
                       <Box>
                         <Typography variant="h6" fontWeight="bold">
-                          {appointment.doctor?.name || 'Bác sĩ không xác định'}
+                          {appointment.doctor?.name || "Bác sĩ không xác định"}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {appointment.doctor?.specialization || 'Chuyên khoa không xác định'}
+                          {appointment.doctor?.specialization ||
+                            "Chuyên khoa không xác định"}
                         </Typography>
                       </Box>
                     </Box>
 
                     {/* Appointment Details */}
                     <Box sx={{ mb: 2 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                        <CalendarToday sx={{ fontSize: 16, color: "text.secondary", mr: 1 }} />
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                      >
+                        <CalendarToday
+                          sx={{ fontSize: 16, color: "text.secondary", mr: 1 }}
+                        />
                         <Typography variant="body2">
                           {appointment.date}
                         </Typography>
                       </Box>
-                      
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                        <AccessTime sx={{ fontSize: 16, color: "text.secondary", mr: 1 }} />
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                      >
+                        <AccessTime
+                          sx={{ fontSize: 16, color: "text.secondary", mr: 1 }}
+                        />
                         <Typography variant="body2">
                           {appointment.time}
                         </Typography>
                       </Box>
-                      
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                        <Person sx={{ fontSize: 16, color: "text.secondary", mr: 1 }} />
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                      >
+                        <Person
+                          sx={{ fontSize: 16, color: "text.secondary", mr: 1 }}
+                        />
                         <Typography variant="body2">
                           {appointment.patientName}
                         </Typography>
                       </Box>
-                      
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                        <Phone sx={{ fontSize: 16, color: "text.secondary", mr: 1 }} />
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                      >
+                        <Phone
+                          sx={{ fontSize: 16, color: "text.secondary", mr: 1 }}
+                        />
                         <Typography variant="body2">
                           {appointment.patientPhone}
                         </Typography>
@@ -257,7 +307,11 @@ export default function AppointmentHistory() {
 
                     {/* Appointment Type */}
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
                         Loại khám:
                       </Typography>
                       <Chip
@@ -270,7 +324,11 @@ export default function AppointmentHistory() {
                     {/* Notes */}
                     {appointment.notes && (
                       <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          gutterBottom
+                        >
                           Ghi chú:
                         </Typography>
                         <Typography variant="body2">
@@ -281,7 +339,7 @@ export default function AppointmentHistory() {
 
                     {/* Action Buttons */}
                     <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-                      {appointment.status === 'pending' && (
+                      {appointment.status === "pending" && (
                         <Button
                           variant="outlined"
                           size="small"
@@ -291,11 +349,12 @@ export default function AppointmentHistory() {
                           Hủy lịch
                         </Button>
                       )}
-                      
+
                       <Button
                         variant="contained"
                         size="small"
-                        sx={{ 
+                        onClick={() => handleViewDetails(appointment)}
+                        sx={{
                           flex: 1,
                           bgcolor: "#3B82F6",
                           "&:hover": {
@@ -317,7 +376,7 @@ export default function AppointmentHistory() {
         <Box sx={{ textAlign: "center", mt: 4 }}>
           <Button
             variant="outlined"
-            onClick={() => navigate('/scheduling')}
+            onClick={() => navigate("/scheduling")}
             sx={{
               borderColor: "#3B82F6",
               color: "#3B82F6",
@@ -336,6 +395,260 @@ export default function AppointmentHistory() {
           </Button>
         </Box>
       </Container>
+
+      {/* Appointment Details Dialog */}
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+          },
+        }}
+      >
+        {selectedAppointment && (
+          <>
+            <DialogTitle
+              sx={{
+                pb: 2,
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                bgcolor: "#F0F9FF",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h5" fontWeight="bold" color="#1E40AF">
+                  Chi tiết lịch hẹn
+                </Typography>
+                <Chip
+                  icon={getStatusIcon(selectedAppointment.status)}
+                  label={getStatusText(selectedAppointment.status)}
+                  sx={{
+                    bgcolor: getStatusColor(selectedAppointment.status),
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                />
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Mã lịch hẹn: #{selectedAppointment.id}
+              </Typography>
+            </DialogTitle>
+            <DialogContent sx={{ pt: 3 }}>
+              <Grid container spacing={3}>
+                {/* Doctor Info */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    Thông tin bác sĩ
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      p: 2,
+                      bgcolor: "#F9FAFB",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Avatar
+                      src={selectedAppointment.doctor?.profileImage}
+                      alt={selectedAppointment.doctor?.name}
+                      sx={{ width: 64, height: 64, mr: 2 }}
+                    />
+                    <Box>
+                      <Typography variant="h6" fontWeight="bold">
+                        {selectedAppointment.doctor?.name ||
+                          "Bác sĩ không xác định"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {selectedAppointment.doctor?.specialization ||
+                          "Chuyên khoa không xác định"}
+                      </Typography>
+                      {selectedAppointment.doctor?.experience && (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 0.5 }}
+                        >
+                          {selectedAppointment.doctor.experience}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </Grid>
+
+                {/* Appointment Details */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    Thông tin lịch hẹn
+                  </Typography>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <CalendarToday
+                        sx={{ fontSize: 20, color: "text.secondary", mr: 1.5 }}
+                      />
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Ngày
+                        </Typography>
+                        <Typography variant="body1" fontWeight="medium">
+                          {selectedAppointment.date}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <AccessTime
+                        sx={{ fontSize: 20, color: "text.secondary", mr: 1.5 }}
+                      />
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Giờ
+                        </Typography>
+                        <Typography variant="body1" fontWeight="medium">
+                          {selectedAppointment.time}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        Loại khám
+                      </Typography>
+                      <Chip
+                        label={selectedAppointment.type}
+                        variant="outlined"
+                        sx={{ borderColor: "#3B82F6", color: "#3B82F6" }}
+                      />
+                    </Box>
+                  </Box>
+                </Grid>
+
+                {/* Patient Info */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    Thông tin người đặt
+                  </Typography>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Person
+                        sx={{ fontSize: 20, color: "text.secondary", mr: 1.5 }}
+                      />
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Tên bệnh nhân
+                        </Typography>
+                        <Typography variant="body1" fontWeight="medium">
+                          {selectedAppointment.patientName ||
+                            "Chưa có thông tin"}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Phone
+                        sx={{ fontSize: 20, color: "text.secondary", mr: 1.5 }}
+                      />
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Số điện thoại
+                        </Typography>
+                        <Typography variant="body1" fontWeight="medium">
+                          {selectedAppointment.patientPhone ||
+                            selectedAppointment.phone ||
+                            "Chưa có thông tin"}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        Phương thức thanh toán
+                      </Typography>
+                      <Typography variant="body1" fontWeight="medium">
+                        {selectedAppointment.paymentMethod === "cash"
+                          ? "Tiền mặt"
+                          : selectedAppointment.paymentMethod === "card"
+                            ? "Thẻ"
+                            : selectedAppointment.paymentMethod ||
+                              "Chưa có thông tin"}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+
+                {/* Notes */}
+                {selectedAppointment.notes && (
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                      Ghi chú
+                    </Typography>
+                    <Paper sx={{ p: 2, bgcolor: "#F9FAFB" }}>
+                      <Typography variant="body1">
+                        {selectedAppointment.notes}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                )}
+              </Grid>
+            </DialogContent>
+            <DialogActions
+              sx={{ p: 3, borderTop: "1px solid", borderColor: "divider" }}
+            >
+              <Button
+                onClick={handleCloseDialog}
+                variant="outlined"
+                sx={{
+                  borderColor: "#3B82F6",
+                  color: "#3B82F6",
+                  px: 3,
+                  "&:hover": {
+                    borderColor: "#2563EB",
+                    bgcolor: "#F0F9FF",
+                  },
+                }}
+              >
+                Đóng
+              </Button>
+              {selectedAppointment.status === "pending" && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  sx={{
+                    px: 3,
+                    "&:hover": {
+                      bgcolor: "#DC2626",
+                    },
+                  }}
+                >
+                  Hủy lịch hẹn
+                </Button>
+              )}
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Box>
   );
 }

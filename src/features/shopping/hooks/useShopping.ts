@@ -55,8 +55,8 @@ export const useShopping = () => {
     dispatch(addToCartThunk({ productId, quantity }));
   }, [dispatch]);
 
-  const updateCartItemQuantity = useCallback((itemId: number, quantity: number) => {
-    dispatch(updateCartItemThunk({ itemId, quantity }));
+  const updateCartItemQuantity = useCallback((itemIndex: number, quantity: number) => {
+    dispatch(updateCartItemThunk({ itemIndex, quantity }) as unknown);
   }, [dispatch]);
 
   const removeProductFromCart = useCallback((itemId: number) => {

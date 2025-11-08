@@ -21,7 +21,9 @@ export const getProductsByCategory = (products: Product[]) => {
       ...product,
       price: typeof product.price === 'number' 
         ? `${product.price.toLocaleString("vi-VN")} VNĐ`
-        : product.price,
+        : typeof product.price === 'string'
+          ? product.price
+          : '0 VNĐ',
       originalPrice: product.originalPrice
         ? typeof product.originalPrice === 'number'
           ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ`
@@ -35,7 +37,11 @@ export const getProductsByCategory = (products: Product[]) => {
 
 // Helper function to get product by ID
 export const getProductById = (id: string | number, products: Product[]) => {
-  return products.find((p: Product) => p.id === id || p._id === id);
+  return products.find((p: Product) => {
+    const pId = p.id || p._id;
+    const searchId = typeof id === 'string' ? id : String(id);
+    return String(pId) === searchId || pId === id;
+  });
 };
 
 const ShoppingPage = () => {
@@ -43,14 +49,14 @@ const ShoppingPage = () => {
   const { products, categories, blogArticles, loading, error } = useSelector((state: RootState) => state.shopping);
 
   useEffect(() => {
-    dispatch(fetchProducts({ page: 1, limit: 50 }));
-    dispatch(fetchCategories());
-    dispatch(fetchBlogArticles({ page: 1, limit: 10 }));
+    dispatch(fetchProducts({ page: 1, limit: 50 }) as unknown);
+    dispatch(fetchCategories() as unknown);
+    dispatch(fetchBlogArticles({ page: 1, limit: 10 }) as unknown);
   }, [dispatch]);
 
   const handleCategoryClick = (categoryId: number) => {
     console.log("Category clicked:", categoryId);
-    dispatch(fetchProducts({ page: 1, limit: 50, categoryId }));
+    dispatch(fetchProducts({ page: 1, limit: 50, categoryId }) as unknown);
   };
 
   const handleBlogClick = (articleId: number) => {
@@ -408,11 +414,11 @@ const ShoppingPage = () => {
                     key={product.id || product._id}
                     id={product.id || product._id}
                     name={product.name}
-                    price={product.price}
-                    originalPrice={product.originalPrice}
+                    price={typeof product.price === 'number' ? product.price : typeof product.price === 'string' ? product.price : 0}
+                    originalPrice={typeof product.originalPrice === 'number' ? product.originalPrice : product.originalPrice}
                     image={product.image || product.images?.[0] || "https://via.placeholder.com/300"}
-                    rating={product.rating || product.reviews?.averageRating || 0}
-                    reviews={product.reviewCount || product.reviews?.length || 0}
+                    rating={product.rating || (Array.isArray(product.reviews) ? product.reviews.reduce((acc: number, r: { rating?: number }) => acc + (r.rating || 0), 0) / product.reviews.length : 0) || 0}
+                    reviews={product.reviewCount || (Array.isArray(product.reviews) ? product.reviews.length : 0) || 0}
                     brand={product.brand}
                     weight={product.weight}
                     color={product.color}

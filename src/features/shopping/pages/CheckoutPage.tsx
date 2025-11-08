@@ -111,24 +111,33 @@ const CheckoutPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   interface CartItemWithProduct {
-    product?: { price?: number | string; _id?: string; id?: string; name?: string; image?: string; color?: string; size?: string; weight?: string };
+    product?: { 
+      price?: number | string;
+      _id?: string;
+      id?: string | number;
+      name?: string;
+      image?: string;
+      color?: string;
+      size?: string;
+      weight?: string;
+    };
     productImage?: string;
     productName?: string;
     quantity: number;
     color?: string;
     size?: string;
     weight?: string;
-    price?: number;
-    id?: string;
+    price?: number | string;
+    id?: string | number;
     _id?: string;
   }
 
   useEffect(() => {
-    dispatch(fetchCart());
+    dispatch(fetchCart() as unknown);
   }, [dispatch]);
   
   // Calculate totals
-  const cartItems: CartItemWithProduct[] = cart?.items || [];
+  const cartItems: CartItemWithProduct[] = (cart?.items || []) as CartItemWithProduct[];
   const subtotal = cartItems.reduce((total: number, item: CartItemWithProduct) => {
     const price = typeof item.product?.price === 'number' 
       ? item.product.price 
@@ -223,7 +232,7 @@ const CheckoutPage: React.FC = () => {
           paymentMethod: selectedPayment,
         };
 
-        const result = await dispatch(createOrderThunk(orderData));
+        const result = await dispatch(createOrderThunk(orderData) as unknown);
         
         interface OrderResult {
           payload?: {

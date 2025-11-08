@@ -332,11 +332,11 @@ export const clearCartThunk = createAsyncThunk(
 // Fetch orders thunk
 export const fetchOrders = createAsyncThunk(
   'shopping/fetchOrders',
-  async (params?: {
+  async (params: {
     page?: number;
     limit?: number;
     status?: string;
-  }, { dispatch }) => {
+  } = {}, { dispatch }) => {
     try {
       dispatch(setOrdersLoading(true));
       dispatch(setOrdersError(null));

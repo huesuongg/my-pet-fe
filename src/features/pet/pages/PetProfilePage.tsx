@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 // import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -47,11 +46,10 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { RootState, AppDispatch } from '../../../store';
-import { getPetsByUserId, deletePet } from '../petThunk';
 import { useAuth } from '../../authenticate/hooks/useAuth';
 import { Pet, PET_SPECIES, PET_GENDERS } from '../types';
 import PetForm from '../components/PetForm';
+import { petAPI } from '../petAPI';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -76,21 +74,56 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function PetProfilePage() {
-  const dispatch = useDispatch<AppDispatch>();
   // const navigate = useNavigate();
   const { user } = useAuth();
-  const { pets, loading, error } = useSelector((state: RootState) => state.pet);
   
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
   const [openForm, setOpenForm] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<Pet | null>(null);
 
-  useEffect(() => {
-    if (user?.id) {
-      dispatch(getPetsByUserId(Number(user.id)));
+  // Helper function để normalize pet data - đảm bảo các array fields luôn tồn tại
+  const normalizePet = (pet: Pet): Pet => {
+    if (!pet.id) {
+      console.error('Pet missing ID:', pet);
     }
-  }, [dispatch, user?.id]);
+    return {
+      ...pet,
+      id: pet.id || '', // Đảm bảo id luôn có
+      vaccinationHistory: Array.isArray(pet.vaccinationHistory) ? pet.vaccinationHistory : [],
+      medicalHistory: Array.isArray(pet.medicalHistory) ? pet.medicalHistory : []
+    };
+  };
+
+  const loadPets = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await petAPI.getPets();
+      // Đảm bảo data luôn là array và normalize từng pet
+      if (Array.isArray(data)) {
+        const normalizedPets = data.map(normalizePet);
+        setPets(normalizedPets);
+      } else {
+        console.warn('Expected array but got:', data);
+        setPets([]);
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load pets';
+      setError(errorMessage);
+      console.error('Error loading pets:', err);
+      setPets([]); // Đảm bảo pets luôn là array ngay cả khi có lỗi
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPets();
+  }, [user?.id]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -102,6 +135,12 @@ export default function PetProfilePage() {
   };
 
   const handleEditPet = (pet: Pet) => {
+    if (!pet || !pet.id) {
+      console.error('Cannot edit pet: pet or pet.id is missing', pet);
+      toast.error('Không thể chỉnh sửa: thiếu thông tin thú cưng');
+      return;
+    }
+    console.log('Editing pet:', pet.id, pet.name);
     setEditingPet(pet);
     setOpenForm(true);
   };
@@ -113,16 +152,15 @@ export default function PetProfilePage() {
   const confirmDelete = async () => {
     if (deleteDialog) {
       try {
-        await dispatch(deletePet(deleteDialog.id)).unwrap();
+        await petAPI.deletePet(deleteDialog.id);
         toast.success(`Đã xóa thú cưng "${deleteDialog.name}" thành công!`);
         setDeleteDialog(null);
         // Refresh pets list
-        if (user?.id) {
-          dispatch(getPetsByUserId(Number(user.id)));
-        }
-      } catch (error) {
-        toast.error('Có lỗi xảy ra khi xóa thú cưng');
-        console.error('Delete pet error:', error);
+        await loadPets();
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi xóa thú cưng';
+        toast.error(errorMessage);
+        console.error('Delete pet error:', err);
       }
     }
   };
@@ -296,7 +334,7 @@ export default function PetProfilePage() {
           {/* Tab Panels */}
           <TabPanel value={tabValue} index={0}>
             <Grid container spacing={3}>
-              {pets.map((pet, index) => (
+              {(Array.isArray(pets) ? pets : []).map((pet, index) => (
                 <Grid key={pet.id} size={{ xs: 12, sm: 6, md: 4 }}>
                   <Zoom in timeout={600 + index * 100}>
                     <Card sx={{ 
@@ -457,7 +495,7 @@ export default function PetProfilePage() {
                 <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
                   💉 Lịch sử tiêm phòng
                 </Typography>
-                {pets.map((pet) => (
+                {(Array.isArray(pets) ? pets : []).map((pet) => (
                   <Card key={pet.id} sx={{ 
                     mb: 3, 
                     borderRadius: 3,
@@ -576,7 +614,7 @@ export default function PetProfilePage() {
                 <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
                   🏥 Lịch sử khám bệnh
                 </Typography>
-                {pets.map((pet) => (
+                {(Array.isArray(pets) ? pets : []).map((pet) => (
                   <Card key={pet.id} sx={{ 
                     mb: 3, 
                     borderRadius: 3,
@@ -690,19 +728,29 @@ export default function PetProfilePage() {
       )}
 
       {/* Pet Form Dialog */}
-      <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="md" fullWidth>
+      <Dialog 
+        open={openForm} 
+        onClose={() => {
+          setOpenForm(false);
+          setEditingPet(null); // Reset editing pet khi đóng
+        }} 
+        maxWidth="md" 
+        fullWidth
+      >
         <DialogTitle>
-          {editingPet ? 'Chỉnh sửa thú cưng' : 'Thêm thú cưng mới'}
+          {editingPet ? `Chỉnh sửa thú cưng: ${editingPet.name}` : 'Thêm thú cưng mới'}
         </DialogTitle>
         <DialogContent>
           <PetForm
             pet={editingPet}
-            onClose={() => setOpenForm(false)}
+            onClose={() => {
+              setOpenForm(false);
+              setEditingPet(null); // Reset editing pet khi đóng
+            }}
             onSuccess={() => {
               setOpenForm(false);
-              if (user?.id) {
-                dispatch(getPetsByUserId(Number(user.id)));
-              }
+              setEditingPet(null); // Reset editing pet sau khi thành công
+              loadPets();
             }}
           />
         </DialogContent>

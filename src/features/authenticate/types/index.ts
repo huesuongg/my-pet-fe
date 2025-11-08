@@ -55,6 +55,13 @@ export interface User {
     avatar?: string;
     isActive?: boolean;
     createdAt?: string;
+    backgroundImg?: string;
+    introduction?: string;
+    liveAt?: string;
+    studyAt?: string;
+    studiedAt?: string;
+    workAt?: string;
+    from?: string;
 }
 
 export interface AuthState {

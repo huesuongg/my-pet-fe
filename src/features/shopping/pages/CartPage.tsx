@@ -90,18 +90,30 @@ const CartPage: React.FC = () => {
   const [promoCode, setPromoCode] = useState("");
 
   useEffect(() => {
-    dispatch(fetchCart());
+    dispatch(fetchCart() as unknown);
   }, [dispatch]);
 
   // Calculate totals
   interface CartItemWithProduct {
-    product?: { price?: number | string };
+    product?: { 
+      price?: number | string;
+      image?: string;
+      name?: string;
+      color?: string;
+      size?: string;
+      weight?: string;
+    };
     productImage?: string;
+    productName?: string;
     quantity: number;
-    id?: string;
+    color?: string;
+    size?: string;
+    weight?: string;
+    price?: number | string;
+    id?: string | number;
     _id?: string;
   }
-  const cartItems: CartItemWithProduct[] = cart?.items || [];
+  const cartItems: CartItemWithProduct[] = (cart?.items || []) as CartItemWithProduct[];
   const subtotal = cartItems.reduce((total: number, item: CartItemWithProduct) => {
     const price = typeof item.product?.price === 'number' 
       ? item.product.price 
@@ -116,12 +128,12 @@ const CartPage: React.FC = () => {
     const item = cartItems[itemIndex];
     if (item) {
       const newQuantity = Math.max(1, item.quantity + delta);
-      await dispatch(updateCartItemThunk({ itemIndex, quantity: newQuantity }));
+      await dispatch(updateCartItemThunk({ itemIndex, quantity: newQuantity }) as unknown);
     }
   };
 
   const handleRemoveItem = async (itemIndex: number) => {
-    await dispatch(removeFromCartThunk(itemIndex));
+    await dispatch(removeFromCartThunk(itemIndex) as unknown);
   };
 
   const handleShippingChange = (shippingId: number) => {
@@ -282,7 +294,7 @@ const CartPage: React.FC = () => {
                         value={item.quantity}
                         onChange={(e) => {
                           const newQuantity = Math.max(1, parseInt(e.target.value) || 1);
-                          dispatch(updateCartItemThunk({ itemIndex: index, quantity: newQuantity }));
+                          dispatch(updateCartItemThunk({ itemIndex: index, quantity: newQuantity }) as unknown);
                         }}
                         className={styles.quantityInput}
                         inputProps={{ min: 1, style: { textAlign: "center" } }}

@@ -1,6 +1,7 @@
 import MainContent from "../components/MainContent";
 import NewsFeedLeftSideBar from "../components/NewsFeedLeftSideBar";
 import NewsFeedRightSideBar from "../components/NewsFeedRightSideBar";
+
 import { PostProvider } from "../context/PostContext";
 
 const NewFeeds: React.FC = () => {

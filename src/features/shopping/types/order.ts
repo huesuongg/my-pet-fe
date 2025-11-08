@@ -45,17 +45,19 @@ export enum OrderStatus {
 }
 
 export interface Order {
-  id: number;
-  orderNumber: string;
-  date: string;
-  status: OrderStatus;
+  id?: number;
+  _id?: string;
+  orderNumber?: string;
+  date?: string;
+  createdAt?: string;
+  status: OrderStatus | string;
   items: OrderItem[];
-  shippingInfo: ShippingInfo;
-  shippingOption: ShippingOption;
-  paymentMethod: string;
-  subtotal: number;
-  shippingFee: number;
-  total: number;
+  shippingInfo?: ShippingInfo;
+  shippingOption?: ShippingOption;
+  paymentMethod?: string;
+  subtotal?: number;
+  shippingFee?: number;
+  total?: number;
 }
 
 // Helper function to convert CartItems to OrderItems

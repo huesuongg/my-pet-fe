@@ -79,7 +79,7 @@ const OrdersPage: React.FC = () => {
   };
   
   useEffect(() => {
-    dispatch(fetchOrders({ page: 1, limit: 50 }));
+    dispatch(fetchOrders({ page: 1, limit: 50 }) as unknown);
   }, [dispatch]);
   
   useEffect(() => {
@@ -200,9 +200,10 @@ const OrdersPage: React.FC = () => {
             </Button>
           </Box>
         ) : (
-          filteredOrders.map((order: Order) => (
-            <OrderCard key={order.id || order._id} order={order} />
-          ))
+          filteredOrders.map((order: Order) => {
+            const orderWithId = { ...order, id: order.id || order._id || 0 };
+            return <OrderCard key={order.id || order._id} order={orderWithId as Order} />;
+          })
         )}
       </Box>
     </Box>

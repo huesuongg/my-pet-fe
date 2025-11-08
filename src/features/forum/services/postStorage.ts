@@ -1,4 +1,4 @@
-import { PostData } from '../context/PostContext';
+import { PostData } from '../types/forum.types';
 
 const POSTS_STORAGE_KEY = 'forum_posts';
 
@@ -42,9 +42,15 @@ export const savePostsToStorage = (posts: PostData[]): void => {
 // Thêm post mới vào storage
 export const addPostToStorage = (post: Omit<PostData, 'id' | 'likes' | 'comments' | 'favorites' | 'isLiked' | 'isFavorited' | 'commentsList'>): PostData => {
   const existingPosts = getStoredPosts();
+  const maxId = existingPosts.length > 0
+    ? Math.max(...existingPosts.map(p => {
+      const numId = typeof p.id === 'string' ? Number(p.id) : p.id;
+      return isNaN(numId) ? 0 : numId;
+    }))
+    : 0;
   const newPost: PostData = {
     ...post,
-    id: Math.max(...existingPosts.map(p => p.id), 0) + 1,
+    id: maxId + 1,
     likes: 0,
     comments: 0,
     favorites: 0,

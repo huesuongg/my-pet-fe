@@ -10,7 +10,13 @@ export default function ServiceSection() {
   const navigate = useNavigate();
   return (
     <Container sx={{ py: 6 }}>
-      <Typography variant="h4" fontWeight="bold" align="center" gutterBottom sx={{ fontFamily: "'Inter', sans-serif" }}>
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        align="center"
+        gutterBottom
+        sx={{ fontFamily: "'Inter', sans-serif" }}
+      >
         Dịch Vụ Chăm Sóc Boss
       </Typography>
 
@@ -20,7 +26,7 @@ export default function ServiceSection() {
             image="https://i.pinimg.com/736x/98/ac/c8/98acc8f2493eb1b1ef7a700f95cf0c56.jpg"
             icon={<PetsIcon color="success" />}
             title="Sản Phẩm Cho Boss"
-            description="Keep your pet looking and feeling their best with our full-service."
+            description="Giữ gìn và chăm sóc Boss chu đáo với các sản phẩm chất lượng."
           />
         </Grid>
 
@@ -29,7 +35,7 @@ export default function ServiceSection() {
             image="https://i.pinimg.com/736x/2c/c4/ba/2cc4ba67e7b6784e8e676f30738edf67.jpg"
             icon={<LocalHospitalIcon color="success" />}
             title="Đặt Lịch Khám"
-            description="From routine check-ups to emergency care, our experience..."
+            description="Từ khám thường xuyên đến khám khẩn cấp, chúng tôi sẽ giúp bạn đặt lịch khám một cách dễ dàng và tiện lợi."
           />
         </Grid>
 
@@ -38,7 +44,7 @@ export default function ServiceSection() {
             image="https://i.pinimg.com/736x/c2/98/c1/c298c13859ab4163ba7843438eefd384.jpg"
             icon={<PeopleAltIcon color="success" />}
             title="Mạng Xã Hội"
-            description="Going away? Leave your pet in safe hands. Our boarding service."
+            description="Hãy chia sẻ với mọi người những hình ảnh và video đáng yêu nhất của Boss của bạn."
           />
         </Grid>
       </Grid>

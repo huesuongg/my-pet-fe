@@ -1,24 +1,35 @@
-import { Box, Button, Typography, Grid, Card, CardContent, Avatar } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Avatar,
+} from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Paw1 from "../../../assets/paw1.svg";
 
 const testimonials = [
   {
     id: 1,
-    name: "Sarah & Max",
-    role: "(Happy Pet Parents)",
-    content: "The team at Doris took amazing care of our dog while we were on vacation. We felt so at ease knowing he was in such good hands",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-    bgColor: "#1565C0"
+    name: "Văn Toàn",
+    role: "(Bố mẹ Puppy)",
+    content:
+      "Nhóm tại My Pet đã chăm sóc tuyệt vời cho chó của chúng tôi trong khi chúng tôi đang ở nơi khác. Chúng tôi cảm thấy rất thoải mái khi biết rằng anh ấy đang ở trong tay của những người tốt",
+    avatar: "https://a-z-animals.com/media/2022/06/Alaskan-Malamute.jpg",
+    bgColor: "#1565C0",
   },
   {
     id: 2,
-    name: "Jessica",
-    role: "(Cat Lover)",
-    content: "Our cat came back from grooming looking like a million bucks! We can't recommend Doris enough",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-    bgColor: "#1976D2"
-  }
+    name: "Linh Meo",
+    role: "(Người yêu mèo)",
+    content:
+      "Mèo của chúng tôi trở về sau khi được chăm sóc rất đẹp! Không thể diễn tả đủ lời cảm ơn đối với nhóm tại My Pet",
+    avatar:
+      "https://th.bing.com/th/id/R.23e7d4f38fe7e2e41099c25948d6b5fc?rik=8yxk0rvsDq6TZA&pid=ImgRaw&r=0",
+    bgColor: "#1976D2",
+  },
 ];
 
 export default function TestimonialSection() {
@@ -26,18 +37,25 @@ export default function TestimonialSection() {
     <Box sx={{ py: 8, bgcolor: "white" }}>
       <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 4 } }}>
         {/* Header */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 6 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 6,
+          }}
+        >
           <Typography
             variant="h3"
             sx={{
               fontWeight: "bold",
               color: "black",
-              fontSize: { xs: "1.8rem", md: "2.2rem" }
+              fontSize: { xs: "1.8rem", md: "2.2rem" },
             }}
           >
             Khách Hàng Nói Gì Về My Pet
           </Typography>
-          
+
           <Button
             variant="contained"
             endIcon={<ArrowForwardIcon />}
@@ -85,7 +103,10 @@ export default function TestimonialSection() {
                   <Typography variant="body2" sx={{ mb: 3, opacity: 0.9 }}>
                     {testimonial.role}
                   </Typography>
-                  <Typography variant="body1" sx={{ fontStyle: "italic", lineHeight: 1.6 }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontStyle: "italic", lineHeight: 1.6 }}
+                  >
                     "{testimonial.content}"
                   </Typography>
                 </CardContent>
@@ -168,7 +189,7 @@ export default function TestimonialSection() {
             >
               Bạn Đã Sẵn Sàng Để Chăm Sóc Các Boss Đúng Cách ?
             </Typography>
-            
+
             <Typography
               variant="body1"
               sx={{
@@ -180,7 +201,10 @@ export default function TestimonialSection() {
                 lineHeight: 1.6,
               }}
             >
-              Don't wait! Your pet deserves the best, and we're here to provide it. Whether you're looking for grooming, veterinary services, or just a safe place for your pet to stay, we're ready to help.
+              Đừng chần chừ nữa! Thú cưng của bạn xứng đáng nhận được những điều
+              tốt nhất — và chúng tôi luôn sẵn sàng mang điều đó đến cho bạn. Dù
+              bạn đang tìm dịch vụ chăm sóc, thú y, hay một nơi an toàn để thú
+              cưng nghỉ ngơi, chúng tôi đều sẵn lòng đồng hành và hỗ trợ.
             </Typography>
 
             <Button

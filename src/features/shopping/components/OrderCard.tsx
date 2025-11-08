@@ -10,24 +10,30 @@ interface OrderCardProps {
 const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const navigate = useNavigate();
 
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
+  const getStatusColor = (status: OrderStatus | string) => {
+    const statusStr = typeof status === 'string' ? status : status;
+    switch (statusStr) {
     case OrderStatus.PENDING:
+    case 'PENDING':
       return '#FFA500'; // Orange
     case OrderStatus.PROCESSING:
+    case 'PROCESSING':
       return '#3B82F6'; // Blue
     case OrderStatus.SHIPPED:
+    case 'SHIPPED':
       return '#8B5CF6'; // Purple
     case OrderStatus.DELIVERED:
+    case 'DELIVERED':
       return '#22C55E'; // Green
     case OrderStatus.CANCELLED:
+    case 'CANCELLED':
       return '#EF4444'; // Red
     default:
       return '#6B7280'; // Gray
     }
   };
 
-  const getStatusText = (status: OrderStatus) => {
+  const getStatusText = (status: OrderStatus | string) => {
     switch (status) {
     case OrderStatus.PENDING:
       return 'Chờ xác nhận';
@@ -86,7 +92,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
               Đơn hàng #{order.orderNumber}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Đặt ngày: {formatDate(order.date)}
+              Đặt ngày: {formatDate(order.date || order.createdAt || new Date().toISOString())}
             </Typography>
           </Box>
           <Chip

@@ -62,7 +62,7 @@ export const createPet = createAsyncThunk<
         message: 'User not authenticated'
       });
     }
-    const pet = await petAPI.createPet(userId, petData);
+    const pet = await petAPI.createPet(String(userId), petData);
     return pet;
   } catch {
     return rejectWithValue({

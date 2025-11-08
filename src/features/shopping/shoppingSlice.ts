@@ -131,10 +131,10 @@ const shoppingSlice = createSlice({
     addOrder: (state, action: PayloadAction<Order>) => {
       state.orders.unshift(action.payload); // Add new order at the beginning
     },
-    updateOrderStatus: (state, action: PayloadAction<{ orderId: number; status: string }>) => {
-      const order = state.orders.find(order => order.id === action.payload.orderId);
+    updateOrderStatus: (state, action: PayloadAction<{ orderId: number | string; status: string | OrderStatus }>) => {
+      const order = state.orders.find(order => (order.id === action.payload.orderId) || (order._id === action.payload.orderId));
       if (order) {
-        order.status = action.payload.status;
+        order.status = action.payload.status as OrderStatus | string;
       }
     },
     setOrdersLoading: (state, action: PayloadAction<boolean>) => {

@@ -50,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         color,
         size,
         weight
-      }));
+      }) as unknown);
       
       // Check if action was rejected
       if (addToCartThunk.rejected.match(result)) {

@@ -10,6 +10,7 @@ import {
   Tab,
   TextField,
   Card,
+  CardContent,
   Chip,
   Snackbar,
   Alert,
@@ -195,7 +196,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
         color: selectedColor || undefined,
         size: selectedSize || undefined,
         weight: selectedWeight || undefined,
-      }));
+      }) as unknown);
       
       // Show success message
       setOpenSnackbar(true);
@@ -211,8 +212,19 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
     setOpenSnackbar(false);
   };
 
-  const totalPrice = product ? (typeof product.price === 'number' ? product.price : parseFloat(product.price.toString().replace(/[^\d]/g, ''))) * quantity : 0;
-  const reviews = product?.reviews || [];
+  const totalPrice = product ? (typeof product.price === 'number' ? product.price : typeof product.price === 'string' ? parseFloat(product.price.toString().replace(/[^\d]/g, '')) : 0) * quantity : 0;
+  const reviews = (product?.reviews || []) as Array<{
+    id?: string | number;
+    _id?: string;
+    name?: string;
+    user?: { name?: string; avatar?: string };
+    avatar?: string;
+    rating?: number;
+    comment?: string;
+    content?: string;
+    date?: string;
+    createdAt?: string;
+  }>;
 
   if (loading) {
     return (
@@ -384,39 +396,26 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
               <>
                 <Box className={styles.reviewsGrid}>
                   {reviews.map((review, index: number) => {
-                    interface Review {
-                      id?: string | number;
-                      _id?: string;
-                      name?: string;
-                      user?: { name?: string; avatar?: string };
-                      avatar?: string;
-                      rating?: number;
-                      comment?: string;
-                      content?: string;
-                      date?: string;
-                      createdAt?: string;
-                    }
-                    const reviewData = review as Review;
                     return (
-                      <Card key={reviewData.id || reviewData._id || index} className={styles.reviewCard}>
+                      <Card key={review.id || review._id || index} className={styles.reviewCard}>
                         <CardContent>
                           <Box className={styles.reviewHeader}>
                             <Avatar
-                              src={reviewData.avatar || reviewData.user?.avatar || "https://via.placeholder.com/40"}
+                              src={review.avatar || review.user?.avatar || "https://via.placeholder.com/40"}
                               className={styles.reviewAvatar}
                             />
                             <Box className={styles.reviewInfo}>
                               <Typography variant="subtitle1" className={styles.reviewerName}>
-                                {reviewData.name || reviewData.user?.name || "Khách hàng"}
+                                {review.name || review.user?.name || "Khách hàng"}
                               </Typography>
                               <Typography variant="caption" className={styles.reviewDate}>
-                                {reviewData.date || new Date(reviewData.createdAt || reviewData.date || '').toLocaleDateString("vi-VN")}
+                                {review.date || new Date(review.createdAt || review.date || '').toLocaleDateString("vi-VN")}
                               </Typography>
                             </Box>
                           </Box>
-                          <Rating value={reviewData.rating || 5} readOnly className={styles.reviewRating} />
+                          <Rating value={review.rating || 5} readOnly className={styles.reviewRating} />
                           <Typography variant="body2" className={styles.reviewComment}>
-                            {reviewData.comment || reviewData.content || "Chưa có nhận xét."}
+                            {review.comment || review.content || "Chưa có nhận xét."}
                           </Typography>
                         </CardContent>
                       </Card>
