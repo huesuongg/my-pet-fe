@@ -90,7 +90,8 @@ const CartPage: React.FC = () => {
   const [promoCode, setPromoCode] = useState("");
 
   useEffect(() => {
-    dispatch(fetchCart() as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchCart() as any);
   }, [dispatch]);
 
   // Calculate totals
@@ -128,12 +129,14 @@ const CartPage: React.FC = () => {
     const item = cartItems[itemIndex];
     if (item) {
       const newQuantity = Math.max(1, item.quantity + delta);
-      await dispatch(updateCartItemThunk({ itemIndex, quantity: newQuantity }) as unknown);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await dispatch(updateCartItemThunk({ itemIndex, quantity: newQuantity }) as any);
     }
   };
 
   const handleRemoveItem = async (itemIndex: number) => {
-    await dispatch(removeFromCartThunk(itemIndex) as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await dispatch(removeFromCartThunk(itemIndex) as any);
   };
 
   const handleShippingChange = (shippingId: number) => {
@@ -255,21 +258,21 @@ const CartPage: React.FC = () => {
                     <Box className={styles.productDetails}>
                       {(item.color || item.product?.color) && (
                         <Chip
-                          label={`Màu: ${item.color || item.product.color}`}
+                          label={`Màu: ${item.color || item.product?.color || ''}`}
                           size="small"
                           className={styles.detailChip}
                         />
                       )}
                       {(item.size || item.product?.size) && (
                         <Chip
-                          label={`Size: ${item.size || item.product.size}`}
+                          label={`Size: ${item.size || item.product?.size || ''}`}
                           size="small"
                           className={styles.detailChip}
                         />
                       )}
                       {(item.weight || item.product?.weight) && (
                         <Chip
-                          label={item.weight || item.product.weight}
+                          label={item.weight || item.product?.weight || ''}
                           size="small"
                           className={styles.weightChip}
                         />
@@ -294,7 +297,8 @@ const CartPage: React.FC = () => {
                         value={item.quantity}
                         onChange={(e) => {
                           const newQuantity = Math.max(1, parseInt(e.target.value) || 1);
-                          dispatch(updateCartItemThunk({ itemIndex: index, quantity: newQuantity }) as unknown);
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          dispatch(updateCartItemThunk({ itemIndex: index, quantity: newQuantity }) as any);
                         }}
                         className={styles.quantityInput}
                         inputProps={{ min: 1, style: { textAlign: "center" } }}
@@ -311,7 +315,11 @@ const CartPage: React.FC = () => {
                       {(() => {
                         const price = typeof item.product?.price === 'number' 
                           ? item.product.price 
-                          : item.price || 0;
+                          : typeof item.price === 'number' 
+                            ? item.price 
+                            : typeof item.price === 'string'
+                              ? parseFloat(item.price.toString().replace(/[^\d]/g, '')) || 0
+                              : 0;
                         return (price * item.quantity).toLocaleString("vi-VN");
                       })()} VNĐ
                     </Typography>

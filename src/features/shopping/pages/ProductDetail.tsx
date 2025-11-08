@@ -190,13 +190,16 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
     if (!product || !id) return;
     
     try {
-      await dispatch(addToCartThunk({
-        productId: id,
-        quantity,
-        color: selectedColor || undefined,
-        size: selectedSize || undefined,
-        weight: selectedWeight || undefined,
-      }) as unknown);
+      await dispatch(
+        addToCartThunk({
+          productId: id,
+          quantity,
+          color: selectedColor || undefined,
+          size: selectedSize || undefined,
+          weight: selectedWeight || undefined,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any
+      );
       
       // Show success message
       setOpenSnackbar(true);

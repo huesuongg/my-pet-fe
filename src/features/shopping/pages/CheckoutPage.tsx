@@ -123,6 +123,7 @@ const CheckoutPage: React.FC = () => {
     };
     productImage?: string;
     productName?: string;
+    productId?: string | number;
     quantity: number;
     color?: string;
     size?: string;
@@ -133,7 +134,8 @@ const CheckoutPage: React.FC = () => {
   }
 
   useEffect(() => {
-    dispatch(fetchCart() as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchCart() as any);
   }, [dispatch]);
   
   // Calculate totals
@@ -141,7 +143,11 @@ const CheckoutPage: React.FC = () => {
   const subtotal = cartItems.reduce((total: number, item: CartItemWithProduct) => {
     const price = typeof item.product?.price === 'number' 
       ? item.product.price 
-      : item.price || 0;
+      : typeof item.price === 'number' 
+        ? item.price 
+        : typeof item.price === 'string'
+          ? parseFloat(item.price.toString().replace(/[^\d]/g, '')) || 0
+          : 0;
     return total + (price * item.quantity);
   }, 0);
   const shippingFee = selectedShipping.price;
@@ -221,7 +227,7 @@ const CheckoutPage: React.FC = () => {
       try {
         const orderData = {
           items: cartItems.map((item: CartItemWithProduct) => ({
-            productId: item.product?._id || item.product?.id || String(item.product || ''),
+            productId: String(item.product?._id || item.product?.id || item.productId || item.product || ''),
             quantity: item.quantity,
             color: item.color || item.product?.color,
             size: item.size || item.product?.size,
@@ -232,7 +238,8 @@ const CheckoutPage: React.FC = () => {
           paymentMethod: selectedPayment,
         };
 
-        const result = await dispatch(createOrderThunk(orderData) as unknown);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = await dispatch(createOrderThunk(orderData) as any);
         
         interface OrderResult {
           payload?: {
@@ -370,7 +377,7 @@ const CheckoutPage: React.FC = () => {
                       Số lượng: {item.quantity}
                     </Typography>
                     <Typography variant="body1" className={styles.productPrice}>
-                      {(price * item.quantity).toLocaleString("vi-VN")} VNĐ
+                      {((typeof price === 'number' ? price : 0) * item.quantity).toLocaleString("vi-VN")} VNĐ
                     </Typography>
                   </Box>
                 </Box>
@@ -724,7 +731,15 @@ const CheckoutPage: React.FC = () => {
           </Typography>
           {cartItems.map((item: CartItemWithProduct, index: number) => {
             const product = item.product || {};
-            const price = typeof product.price === 'number' ? product.price : item.price || 0;
+            const price = typeof product.price === 'number' 
+              ? product.price 
+              : typeof item.price === 'number' 
+                ? item.price 
+                : typeof item.price === 'string'
+                  ? parseFloat(item.price.toString().replace(/[^\d]/g, '')) || 0
+                  : typeof product.price === 'string'
+                    ? parseFloat(product.price.toString().replace(/[^\d]/g, '')) || 0
+                    : 0;
             return (
               <Box key={item.id || item._id || index} className={styles.orderItem}>
                 <img

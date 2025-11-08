@@ -13,7 +13,11 @@ export const getProductsByCategory = (products: Product[]) => {
   const categories: { [key: string]: Product[] } = {};
 
   products.forEach((product: Product) => {
-    const categoryName = product.category?.name || "Khác";
+    const categoryName = typeof product.category === 'object' && product.category?.name 
+      ? product.category.name 
+      : typeof product.category === 'string' 
+        ? product.category 
+        : "Khác";
     if (!categories[categoryName]) {
       categories[categoryName] = [];
     }
@@ -49,14 +53,18 @@ const ShoppingPage = () => {
   const { products, categories, blogArticles, loading, error } = useSelector((state: RootState) => state.shopping);
 
   useEffect(() => {
-    dispatch(fetchProducts({ page: 1, limit: 50 }) as unknown);
-    dispatch(fetchCategories() as unknown);
-    dispatch(fetchBlogArticles({ page: 1, limit: 10 }) as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchProducts({ page: 1, limit: 50 }) as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchCategories() as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchBlogArticles({ page: 1, limit: 10 }) as any);
   }, [dispatch]);
 
   const handleCategoryClick = (categoryId: number) => {
     console.log("Category clicked:", categoryId);
-    dispatch(fetchProducts({ page: 1, limit: 50, categoryId }) as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchProducts({ page: 1, limit: 50, categoryId }) as any);
   };
 
   const handleBlogClick = (articleId: number) => {
@@ -341,8 +349,8 @@ const ShoppingPage = () => {
           <Box className={styles.categoriesGrid}>
             {categories.map((category) => (
               <CategoryCard
-                key={category.id || category._id}
-                id={category.id || category._id}
+                key={category.id || category._id || 0}
+                id={(category.id || category._id || 0) as number}
                 name={category.name}
                 image={category.image || "https://via.placeholder.com/300"}
                 description={category.description}
@@ -411,11 +419,11 @@ const ShoppingPage = () => {
               <Box className={styles.productsGrid}>
                 {categoryProducts.map((product) => (
                   <ProductCard
-                    key={product.id || product._id}
-                    id={product.id || product._id}
+                    key={product.id || product._id || 0}
+                    id={(product.id || product._id || 0) as string | number}
                     name={product.name}
                     price={typeof product.price === 'number' ? product.price : typeof product.price === 'string' ? product.price : 0}
-                    originalPrice={typeof product.originalPrice === 'number' ? product.originalPrice : product.originalPrice}
+                    originalPrice={typeof product.originalPrice === 'number' ? product.originalPrice : typeof product.originalPrice === 'string' ? product.originalPrice : undefined}
                     image={product.image || product.images?.[0] || "https://via.placeholder.com/300"}
                     rating={product.rating || (Array.isArray(product.reviews) ? product.reviews.reduce((acc: number, r: { rating?: number }) => acc + (r.rating || 0), 0) / product.reviews.length : 0) || 0}
                     reviews={product.reviewCount || (Array.isArray(product.reviews) ? product.reviews.length : 0) || 0}
@@ -455,8 +463,8 @@ const ShoppingPage = () => {
           <Box className={styles.blogGrid}>
             {blogArticles.map((article) => (
               <BlogCard
-                key={article.id || article._id}
-                id={article.id || article._id}
+                key={article.id || article._id || 0}
+                id={(article.id || article._id || 0) as number}
                 title={article.title}
                 description={article.description}
                 image={article.image || "https://via.placeholder.com/400"}

@@ -169,7 +169,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         toast.success('Cập nhật thú cưng thành công!');
       } else {
         // Create new pet - gửi tất cả data
-        await petAPI.createPet(Number(user.id), submitData);
+        await petAPI.createPet(String(user.id), submitData);
         toast.success('Thêm thú cưng mới thành công!');
       }
       onSuccess();

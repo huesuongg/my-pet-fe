@@ -44,13 +44,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setLoading(true);
     
     try {
-      const result = await dispatch(addToCartThunk({ 
-        productId: id, 
-        quantity: 1,
-        color,
-        size,
-        weight
-      }) as unknown);
+      const result = await dispatch(
+        addToCartThunk({ 
+          productId: id, 
+          quantity: 1,
+          color,
+          size,
+          weight
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any
+      );
       
       // Check if action was rejected
       if (addToCartThunk.rejected.match(result)) {

@@ -20,23 +20,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CircularProgress, Alert } from '@mui/material';
 import styles from './OrdersPage.module.css';
 import OrderCard from '../components/OrderCard';
-import { OrderStatus } from '../types/order';
+import { OrderStatus, Order } from '../types/order';
 import { fetchOrders } from '../shoppingThunk';
 import { RootState } from '../../../store';
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  interface OrderItem {
+  interface LocalOrderItem {
     productName?: string;
     product?: { name?: string };
   }
 
-  interface Order {
-    status?: string;
-    orderNumber?: string;
+  interface LocalOrder {
+    id?: number;
     _id?: string;
-    items?: OrderItem[];
+    status?: string | OrderStatus;
+    orderNumber?: string;
+    items?: LocalOrderItem[];
     createdAt?: string;
     date?: string;
   }
@@ -44,10 +45,10 @@ const OrdersPage: React.FC = () => {
   const { orders, loading, error } = useSelector((state: RootState) => state.shopping);
   const [tabValue, setTabValue] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<LocalOrder[]>([]);
   
   const filterOrders = () => {
-    let filtered: Order[] = [...(orders || [])];
+    let filtered: LocalOrder[] = [...(orders || [])];
     
     // Filter by tab/status
     if (tabValue !== 'all') {
@@ -61,7 +62,7 @@ const OrdersPage: React.FC = () => {
         const orderNumber = order.orderNumber || order._id || '';
         const items = order.items || [];
         return orderNumber.toLowerCase().includes(query) ||
-          items.some((item: OrderItem) => {
+          items.some((item: LocalOrderItem) => {
             const productName = item.productName || item.product?.name || '';
             return productName.toLowerCase().includes(query);
           });
@@ -79,7 +80,8 @@ const OrdersPage: React.FC = () => {
   };
   
   useEffect(() => {
-    dispatch(fetchOrders({ page: 1, limit: 50 }) as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchOrders({ page: 1, limit: 50 }) as any);
   }, [dispatch]);
   
   useEffect(() => {
@@ -200,9 +202,25 @@ const OrdersPage: React.FC = () => {
             </Button>
           </Box>
         ) : (
-          filteredOrders.map((order: Order) => {
-            const orderWithId = { ...order, id: order.id || order._id || 0 };
-            return <OrderCard key={order.id || order._id} order={orderWithId as Order} />;
+          filteredOrders.map((order: LocalOrder) => {
+            // Convert LocalOrder to Order format
+            const orderWithId: Order = { 
+              id: order.id || (order._id ? Number(order._id) : undefined) || 0,
+              _id: order._id,
+              orderNumber: order.orderNumber,
+              date: order.date,
+              createdAt: order.createdAt,
+              status: (order.status || OrderStatus.PENDING) as OrderStatus | string,
+              items: order.items ? order.items.map((item, index) => ({
+                id: index + 1,
+                productId: 0, // Default value since LocalOrderItem doesn't have productId
+                productName: item.productName || item.product?.name || '',
+                productImage: '',
+                price: 0,
+                quantity: 1
+              })) : []
+            };
+            return <OrderCard key={order.id || order._id || 0} order={orderWithId} />;
           })
         )}
       </Box>

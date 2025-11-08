@@ -176,7 +176,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                 Tổng tiền:
               </Typography>
               <Typography variant="subtitle1" fontWeight={600} color="#1E40AF">
-                {order.total.toLocaleString('vi-VN')} VNĐ
+                {(order.total || 0).toLocaleString('vi-VN')} VNĐ
               </Typography>
             </Box>
             <Button

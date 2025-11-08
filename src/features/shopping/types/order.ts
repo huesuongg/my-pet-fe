@@ -62,15 +62,22 @@ export interface Order {
 
 // Helper function to convert CartItems to OrderItems
 export const cartItemsToOrderItems = (cartItems: CartItem[]): OrderItem[] => {
-  return cartItems.map((item, index) => ({
-    id: index + 1,
-    productId: item.product.id,
-    productName: item.product.name,
-    productImage: item.product.image,
-    price: item.product.price,
-    quantity: item.quantity,
-    weight: item.product.weight,
-    color: item.product.color,
-    size: item.product.size,
-  }));
+  return cartItems.map((item, index) => {
+    const product = typeof item.product === 'object' ? item.product : null;
+    const productId = product?.id || product?._id || item.productId || 0;
+    const productName = product?.name || item.productName || '';
+    const productImage = product?.image || item.productImage || '';
+    const price = typeof product?.price === 'number' ? product.price : typeof item.price === 'number' ? item.price : 0;
+    return {
+      id: index + 1,
+      productId: typeof productId === 'number' ? productId : 0,
+      productName,
+      productImage,
+      price: typeof price === 'number' ? price : 0,
+      quantity: item.quantity,
+      weight: product?.weight || item.weight,
+      color: product?.color || item.color,
+      size: product?.size || item.size,
+    };
+  });
 }; 

@@ -56,7 +56,8 @@ export const useShopping = () => {
   }, [dispatch]);
 
   const updateCartItemQuantity = useCallback((itemIndex: number, quantity: number) => {
-    dispatch(updateCartItemThunk({ itemIndex, quantity }) as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(updateCartItemThunk({ itemIndex, quantity }) as any);
   }, [dispatch]);
 
   const removeProductFromCart = useCallback((itemId: number) => {
