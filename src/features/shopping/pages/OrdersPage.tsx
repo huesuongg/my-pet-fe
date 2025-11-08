@@ -27,21 +27,27 @@ import { RootState } from '../../../store';
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  interface OrderItem {
+    productName?: string;
+    product?: { name?: string };
+  }
+
+  interface Order {
+    status?: string;
+    orderNumber?: string;
+    _id?: string;
+    items?: OrderItem[];
+    createdAt?: string;
+    date?: string;
+  }
+
   const { orders, loading, error } = useSelector((state: RootState) => state.shopping);
   const [tabValue, setTabValue] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
-  
-  useEffect(() => {
-    dispatch(fetchOrders({ page: 1, limit: 50 }) as any);
-  }, [dispatch]);
-  
-  useEffect(() => {
-    filterOrders();
-  }, [tabValue, searchQuery, orders]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   
   const filterOrders = () => {
-    let filtered = [...(orders || [])];
+    let filtered: Order[] = [...(orders || [])];
     
     // Filter by tab/status
     if (tabValue !== 'all') {
@@ -55,7 +61,7 @@ const OrdersPage: React.FC = () => {
         const orderNumber = order.orderNumber || order._id || '';
         const items = order.items || [];
         return orderNumber.toLowerCase().includes(query) ||
-          items.some((item: any) => {
+          items.some((item: OrderItem) => {
             const productName = item.productName || item.product?.name || '';
             return productName.toLowerCase().includes(query);
           });

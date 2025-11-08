@@ -29,7 +29,6 @@ import { shoppingAPI } from "../shoppingAPI";
 import { Product } from "../types";
 
 // Mock data for product detail (fallback) - unused but kept for reference
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* const mockProducts = [
   {
     id: 1,
@@ -399,28 +398,28 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
                     }
                     const reviewData = review as Review;
                     return (
-                    <Card key={reviewData.id || reviewData._id || index} className={styles.reviewCard}>
-                      <CardContent>
-                        <Box className={styles.reviewHeader}>
-                          <Avatar
-                            src={reviewData.avatar || reviewData.user?.avatar || "https://via.placeholder.com/40"}
-                            className={styles.reviewAvatar}
-                          />
-                          <Box className={styles.reviewInfo}>
-                            <Typography variant="subtitle1" className={styles.reviewerName}>
-                              {reviewData.name || reviewData.user?.name || "Khách hàng"}
-                            </Typography>
-                            <Typography variant="caption" className={styles.reviewDate}>
-                              {reviewData.date || new Date(reviewData.createdAt || reviewData.date || '').toLocaleDateString("vi-VN")}
-                            </Typography>
+                      <Card key={reviewData.id || reviewData._id || index} className={styles.reviewCard}>
+                        <CardContent>
+                          <Box className={styles.reviewHeader}>
+                            <Avatar
+                              src={reviewData.avatar || reviewData.user?.avatar || "https://via.placeholder.com/40"}
+                              className={styles.reviewAvatar}
+                            />
+                            <Box className={styles.reviewInfo}>
+                              <Typography variant="subtitle1" className={styles.reviewerName}>
+                                {reviewData.name || reviewData.user?.name || "Khách hàng"}
+                              </Typography>
+                              <Typography variant="caption" className={styles.reviewDate}>
+                                {reviewData.date || new Date(reviewData.createdAt || reviewData.date || '').toLocaleDateString("vi-VN")}
+                              </Typography>
+                            </Box>
                           </Box>
-                        </Box>
-                        <Rating value={reviewData.rating || 5} readOnly className={styles.reviewRating} />
-                        <Typography variant="body2" className={styles.reviewComment}>
-                          {reviewData.comment || reviewData.content || "Chưa có nhận xét."}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                          <Rating value={reviewData.rating || 5} readOnly className={styles.reviewRating} />
+                          <Typography variant="body2" className={styles.reviewComment}>
+                            {reviewData.comment || reviewData.content || "Chưa có nhận xét."}
+                          </Typography>
+                        </CardContent>
+                      </Card>
                     );
                   })}
                 </Box>
