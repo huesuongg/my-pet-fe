@@ -71,8 +71,17 @@ export const AdminDashboard = () => {
       setStats(stats);
       
       setLoading(false);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Lỗi khi tải danh sách users";
+    } catch (err) {
+      interface ErrorResponse {
+        response?: {
+          data?: {
+            message?: string;
+          };
+        };
+        message?: string;
+      }
+      const error = err as ErrorResponse;
+      const errorMessage = error.response?.data?.message || error.message || "Lỗi khi tải danh sách users";
       setError(errorMessage);
       toast.error(errorMessage);
       setLoading(false);
@@ -89,7 +98,7 @@ export const AdminDashboard = () => {
       });
       toast.success("User đã bị ban!");
       fetchUsers();
-    } catch (err: any) {
+    } catch {
       toast.error("Không thể ban user");
     }
   };
@@ -101,7 +110,7 @@ export const AdminDashboard = () => {
       await axiosInstance.put(`/api/users/${userId}/unban`);
       toast.success("User đã được unban!");
       fetchUsers();
-    } catch (err: any) {
+    } catch {
       toast.error("Không thể unban user");
     }
   };

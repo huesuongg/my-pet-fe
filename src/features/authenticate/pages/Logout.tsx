@@ -21,7 +21,7 @@ export const Logout = () => {
           setTimeout(() => {
             navigate(routes.HOME_PATH);
           }, 1500);
-        } catch (error) {
+        } catch {
           toast.error("Có lỗi xảy ra khi đăng xuất");
           navigate(routes.HOME_PATH);
         }

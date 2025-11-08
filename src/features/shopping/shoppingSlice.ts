@@ -134,7 +134,7 @@ const shoppingSlice = createSlice({
     updateOrderStatus: (state, action: PayloadAction<{ orderId: number; status: string }>) => {
       const order = state.orders.find(order => order.id === action.payload.orderId);
       if (order) {
-        order.status = action.payload.status as any;
+        order.status = action.payload.status;
       }
     },
     setOrdersLoading: (state, action: PayloadAction<boolean>) => {

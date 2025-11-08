@@ -62,7 +62,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     }
   }, [pet]);
 
-  const handleInputChange = (field: keyof PetFormData, value: any) => {
+  const handleInputChange = (field: keyof PetFormData, value: string | number | Date | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (formErrors[field]) {
