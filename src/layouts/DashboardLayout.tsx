@@ -39,9 +39,9 @@ const navigationItems = [
   {
     title: "Schedule management",
     icon: <CalendarTodayIcon />,
-    path: "/dashboard/project",
+    path: "/dashboard/scheduling",
   },
-  { title: "User management", icon: <GroupIcon />, path: "#" },
+  { title: "User management", icon: <GroupIcon />, path: "/dashboard/users" },
   { title: "Finance management", icon: <BarChartIcon />, path: "#" },
   { title: "Logout", icon: <LogoutIcon />, path: "/logout" },
 ];
