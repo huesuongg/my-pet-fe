@@ -1,12 +1,12 @@
-import { 
-  Card, 
-  CardContent, 
-  Typography, 
-  Box, 
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
   Chip,
   Stack,
   Divider,
-  Button
+  Button,
 } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -19,31 +19,38 @@ interface ClinicCardProps {
   onViewDetail?: () => void;
 }
 
-const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+const dayNames = [
+  "Chủ nhật",
+  "Thứ 2",
+  "Thứ 3",
+  "Thứ 4",
+  "Thứ 5",
+  "Thứ 6",
+  "Thứ 7",
+];
 
 export default function ClinicCard({ clinic, onViewDetail }: ClinicCardProps) {
   const formatWorkingHours = () => {
     if (!clinic.workingHours || clinic.workingHours.length === 0) {
-      return 'Chưa có thông tin';
+      return "Chưa có thông tin";
     }
 
-    const has24h = clinic.workingHours.some(wh => wh.is24Hours);
-    const hasEmergency24h = clinic.workingHours.some(wh => wh.emergency24h);
+    const has24h = clinic.workingHours.some((wh) => wh.is24Hours);
 
     if (has24h) {
-      return '24/24 giờ';
+      return "24/24 giờ";
     }
 
     const firstSchedule = clinic.workingHours[0];
     if (firstSchedule.daysOfWeek.length === 7) {
-      const daysStr = 'Tất cả các ngày';
+      const daysStr = "Tất cả các ngày";
       const timeStr = `${firstSchedule.startTime} - ${firstSchedule.endTime}`;
       return `${daysStr}: ${timeStr}`;
     }
 
     const days = firstSchedule.daysOfWeek
-      .map(day => dayNames[day])
-      .join(', ');
+      .map((day) => dayNames[day])
+      .join(", ");
     return `${days}: ${firstSchedule.startTime} - ${firstSchedule.endTime}`;
   };
 
@@ -94,7 +101,10 @@ export default function ClinicCard({ clinic, onViewDetail }: ClinicCardProps) {
         <Box
           component="img"
           className="clinic-image"
-          src={clinic.imgUrl || 'https://product.hstatic.net/200000731893/product/nam07651-scaled_01a414b13bde4702a49abb8c626450b5.png'}
+          src={
+            clinic.imgUrl ||
+            "https://product.hstatic.net/200000731893/product/nam07651-scaled_01a414b13bde4702a49abb8c626450b5.png"
+          }
           alt={clinic.name}
           sx={{
             width: "100%",
@@ -103,17 +113,18 @@ export default function ClinicCard({ clinic, onViewDetail }: ClinicCardProps) {
             transition: "transform 0.3s ease",
           }}
           onError={(e) => {
-            e.currentTarget.src = 'https://product.hstatic.net/200000731893/product/nam07651-scaled_01a414b13bde4702a49abb8c626450b5.png';
+            e.currentTarget.src =
+              "https://product.hstatic.net/200000731893/product/nam07651-scaled_01a414b13bde4702a49abb8c626450b5.png";
           }}
         />
       </Box>
 
       <CardContent sx={{ flexGrow: 1, p: 3 }}>
-        <Typography 
-          variant="h5" 
-          fontWeight="bold" 
+        <Typography
+          variant="h5"
+          fontWeight="bold"
           gutterBottom
-          sx={{ 
+          sx={{
             color: "#1f2937",
             fontSize: "1.3rem",
             mb: 2,
@@ -126,9 +137,11 @@ export default function ClinicCard({ clinic, onViewDetail }: ClinicCardProps) {
         <Stack spacing={2}>
           {/* Address */}
           <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-            <LocationOnIcon sx={{ fontSize: 20, color: "#1395DA", mr: 1, mt: 0.5 }} />
+            <LocationOnIcon
+              sx={{ fontSize: 20, color: "#1395DA", mr: 1, mt: 0.5 }}
+            />
             <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-              {clinic.address || 'Chưa có địa chỉ'}
+              {clinic.address || "Chưa có địa chỉ"}
             </Typography>
           </Box>
 
@@ -136,20 +149,22 @@ export default function ClinicCard({ clinic, onViewDetail }: ClinicCardProps) {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <PhoneIcon sx={{ fontSize: 20, color: "#1395DA", mr: 1 }} />
             <Typography variant="body2" color="text.secondary">
-              {clinic.phone || 'Chưa có số điện thoại'}
+              {clinic.phone || "Chưa có số điện thoại"}
             </Typography>
           </Box>
 
           {/* Working Hours */}
           <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-            <AccessTimeIcon sx={{ fontSize: 20, color: "#1395DA", mr: 1, mt: 0.5 }} />
+            <AccessTimeIcon
+              sx={{ fontSize: 20, color: "#1395DA", mr: 1, mt: 0.5 }}
+            />
             <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
               {formatWorkingHours()}
             </Typography>
           </Box>
 
           {/* Emergency 24h Badge */}
-          {clinic.workingHours?.some(wh => wh.emergency24h) && (
+          {clinic.workingHours?.some((wh) => wh.emergency24h) && (
             <Chip
               label="Trực cấp cứu 24/24h 🆘"
               size="small"
@@ -198,4 +213,3 @@ export default function ClinicCard({ clinic, onViewDetail }: ClinicCardProps) {
     </Card>
   );
 }
-
