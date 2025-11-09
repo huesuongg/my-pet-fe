@@ -259,7 +259,7 @@ export const updateUserAPI = async (userId: string, payload: UpdateUserPayload):
     
     // Nếu error response có data, có thể backend đã update thành công nhưng trả về error
     if (axiosError?.response?.data && typeof axiosError.response.data === 'object') {
-      const errorData = axiosError.response.data;
+      const errorData = axiosError.response.data as Record<string, unknown>;
       // Kiểm tra xem có phải là user object không
       if (errorData._id || errorData.id || errorData.username) {
         console.warn('Warning: Backend returned error but data may have been updated. Using error response data.');

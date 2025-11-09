@@ -423,7 +423,7 @@ const ShoppingPage = () => {
                     id={(product.id || product._id || 0) as string | number}
                     name={product.name}
                     price={typeof product.price === 'number' ? product.price : typeof product.price === 'string' ? product.price : 0}
-                    originalPrice={typeof product.originalPrice === 'number' ? product.originalPrice : typeof product.originalPrice === 'string' ? product.originalPrice : undefined}
+                    originalPrice={typeof product.originalPrice === 'number' ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ` : typeof product.originalPrice === 'string' ? product.originalPrice : undefined}
                     image={product.image || product.images?.[0] || "https://via.placeholder.com/300"}
                     rating={product.rating || (Array.isArray(product.reviews) ? product.reviews.reduce((acc: number, r: { rating?: number }) => acc + (r.rating || 0), 0) / product.reviews.length : 0) || 0}
                     reviews={product.reviewCount || (Array.isArray(product.reviews) ? product.reviews.length : 0) || 0}
