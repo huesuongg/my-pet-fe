@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Use environment variable or default to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://my-pet-api.onrender.com";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
