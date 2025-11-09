@@ -10,9 +10,12 @@ export const schedulingAPI = {
         params: includeSlots ? { includeSlots: "true" } : {},
       });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching doctors:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch doctors");
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to fetch doctors"
+        : "Failed to fetch doctors";
+      throw new Error(errorMessage);
     }
   },
 
@@ -21,12 +24,16 @@ export const schedulingAPI = {
     try {
       const response = await axiosInstance.get(`/api/doctors/${id}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching doctor:", error);
-      if (error.response?.status === 404) {
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } } }
+        : null;
+      if (axiosError?.response?.status === 404) {
         return null;
       }
-      throw new Error(error.response?.data?.message || "Failed to fetch doctor");
+      const errorMessage = axiosError?.response?.data?.message || "Failed to fetch doctor";
+      throw new Error(errorMessage);
     }
   },
 
@@ -35,9 +42,12 @@ export const schedulingAPI = {
     try {
       const response = await axiosInstance.get("/api/appointments");
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching appointments:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch appointments");
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to fetch appointments"
+        : "Failed to fetch appointments";
+      throw new Error(errorMessage);
     }
   },
 
@@ -46,9 +56,12 @@ export const schedulingAPI = {
     try {
       const response = await axiosInstance.post("/api/appointments", appointment);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating appointment:", error);
-      throw new Error(error.response?.data?.message || "Failed to create appointment");
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to create appointment"
+        : "Failed to create appointment";
+      throw new Error(errorMessage);
     }
   },
 
@@ -57,12 +70,16 @@ export const schedulingAPI = {
     try {
       const response = await axiosInstance.patch(`/api/appointments/${id}`, updates);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating appointment:", error);
-      if (error.response?.status === 404) {
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } } }
+        : null;
+      if (axiosError?.response?.status === 404) {
         return null;
       }
-      throw new Error(error.response?.data?.message || "Failed to update appointment");
+      const errorMessage = axiosError?.response?.data?.message || "Failed to update appointment";
+      throw new Error(errorMessage);
     }
   },
 
@@ -71,9 +88,12 @@ export const schedulingAPI = {
     try {
       const response = await axiosInstance.delete(`/api/appointments/${appointmentId}`);
       return response.data?.success || true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error deleting appointment:", error);
-      throw new Error(error.response?.data?.message || "Failed to delete appointment");
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to delete appointment"
+        : "Failed to delete appointment";
+      throw new Error(errorMessage);
     }
   },
 };

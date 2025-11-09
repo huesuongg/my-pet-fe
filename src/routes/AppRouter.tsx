@@ -92,8 +92,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboard /> },
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
-          { path: routes.USERS_PATH, element: <AdminDashboard /> },
-          { path: routes.SCHEDULINGS_PATH, element: <AdminDashboard /> },
+      { path: routes.USERS_PATH, element: <AdminDashboard /> },
+      { path: routes.SCHEDULINGS_PATH, element: <AdminDashboard /> },
     ],
   },
   {

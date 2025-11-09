@@ -1,26 +1,37 @@
-﻿import { Box, Typography, Button } from "@mui/material";
+﻿import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Box, Typography, Button, CircularProgress, Alert } from "@mui/material";
 import CategoryCard from "../components/CategoryCard";
 import ProductCard from "../components/ProductCard";
 import BlogCard from "../components/BlogCard";
 import styles from "./ShoppingPage.module.css";
-import { productCategories } from "../constants";
-import { blogArticles } from "../constants";
-import { productsData } from "../constants";
+import { fetchProducts, fetchCategories, fetchBlogArticles } from "../shoppingThunk";
+import { RootState } from "../../../store";
+import { Product } from "../types";
 
-// Helper function to get products by category
-export const getProductsByCategory = () => {
-  const products = Object.values(productsData);
-  const categories: { [key: string]: any[] } = {};
+export const getProductsByCategory = (products: Product[]) => {
+  const categories: { [key: string]: Product[] } = {};
 
-  products.forEach((product: any) => {
-    if (!categories[product.category]) {
-      categories[product.category] = [];
+  products.forEach((product: Product) => {
+    const categoryName = typeof product.category === 'object' && product.category?.name 
+      ? product.category.name 
+      : typeof product.category === 'string' 
+        ? product.category 
+        : "Khác";
+    if (!categories[categoryName]) {
+      categories[categoryName] = [];
     }
-    categories[product.category].push({
+    categories[categoryName].push({
       ...product,
-      price: `${product.price.toLocaleString("vi-VN")} VNĐ`,
+      price: typeof product.price === 'number' 
+        ? `${product.price.toLocaleString("vi-VN")} VNĐ`
+        : typeof product.price === 'string'
+          ? product.price
+          : '0 VNĐ',
       originalPrice: product.originalPrice
-        ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ`
+        ? typeof product.originalPrice === 'number'
+          ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ`
+          : product.originalPrice
         : undefined,
     });
   });
@@ -29,22 +40,37 @@ export const getProductsByCategory = () => {
 };
 
 // Helper function to get product by ID
-export const getProductById = (id: number) => {
-  return productsData[id as keyof typeof productsData];
+export const getProductById = (id: string | number, products: Product[]) => {
+  return products.find((p: Product) => {
+    const pId = p.id || p._id;
+    const searchId = typeof id === 'string' ? id : String(id);
+    return String(pId) === searchId || pId === id;
+  });
 };
 
 const ShoppingPage = () => {
+  const dispatch = useDispatch();
+  const { products, categories, blogArticles, loading, error } = useSelector((state: RootState) => state.shopping);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchProducts({ page: 1, limit: 50 }) as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchCategories() as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchBlogArticles({ page: 1, limit: 10 }) as any);
+  }, [dispatch]);
+
   const handleCategoryClick = (categoryId: number) => {
     console.log("Category clicked:", categoryId);
-    // TODO: Implement category filtering
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchProducts({ page: 1, limit: 50, categoryId }) as any);
   };
 
   const handleBlogClick = (articleId: number) => {
     console.log("Blog article clicked:", articleId);
     // TODO: Implement blog navigation
   };
-
-  // const navigate = useNavigate();
   return (
     <Box>
       <Box
@@ -311,87 +337,112 @@ const ShoppingPage = () => {
         >
           Danh Mục Sản Phẩm
         </Typography>
-        <Box className={styles.categoriesGrid}>
-          {productCategories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              id={category.id}
-              name={category.name}
-              image={category.image}
-              description={category.description}
-              productCount={category.productCount}
-              onClick={handleCategoryClick}
-            />
-          ))}
-        </Box>
+        {loading.categories ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error.categories ? (
+          <Alert severity="error" sx={{ mb: 4 }}>
+            {error.categories}
+          </Alert>
+        ) : (
+          <Box className={styles.categoriesGrid}>
+            {categories.map((category) => (
+              <CategoryCard
+                key={category.id || category._id || 0}
+                id={(category.id || category._id || 0) as number}
+                name={category.name}
+                image={category.image || "https://via.placeholder.com/300"}
+                description={category.description}
+                onClick={handleCategoryClick}
+              />
+            ))}
+          </Box>
+        )}
       </Box>
 
       {/* Products by Category Section */}
-      {Object.entries(getProductsByCategory()).map(
-        ([categoryName, products]) => (
-          <Box key={categoryName} className={styles.productsSection}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                mb: 4,
-              }}
-            >
-              <Typography
-                variant="h3"
-                className={styles.productsTitle}
+      {loading.products ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : error.products ? (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error.products}
+        </Alert>
+      ) : products.length > 0 ? (
+        Object.entries(getProductsByCategory(products)).map(
+          ([categoryName, categoryProducts]) => (
+            <Box key={categoryName} className={styles.productsSection}>
+              <Box
                 sx={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontWeight: "700",
-                  color: "#1E40AF",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 4,
                 }}
               >
-                {categoryName}
-              </Typography>
-              <Button
-                variant="outlined"
-                sx={{
-                  borderColor: "#3B82F6",
-                  color: "#3B82F6",
-                  px: 3,
-                  py: 1,
-                  borderRadius: "25px",
-                  fontSize: "0.9rem",
-                  fontWeight: "600",
-                  textTransform: "none",
-                  fontFamily: "'Inter', sans-serif",
-                  "&:hover": {
-                    borderColor: "#1E40AF",
+                <Typography
+                  variant="h3"
+                  className={styles.productsTitle}
+                  sx={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: "700",
                     color: "#1E40AF",
-                    bgcolor: "rgba(30, 64, 175, 0.05)",
-                  },
-                }}
-              >
-                Xem tất cả →
-              </Button>
-            </Box>
+                  }}
+                >
+                  {categoryName}
+                </Typography>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    borderColor: "#3B82F6",
+                    color: "#3B82F6",
+                    px: 3,
+                    py: 1,
+                    borderRadius: "25px",
+                    fontSize: "0.9rem",
+                    fontWeight: "600",
+                    textTransform: "none",
+                    fontFamily: "'Inter', sans-serif",
+                    "&:hover": {
+                      borderColor: "#1E40AF",
+                      color: "#1E40AF",
+                      bgcolor: "rgba(30, 64, 175, 0.05)",
+                    },
+                  }}
+                >
+                  Xem tất cả →
+                </Button>
+              </Box>
 
-            <Box className={styles.productsGrid}>
-              {products.map((product: any) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  price={product.price}
-                  originalPrice={product.originalPrice}
-                  image={product.image}
-                  rating={product.rating}
-                  reviews={product.review}
-                  brand={product.brand}
-                  weight={product.weight}
-                  color={product.color}
-                  size={product.size}
-                />
-              ))}
+              <Box className={styles.productsGrid}>
+                {categoryProducts.map((product) => (
+                  <ProductCard
+                    key={product.id || product._id || 0}
+                    id={(product.id || product._id || 0) as string | number}
+                    name={product.name}
+                    price={typeof product.price === 'number' ? product.price : typeof product.price === 'string' ? product.price : 0}
+                    originalPrice={typeof product.originalPrice === 'number' ? `${product.originalPrice.toLocaleString("vi-VN")} VNĐ` : typeof product.originalPrice === 'string' ? product.originalPrice : undefined}
+                    image={product.image || product.images?.[0] || "https://via.placeholder.com/300"}
+                    rating={product.rating || (Array.isArray(product.reviews) ? product.reviews.reduce((acc: number, r: { rating?: number }) => acc + (r.rating || 0), 0) / product.reviews.length : 0) || 0}
+                    reviews={product.reviewCount || (Array.isArray(product.reviews) ? product.reviews.length : 0) || 0}
+                    brand={product.brand}
+                    weight={product.weight}
+                    color={product.color}
+                    size={product.size}
+                  />
+                ))}
+              </Box>
             </Box>
-          </Box>
+          )
         )
+      ) : (
+        <Box sx={{ textAlign: "center", py: 8 }}>
+          <Typography variant="h6" color="text.secondary">
+            Chưa có sản phẩm nào
+          </Typography>
+        </Box>
       )}
 
       {/* Blog Section */}
@@ -400,19 +451,35 @@ const ShoppingPage = () => {
           Chăm Boss Như Thế Nào ?
         </Typography>
 
-        <Box className={styles.blogGrid}>
-          {blogArticles.map((article) => (
-            <BlogCard
-              key={article.id}
-              id={article.id}
-              title={article.title}
-              description={article.description}
-              image={article.image}
-              bgColor={article.bgColor}
-              onClick={handleBlogClick}
-            />
-          ))}
-        </Box>
+        {loading.blogArticles ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error.blogArticles ? (
+          <Alert severity="error" sx={{ mb: 4 }}>
+            {error.blogArticles}
+          </Alert>
+        ) : blogArticles.length > 0 ? (
+          <Box className={styles.blogGrid}>
+            {blogArticles.map((article) => (
+              <BlogCard
+                key={article.id || article._id || 0}
+                id={(article.id || article._id || 0) as number}
+                title={article.title}
+                description={article.description}
+                image={article.image || "https://via.placeholder.com/400"}
+                bgColor={article.bgColor || "#E3F2FD"}
+                onClick={handleBlogClick}
+              />
+            ))}
+          </Box>
+        ) : (
+          <Box sx={{ textAlign: "center", py: 4 }}>
+            <Typography variant="body1" color="text.secondary">
+              Chưa có bài viết nào
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

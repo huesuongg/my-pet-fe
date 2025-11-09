@@ -20,9 +20,12 @@ export const petAPI = {
       // Nếu không phải array, trả về empty array
       console.warn('Unexpected response format:', data);
       return [];
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching pets:', error);
-      throw new Error(error.response?.data?.message || 'Failed to fetch pets');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch pets'
+        : 'Failed to fetch pets';
+      throw new Error(errorMessage);
     }
   },
 
@@ -42,9 +45,12 @@ export const petAPI = {
       // Nếu không phải array, trả về empty array
       console.warn('Unexpected response format:', data);
       return [];
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching pets:', error);
-      throw new Error(error.response?.data?.message || 'Failed to fetch pets');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch pets'
+        : 'Failed to fetch pets';
+      throw new Error(errorMessage);
     }
   },
 
@@ -53,23 +59,30 @@ export const petAPI = {
     try {
       const response = await axiosInstance.get(`/api/pets/${petId}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching pet:', error);
-      if (error.response?.status === 404) {
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } } }
+        : null;
+      if (axiosError?.response?.status === 404) {
         return null;
       }
-      throw new Error(error.response?.data?.message || 'Failed to fetch pet');
+      const errorMessage = axiosError?.response?.data?.message || 'Failed to fetch pet';
+      throw new Error(errorMessage);
     }
   },
 
   // Create new pet
-  createPet: async (_userId: number, petData: PetFormData): Promise<Pet> => {
+  createPet: async (_userId: string, petData: PetFormData): Promise<Pet> => {
     try {
       const response = await axiosInstance.post('/api/pets', petData);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating pet:', error);
-      throw new Error(error.response?.data?.message || 'Failed to create pet');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create pet'
+        : 'Failed to create pet';
+      throw new Error(errorMessage);
     }
   },
 
@@ -82,12 +95,16 @@ export const petAPI = {
       console.log('Updating pet:', petId, petData);
       const response = await axiosInstance.put(`/api/pets/${petId}`, petData);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating pet:', error);
-      if (error.response?.status === 404) {
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } }; message?: string }
+        : null;
+      if (axiosError?.response?.status === 404) {
         return null;
       }
-      throw new Error(error.response?.data?.message || error.message || 'Failed to update pet');
+      const errorMessage = axiosError?.response?.data?.message || axiosError?.message || 'Failed to update pet';
+      throw new Error(errorMessage);
     }
   },
 
@@ -96,9 +113,12 @@ export const petAPI = {
     try {
       const response = await axiosInstance.delete(`/api/pets/${petId}`);
       return response.data?.success || true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting pet:', error);
-      throw new Error(error.response?.data?.message || 'Failed to delete pet');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to delete pet'
+        : 'Failed to delete pet';
+      throw new Error(errorMessage);
     }
   },
 
@@ -120,9 +140,12 @@ export const petAPI = {
       });
 
       return newRecord;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding vaccination record:', error);
-      throw new Error(error.response?.data?.message || 'Failed to add vaccination record');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to add vaccination record'
+        : 'Failed to add vaccination record';
+      throw new Error(errorMessage);
     }
   },
 
@@ -144,9 +167,12 @@ export const petAPI = {
       });
 
       return newRecord;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding medical record:', error);
-      throw new Error(error.response?.data?.message || 'Failed to add medical record');
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to add medical record'
+        : 'Failed to add medical record';
+      throw new Error(errorMessage);
     }
   }
 };

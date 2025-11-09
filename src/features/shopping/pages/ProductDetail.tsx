@@ -3,8 +3,6 @@ import {
   Box,
   Typography,
   Button,
-  CardMedia,
-  CardContent,
   Avatar,
   Rating,
   IconButton,
@@ -12,9 +10,11 @@ import {
   Tab,
   TextField,
   Card,
+  CardContent,
   Chip,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -23,11 +23,14 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import styles from "./ProductDetail.module.css";
-import { useCart } from "../../../contexts/CartContext";
+import { addToCartThunk } from "../shoppingThunk";
+import { shoppingAPI } from "../shoppingAPI";
+import { Product } from "../types";
 
-// Mock data for product detail
-const mockProducts = [
+// Mock data for product detail (fallback) - unused but kept for reference
+/* const mockProducts = [
   {
     id: 1,
     name: "Thức Ăn Cho Chó Con Royal Canin Mini Puppy",
@@ -125,15 +128,13 @@ const mockProducts = [
       { id: 8, name: "Chủ Trại Chó", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=40&h=40&fit=crop&crop=face", rating: 5, comment: "Chó của tôi đã cải thiện rõ rệt sau khi dùng sản phẩm này.", date: "28/11/2023" },
     ],
   },
-];
-
-// Mock data for recommended products
-const recommendedProducts = [
-  { id: 1, name: "Thức Ăn Cho Chó", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 120000 },
-  { id: 2, name: "Thức Ăn Cho Mèo", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 95000 },
-  { id: 3, name: "Thức Ăn Cao Cấp", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 350000 },
-  { id: 4, name: "Thức Ăn Hữu Cơ", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 280000 },
-];
+]; */
+/* const recommendedProducts = [
+//   { id: 1, name: "Thức Ăn Cho Chó", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 120000 },
+//   { id: 2, name: "Thức Ăn Cho Mèo", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 95000 },
+//   { id: 3, name: "Thức Ăn Cao Cấp", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 350000 },
+//   { id: 4, name: "Thức Ăn Hữu Cơ", image: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=200&h=200&fit=crop&crop=center", price: 280000 },
+// ]; */
 
 interface ProductDetailProps {
   productId?: number;
@@ -142,73 +143,69 @@ interface ProductDetailProps {
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
   const { id } = useParams<{ id: string }>();
-  const currentProductId = id ? parseInt(id, 10) : mockProducts[0].id;
-
-  const product = mockProducts.find(p => p.id === currentProductId) || mockProducts[0];
-  const reviews = product.reviews;
-
-  const [selectedWeight, setSelectedWeight] = useState(product.weightOptions[0]);
-  const [selectedColor, setSelectedColor] = useState(product.colorOptions[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizeOptions[0]);
+  const dispatch = useDispatch();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedWeight, setSelectedWeight] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState(0);
-  const { dispatch } = useCart();
   const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const fetchProduct = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      setError(null);
+      const productData = await shoppingAPI.getProductById(id);
+      setProduct(productData);
+      // Set default options if available
+      if (productData.weight) setSelectedWeight(productData.weight);
+      if (productData.color) setSelectedColor(productData.color);
+      if (productData.size) setSelectedSize(productData.size);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Không thể tải thông tin sản phẩm";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (id) {
+      fetchProduct();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  const handleWeightChange = (weight: typeof product.weightOptions[0]) => {
-    setSelectedWeight(weight);
-  };
-
-  const handleColorChange = (color: typeof product.colorOptions[0]) => {
-    setSelectedColor(color);
-  };
-
-  const handleSizeChange = (size: typeof product.sizeOptions[0]) => {
-    setSelectedSize(size);
-  };
 
   const handleQuantityChange = (delta: number) => {
     const newQuantity = Math.max(1, quantity + delta);
     setQuantity(newQuantity);
   };
 
-  const handleAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        product: {
-          id: product.id,
-          name: product.name,
-          price: selectedWeight.price,
-          image: product.image,
-          brand: product.brand,
-          weight: selectedWeight.weight,
-          color: selectedColor.color,
-          size: selectedSize.size,
-          category: { id: 1, name: "Default", slug: "default", image: "", isActive: true },
-          inStock: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        quantity,
-      },
-    });
+  const handleAddToCart = async () => {
+    if (!product || !id) return;
     
-    // Show success message
-    setOpenSnackbar(true);
-    
-    console.log("Added to cart:", {
-      productId: product.id,
-      weight: selectedWeight.weight,
-      color: selectedColor.color,
-      size: selectedSize.size,
-      quantity,
-      totalPrice: selectedWeight.price * quantity,
-    });
+    try {
+      await dispatch(
+        addToCartThunk({
+          productId: id,
+          quantity,
+          color: selectedColor || undefined,
+          size: selectedSize || undefined,
+          weight: selectedWeight || undefined,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any
+      );
+      
+      // Show success message
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
   };
 
   const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -218,7 +215,35 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
     setOpenSnackbar(false);
   };
 
-  const totalPrice = selectedWeight.price * quantity;
+  const totalPrice = product ? (typeof product.price === 'number' ? product.price : typeof product.price === 'string' ? parseFloat(product.price.toString().replace(/[^\d]/g, '')) : 0) * quantity : 0;
+  const reviews = (product?.reviews || []) as Array<{
+    id?: string | number;
+    _id?: string;
+    name?: string;
+    user?: { name?: string; avatar?: string };
+    avatar?: string;
+    rating?: number;
+    comment?: string;
+    content?: string;
+    date?: string;
+    createdAt?: string;
+  }>;
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">{error || "Không tìm thấy sản phẩm"}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box className={styles.productDetailContainer}>
@@ -237,7 +262,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
       <Box className={styles.productInfoSection}>
         <Box className={styles.productImageContainer}>
           <img
-            src={product.image}
+            src={product.image || product.images?.[0] || "https://via.placeholder.com/400"}
             alt={product.name}
             className={styles.productImage}
           />
@@ -248,68 +273,59 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
             {product.name}
           </Typography>
 
-          <Typography variant="h6" className={styles.brandName}>
-            {product.brand}
-          </Typography>
+          {product.brand && (
+            <Typography variant="h6" className={styles.brandName}>
+              {product.brand}
+            </Typography>
+          )}
 
           <Typography variant="h4" className={styles.price}>
-            {selectedWeight.price.toLocaleString("vi-VN")} VNĐ
+            {typeof product.price === 'number' 
+              ? product.price.toLocaleString("vi-VN") 
+              : product.price} VNĐ
           </Typography>
 
           {/* Weight Options */}
-          <Box className={styles.weightOptions}>
-            <Typography variant="h6" className={styles.weightLabel}>
-              Trọng lượng:
-            </Typography>
-            <Box className={styles.weightButtons}>
-              {product.weightOptions.map((weight) => (
-                <Button
-                  key={weight.id}
-                  variant={weight.id === selectedWeight.id ? "contained" : "outlined"}
-                  className={styles.weightButton}
-                  onClick={() => handleWeightChange(weight)}
-                >
-                  {weight.weight}
-                </Button>
-              ))}
+          {product.weight && (
+            <Box className={styles.weightOptions}>
+              <Typography variant="h6" className={styles.weightLabel}>
+                Trọng lượng:
+              </Typography>
+              <Chip
+                label={product.weight}
+                variant="outlined"
+                className={styles.weightChip}
+              />
             </Box>
-          </Box>
+          )}
 
           {/* Color Options */}
-          <Box className={styles.colorOptions}>
-            <Typography variant="h6" className={styles.colorLabel}>
-              Màu sắc:
-            </Typography>
-            <Box className={styles.colorButtons}>
-              {product.colorOptions.map((color) => (
-                <Chip
-                  key={color.id}
-                  label={color.color}
-                  variant={color.id === selectedColor.id ? "filled" : "outlined"}
-                  onClick={() => handleColorChange(color)}
-                  className={styles.colorChip}
-                />
-              ))}
+          {product.color && (
+            <Box className={styles.colorOptions}>
+              <Typography variant="h6" className={styles.colorLabel}>
+                Màu sắc:
+              </Typography>
+              <Chip
+                label={product.color}
+                variant="outlined"
+                className={styles.colorChip}
+              />
             </Box>
-          </Box>
+          )}
 
           {/* Size Options */}
-          <Box className={styles.sizeOptions}>
-            <Typography variant="h6" className={styles.sizeLabel}>
-              Kích thước:
-            </Typography>
-            <Box className={styles.sizeButtons}>
-              {product.sizeOptions.map((size) => (
-                <Chip
-                  key={size.id}
-                  label={size.size}
-                  variant={size.id === selectedSize.id ? "filled" : "outlined"}
-                  onClick={() => handleSizeChange(size)}
-                  className={styles.sizeChip}
-                />
-              ))}
+          {product.size && (
+            <Box className={styles.sizeOptions}>
+              <Typography variant="h6" className={styles.sizeLabel}>
+                Kích thước:
+              </Typography>
+              <Chip
+                label={product.size}
+                variant="outlined"
+                className={styles.sizeChip}
+              />
             </Box>
-          </Box>
+          )}
 
           {/* Quantity Selector */}
           <Box className={styles.quantitySection}>
@@ -369,7 +385,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
         {activeTab === 0 && (
           <Box className={styles.descriptionContent}>
             <Typography variant="body1" className={styles.descriptionText}>
-              {product.description}
+              {product.description || "Chưa có mô tả cho sản phẩm này."}
             </Typography>
           </Box>
         )}
@@ -379,69 +395,52 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onClose }) => {
             <Typography variant="h6" className={styles.reviewsTitle}>
               Phản hồi từ khách hàng
             </Typography>
-            <Box className={styles.reviewsGrid}>
-              {reviews.map((review) => (
-                <Card key={review.id} className={styles.reviewCard}>
-                  <CardContent>
-                    <Box className={styles.reviewHeader}>
-                      <Avatar
-                        src={review.avatar}
-                        className={styles.reviewAvatar}
-                      />
-                      <Box className={styles.reviewInfo}>
-                        <Typography variant="subtitle1" className={styles.reviewerName}>
-                          {review.name}
-                        </Typography>
-                        <Typography variant="caption" className={styles.reviewDate}>
-                          {review.date}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Rating value={review.rating} readOnly className={styles.reviewRating} />
-                    <Typography variant="body2" className={styles.reviewComment}>
-                      {review.comment}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </Box>
-            <Button variant="contained" className={styles.viewMoreButton}>
-              Xem thêm
-            </Button>
+            {reviews.length > 0 ? (
+              <>
+                <Box className={styles.reviewsGrid}>
+                  {reviews.map((review, index: number) => {
+                    return (
+                      <Card key={review.id || review._id || index} className={styles.reviewCard}>
+                        <CardContent>
+                          <Box className={styles.reviewHeader}>
+                            <Avatar
+                              src={review.avatar || review.user?.avatar || "https://via.placeholder.com/40"}
+                              className={styles.reviewAvatar}
+                            />
+                            <Box className={styles.reviewInfo}>
+                              <Typography variant="subtitle1" className={styles.reviewerName}>
+                                {review.name || review.user?.name || "Khách hàng"}
+                              </Typography>
+                              <Typography variant="caption" className={styles.reviewDate}>
+                                {review.date || new Date(review.createdAt || review.date || '').toLocaleDateString("vi-VN")}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Rating value={review.rating || 5} readOnly className={styles.reviewRating} />
+                          <Typography variant="body2" className={styles.reviewComment}>
+                            {review.comment || review.content || "Chưa có nhận xét."}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </Box>
+                {reviews.length > 4 && (
+                  <Button variant="contained" className={styles.viewMoreButton}>
+                    Xem thêm
+                  </Button>
+                )}
+              </>
+            ) : (
+              <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
+                Chưa có đánh giá nào cho sản phẩm này.
+              </Typography>
+            )}
           </Box>
         )}
       </Box>
 
-      {/* Recommended Products Section */}
-      <Box className={styles.recommendedSection}>
-        <Typography variant="h4" className={styles.recommendedTitle}>
-          Sản Phẩm Đề xuất
-        </Typography>
-        <Box className={styles.recommendedProducts}>
-          {recommendedProducts.map((recProduct) => (
-            <Card key={recProduct.id} className={styles.recommendedCard}>
-              <CardMedia
-                component="img"
-                height="200"
-                image={recProduct.image}
-                alt={recProduct.name}
-                className={styles.recommendedImage}
-              />
-              <CardContent className={styles.recommendedContent}>
-                <Typography variant="subtitle1" className={styles.recommendedName}>
-                  {recProduct.name}
-                </Typography>
-                <Typography variant="body2" className={styles.recommendedPrice}>
-                  {recProduct.price.toLocaleString("vi-VN")} VNĐ
-                </Typography>
-                <IconButton className={styles.recommendedButton}>
-                  <ShoppingCartIcon />
-                </IconButton>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      </Box>
+      {/* Recommended Products Section - Removed for now, can be added later with API */}
 
       {/* Success Snackbar */}
       <Snackbar

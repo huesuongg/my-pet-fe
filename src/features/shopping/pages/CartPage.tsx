@@ -24,8 +24,12 @@ import {
   BrokenImage as BrokenImageIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { CircularProgress, Alert } from "@mui/material";
 import styles from "./CartPage.module.css";
-import { useCart } from "../../../contexts/CartContext";
+import { fetchCart, updateCartItemThunk, removeFromCartThunk } from "../shoppingThunk";
+import { RootState } from "../../../store";
 
 // Mock data for shipping options
 const shippingOptions = [
@@ -79,27 +83,60 @@ const paymentMethods = [
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cartState, dispatch } = useCart();
+  const dispatch = useDispatch();
+  const { cart, loading, error } = useSelector((state: RootState) => state.shopping);
   const [selectedShipping, setSelectedShipping] = useState(shippingOptions[0]);
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0]);
   const [promoCode, setPromoCode] = useState("");
 
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchCart() as any);
+  }, [dispatch]);
+
   // Calculate totals
-  const subtotal = cartState.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  interface CartItemWithProduct {
+    product?: { 
+      price?: number | string;
+      image?: string;
+      name?: string;
+      color?: string;
+      size?: string;
+      weight?: string;
+    };
+    productImage?: string;
+    productName?: string;
+    quantity: number;
+    color?: string;
+    size?: string;
+    weight?: string;
+    price?: number | string;
+    id?: string | number;
+    _id?: string;
+  }
+  const cartItems: CartItemWithProduct[] = (cart?.items || []) as CartItemWithProduct[];
+  const subtotal = cartItems.reduce((total: number, item: CartItemWithProduct) => {
+    const price = typeof item.product?.price === 'number' 
+      ? item.product.price 
+      : parseFloat(item.product?.price?.toString().replace(/[^\d]/g, '') || '0');
+    return total + (price * item.quantity);
+  }, 0);
   const shippingFee = selectedShipping.price;
   const discount = promoCode === "SAVE10" ? subtotal * 0.1 : 0;
   const total = subtotal + shippingFee - discount;
 
-  const handleQuantityChange = (itemId: number, delta: number) => {
-    const item = cartState.items.find(item => item.id === itemId);
+  const handleQuantityChange = async (itemIndex: number, delta: number) => {
+    const item = cartItems[itemIndex];
     if (item) {
       const newQuantity = Math.max(1, item.quantity + delta);
-      dispatch({ type: "UPDATE_ITEM_QUANTITY", payload: { id: itemId, quantity: newQuantity } });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await dispatch(updateCartItemThunk({ itemIndex, quantity: newQuantity }) as any);
     }
   };
 
-  const handleRemoveItem = (itemId: number) => {
-    dispatch({ type: "REMOVE_ITEM", payload: itemId });
+  const handleRemoveItem = async (itemIndex: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await dispatch(removeFromCartThunk(itemIndex) as any);
   };
 
   const handleShippingChange = (shippingId: number) => {
@@ -122,7 +159,23 @@ const CartPage: React.FC = () => {
     }
   };
 
-  if (cartState.items.length === 0) {
+  if (loading.cart) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error.cart) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">{error.cart}</Alert>
+      </Box>
+    );
+  }
+
+  if (cartItems.length === 0) {
     return (
       <Box className={styles.emptyCartContainer}>
         <Box className={styles.emptyCartContent}>
@@ -160,7 +213,7 @@ const CartPage: React.FC = () => {
           Giỏ hàng của bạn
         </Typography>
         <Typography variant="body2" className={styles.itemCount}>
-          {cartState.items.length} sản phẩm
+          {cartItems.length} sản phẩm
         </Typography>
       </Box>
 
@@ -172,15 +225,15 @@ const CartPage: React.FC = () => {
               Sản phẩm trong giỏ
             </Typography>
 
-            {cartState.items.map((item: { id: number; product: { name: string; price: number; image: string; color?: string; size?: string; weight?: string; }; quantity: number; }) => (
-              <Card key={item.id} className={styles.cartItem}>
+            {cartItems.map((item: CartItemWithProduct, index: number) => (
+              <Card key={item.id || item._id || index} className={styles.cartItem}>
                 <Box className={styles.cartItemImageContainer}>
-                  {item.product.image ? (
+                  {(item.product?.image || item.productImage) ? (
                     <CardMedia
                       component="img"
                       height="120"
-                      image={item.product.image}
-                      alt={item.product.name}
+                      image={item.product?.image || item.productImage}
+                      alt={item.product?.name || item.productName}
                       className={styles.cartItemImage}
                       onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                         const target = e.target as HTMLImageElement;
@@ -193,47 +246,49 @@ const CartPage: React.FC = () => {
                       }}
                     />
                   ) : null}
-                  <Box className={styles.cartItemImagePlaceholder} style={{ display: item.product.image ? 'none' : 'flex' }}>
+                  <Box className={styles.cartItemImagePlaceholder} style={{ display: (item.product?.image || item.productImage) ? 'none' : 'flex' }}>
                     <BrokenImageIcon sx={{ fontSize: 60, color: '#ccc' }} />
                   </Box>
                 </Box>
                 <CardContent className={styles.cartItemContent}>
                   <Box className={styles.cartItemInfo}>
                     <Typography variant="h6" className={styles.productName}>
-                      {item.product.name}
+                      {item.product?.name || item.productName}
                     </Typography>
                     <Box className={styles.productDetails}>
-                      {item.product.color && (
+                      {(item.color || item.product?.color) && (
                         <Chip
-                          label={`Màu: ${item.product.color}`}
+                          label={`Màu: ${item.color || item.product?.color || ''}`}
                           size="small"
                           className={styles.detailChip}
                         />
                       )}
-                      {item.product.size && (
+                      {(item.size || item.product?.size) && (
                         <Chip
-                          label={`Size: ${item.product.size}`}
+                          label={`Size: ${item.size || item.product?.size || ''}`}
                           size="small"
                           className={styles.detailChip}
                         />
                       )}
-                      {item.product.weight && (
+                      {(item.weight || item.product?.weight) && (
                         <Chip
-                          label={item.product.weight}
+                          label={item.weight || item.product?.weight || ''}
                           size="small"
                           className={styles.weightChip}
                         />
                       )}
                     </Box>
                     <Typography variant="h6" className={styles.productPrice}>
-                      {item.product.price.toLocaleString("vi-VN")} VNĐ
+                      {typeof item.product?.price === 'number' 
+                        ? item.product.price.toLocaleString("vi-VN")
+                        : item.price?.toLocaleString("vi-VN") || "0"} VNĐ
                     </Typography>
                   </Box>
 
                   <Box className={styles.cartItemActions}>
                     <Box className={styles.quantityControls}>
                       <IconButton
-                        onClick={() => handleQuantityChange(item.id, -1)}
+                        onClick={() => handleQuantityChange(index, -1)}
                         className={styles.quantityButton}
                       >
                         <RemoveIcon />
@@ -242,13 +297,14 @@ const CartPage: React.FC = () => {
                         value={item.quantity}
                         onChange={(e) => {
                           const newQuantity = Math.max(1, parseInt(e.target.value) || 1);
-                          dispatch({ type: "UPDATE_ITEM_QUANTITY", payload: { id: item.id, quantity: newQuantity } });
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          dispatch(updateCartItemThunk({ itemIndex: index, quantity: newQuantity }) as any);
                         }}
                         className={styles.quantityInput}
                         inputProps={{ min: 1, style: { textAlign: "center" } }}
                       />
                       <IconButton
-                        onClick={() => handleQuantityChange(item.id, 1)}
+                        onClick={() => handleQuantityChange(index, 1)}
                         className={styles.quantityButton}
                       >
                         <AddIcon />
@@ -256,11 +312,20 @@ const CartPage: React.FC = () => {
                     </Box>
 
                     <Typography variant="h6" className={styles.itemTotal}>
-                      {(item.product.price * item.quantity).toLocaleString("vi-VN")} VNĐ
+                      {(() => {
+                        const price = typeof item.product?.price === 'number' 
+                          ? item.product.price 
+                          : typeof item.price === 'number' 
+                            ? item.price 
+                            : typeof item.price === 'string'
+                              ? parseFloat(item.price.toString().replace(/[^\d]/g, '')) || 0
+                              : 0;
+                        return (price * item.quantity).toLocaleString("vi-VN");
+                      })()} VNĐ
                     </Typography>
 
                     <IconButton
-                      onClick={() => handleRemoveItem(item.id)}
+                      onClick={() => handleRemoveItem(index)}
                       className={styles.removeButton}
                     >
                       <DeleteIcon />

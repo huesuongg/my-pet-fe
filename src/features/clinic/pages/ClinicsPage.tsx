@@ -18,8 +18,9 @@ export default function ClinicsPage() {
         setError(null);
         const data = await clinicAPI.getClinics();
         setClinics(data);
-      } catch (err: any) {
-        setError(err.message || 'Không thể tải danh sách phòng khám');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Không thể tải danh sách phòng khám';
+        setError(errorMessage);
         console.error('Error loading clinics:', err);
       } finally {
         setLoading(false);

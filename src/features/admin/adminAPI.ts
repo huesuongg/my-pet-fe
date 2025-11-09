@@ -6,7 +6,7 @@ export interface AdminUser {
   fullname: string;
   email: string;
   role: string;
-  clinicsOwned: any[];
+  clinicsOwned: string[];
   primaryClinicId: string | null;
   doctorProfileId: string | null;
   isBanned: boolean;

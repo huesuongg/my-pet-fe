@@ -15,7 +15,7 @@ export const getStoredPosts = (): PostData[] => {
       // Đảm bảo tất cả posts đều có commentsList
       return posts.map((post: PostData) => ({
         ...post,
-        commentsList: (post.commentsList || []).map((comment: any) => ({
+        commentsList: (post.commentsList || []).map((comment) => ({
           ...comment,
           isLiked: comment.isLiked || false,
           replies: comment.replies || []
@@ -44,9 +44,9 @@ export const addPostToStorage = (post: Omit<PostData, 'id' | 'likes' | 'comments
   const existingPosts = getStoredPosts();
   const maxId = existingPosts.length > 0
     ? Math.max(...existingPosts.map(p => {
-        const numId = typeof p.id === 'string' ? Number(p.id) : p.id;
-        return isNaN(numId) ? 0 : numId;
-      }))
+      const numId = typeof p.id === 'string' ? Number(p.id) : p.id;
+      return isNaN(numId) ? 0 : numId;
+    }))
     : 0;
   const newPost: PostData = {
     ...post,

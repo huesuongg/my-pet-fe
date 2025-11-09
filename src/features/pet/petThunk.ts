@@ -11,7 +11,7 @@ export const getPetsByUserId = createAsyncThunk<
   try {
     const pets = await petAPI.getPetsByUserId(userId.toString());
     return pets;
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to fetch pets'
@@ -33,7 +33,7 @@ export const getPetById = createAsyncThunk<
       });
     }
     return pet;
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to fetch pet'
@@ -47,17 +47,24 @@ export const createPet = createAsyncThunk<
   { rejectValue: RejectPayload }
 >('pet/createPet', async (petData, { rejectWithValue, getState }) => {
   try {
-    const state = getState() as any;
-    const userId = state.auth.user?.id;
+    interface RootState {
+      auth?: {
+        user?: {
+          id?: string;
+        };
+      };
+    }
+    const state = getState() as RootState;
+    const userId = state.auth?.user?.id;
     if (!userId) {
       return rejectWithValue({
         status: 401,
         message: 'User not authenticated'
       });
     }
-    const pet = await petAPI.createPet(userId, petData);
+    const pet = await petAPI.createPet(String(userId), petData);
     return pet;
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to create pet'
@@ -79,7 +86,7 @@ export const updatePet = createAsyncThunk<
       });
     }
     return pet;
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to update pet'
@@ -101,7 +108,7 @@ export const deletePet = createAsyncThunk<
       });
     }
     return petId;
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to delete pet'
@@ -123,7 +130,7 @@ export const addVaccinationRecord = createAsyncThunk<
       });
     }
     return { petId, record: newRecord };
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to add vaccination record'
@@ -145,7 +152,7 @@ export const addMedicalRecord = createAsyncThunk<
       });
     }
     return { petId, record: newRecord };
-  } catch (error) {
+  } catch {
     return rejectWithValue({
       status: 400,
       message: 'Failed to add medical record'

@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Card, CardMedia, CardContent, Typography, IconButton, Box, Chip, Rating, Snackbar, Alert } from "@mui/material";
 import { AddShoppingCart, Visibility} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../../contexts/CartContext";
+import { useDispatch } from "react-redux";
+import { addToCartThunk } from "../shoppingThunk";
 
 interface ProductCardProps {
-  id: number;
+  id: number | string;
   name: string;
   price: string | number;
   originalPrice?: string;
@@ -16,7 +17,7 @@ interface ProductCardProps {
   weight?: string;
   color?: string;
   size?: string;
-  onAddToCart?: (id: number) => void;
+  onAddToCart?: (id: number | string) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -27,46 +28,59 @@ const ProductCard: React.FC<ProductCardProps> = ({
   image,
   rating = 0,
   reviews = 0,
-  brand = "Thương hiệu",
   weight = "400g",
   color = "Xanh",
   size = "M",
 }) => {
   const navigate = useNavigate();
-  const { dispatch } = useCart();
+  const dispatch = useDispatch();
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [loading, setLoading] = useState(false);
 
-  const handleAddToCart = (event: React.MouseEvent) => {
+  const handleAddToCart = async (event: React.MouseEvent) => {
     event.stopPropagation();
+    setLoading(true);
     
-    // Convert price string to number if it's a string
-    const priceValue = typeof price === 'string' 
-      ? parseFloat(price.replace(/[^\d]/g, '')) 
-      : price;
-      
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        product: { 
-          id, 
-          name, 
-          price: priceValue, 
-          image, 
-          brand, 
-          weight, 
-          color, 
+    try {
+      const result = await dispatch(
+        addToCartThunk({ 
+          productId: id, 
+          quantity: 1,
+          color,
           size,
-          category: { id: 1, name: "Default", slug: "default", image: "", isActive: true },
-          inStock: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        quantity: 1,
-      },
-    });
-
-    // Show success message
-    setOpenSnackbar(true);
+          weight
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any
+      );
+      
+      // Check if action was rejected
+      if (addToCartThunk.rejected.match(result)) {
+        interface RejectedPayload {
+          message?: string;
+          code?: string;
+        }
+        const payload = result.payload as RejectedPayload | undefined;
+        const errorMessage = payload?.message || "Không thể thêm sản phẩm vào giỏ hàng";
+        setSnackbarMessage(errorMessage);
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      } else {
+        // Show success message
+        setSnackbarMessage(`Đã thêm ${name} vào giỏ hàng!`);
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      const errorMessage = error instanceof Error ? error.message : "Không thể thêm sản phẩm vào giỏ hàng";
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -225,6 +239,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </IconButton>
             <IconButton
               onClick={handleAddToCart}
+              disabled={loading}
               sx={{
                 bgcolor: "#22C55E",
                 color: "white",
@@ -238,33 +253,36 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   bgcolor: "#16A34A",
                   transform: "translateY(-2px)",
                 },
+                "&:disabled": {
+                  bgcolor: "#9CA3AF",
+                },
                 transition: "all 0.2s ease",
               }}
             >
               <AddShoppingCart sx={{ mr: 1, fontSize: "1.1rem" }} />
-              Mua
+              {loading ? "Đang thêm..." : "Mua"}
             </IconButton>
           </Box>
         </CardContent>
       </Card>
 
-      {/* Success Snackbar */}
+      {/* Success/Error Snackbar */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert 
           onClose={handleCloseSnackbar} 
-          severity="success" 
+          severity={snackbarSeverity}
           sx={{ 
             width: '100%',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             fontWeight: 500
           }}
         >
-          Đã thêm {name} vào giỏ hàng!
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </>

@@ -7,9 +7,12 @@ export const clinicAPI = {
     try {
       const response = await axiosInstance.get("/api/clinics");
       return response.data.items || [];
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching clinics:", error);
-      throw new Error(error.response?.data?.message || "Failed to fetch clinics");
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to fetch clinics"
+        : "Failed to fetch clinics";
+      throw new Error(errorMessage);
     }
   },
 
@@ -18,12 +21,16 @@ export const clinicAPI = {
     try {
       const response = await axiosInstance.get(`/api/clinics/${id}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching clinic:", error);
-      if (error.response?.status === 404) {
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } } }
+        : null;
+      if (axiosError?.response?.status === 404) {
         return null;
       }
-      throw new Error(error.response?.data?.message || "Failed to fetch clinic");
+      const errorMessage = axiosError?.response?.data?.message || "Failed to fetch clinic";
+      throw new Error(errorMessage);
     }
   },
 };

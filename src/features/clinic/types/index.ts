@@ -24,6 +24,13 @@ export interface Clinic {
   noShowMarkAfterMinutes: number;
   createdAt: string;
   updatedAt: string;
-  doctors?: any[]; // Danh sách bác sĩ (chỉ có trong detail) - sử dụng Doctor từ scheduling/types
+  doctors?: Array<{
+    _id?: string;
+    id?: string;
+    name?: string;
+    email?: string;
+    specialization?: string;
+    [key: string]: unknown;
+  }>; // Danh sách bác sĩ (chỉ có trong detail) - sử dụng Doctor từ scheduling/types
 }
 

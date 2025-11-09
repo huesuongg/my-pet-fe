@@ -50,8 +50,9 @@ export default function ClinicDetailPage() {
           } else {
             setError("Không tìm thấy phòng khám");
           }
-        } catch (err: any) {
-          setError(err.message || "Không thể tải thông tin phòng khám");
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : "Không thể tải thông tin phòng khám";
+          setError(errorMessage);
           console.error("Error loading clinic:", err);
         } finally {
           setLoading(false);
@@ -382,15 +383,34 @@ export default function ClinicDetailPage() {
           {clinic.doctors && clinic.doctors.length > 0 ? (
             <Grid container spacing={3} justifyContent="center">
               {clinic.doctors
-                .filter((doctor) => doctor.isActive)
-                .map((doctor) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={doctor.id}>
-                    <DoctorCard
-                      doctor={doctor}
-                      onSchedule={() => handleDoctorSelect(doctor)}
-                    />
-                  </Grid>
-                ))}
+                .filter((doctor) => doctor.isActive && (doctor.id || doctor._id))
+                .map((doctor) => {
+                  // Map partial doctor object to full Doctor type
+                  const doctorId = (doctor.id || doctor._id || '') as string;
+                  const doctorName = doctor.name || 'Bác sĩ';
+                  const fullDoctor = {
+                    id: doctorId,
+                    name: doctorName,
+                    specialization: doctor.specialization || 'Chưa có chuyên khoa',
+                    profileImage: (doctor as { profileImage?: string }).profileImage || 'https://via.placeholder.com/150',
+                    experience: (doctor as { experience?: string }).experience || 'Chưa có thông tin',
+                    qualifications: (doctor as { qualifications?: string[] }).qualifications || [],
+                    skills: (doctor as { skills?: string[] }).skills || [],
+                    biography: (doctor as { biography?: string }).biography || '',
+                    phone: (doctor as { phone?: string }).phone || clinic.phone || '',
+                    address: clinic.address || '',
+                    city: clinic.address || '',
+                    isActive: doctor.isActive !== false,
+                  };
+                  return (
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={doctorId}>
+                      <DoctorCard
+                        doctor={fullDoctor}
+                        onSchedule={() => handleDoctorSelect({ id: doctorId, name: doctorName })}
+                      />
+                    </Grid>
+                  );
+                })}
             </Grid>
           ) : (
             <Paper

@@ -111,8 +111,9 @@ export default function PetProfilePage() {
         console.warn('Expected array but got:', data);
         setPets([]);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load pets');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load pets';
+      setError(errorMessage);
       console.error('Error loading pets:', err);
       setPets([]); // Đảm bảo pets luôn là array ngay cả khi có lỗi
     } finally {
@@ -156,8 +157,9 @@ export default function PetProfilePage() {
         setDeleteDialog(null);
         // Refresh pets list
         await loadPets();
-      } catch (err: any) {
-        toast.error(err.message || 'Có lỗi xảy ra khi xóa thú cưng');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi xóa thú cưng';
+        toast.error(errorMessage);
         console.error('Delete pet error:', err);
       }
     }

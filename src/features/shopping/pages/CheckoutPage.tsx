@@ -17,6 +17,7 @@ import {
   CardContent,
   IconButton,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   NavigateNext as NextIcon,
@@ -26,10 +27,11 @@ import {
   ArrowBack as BackIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../../contexts/CartContext";
-import { useDispatch } from "react-redux";
-import { addOrder } from "../shoppingSlice";
-import { Order, OrderStatus, cartItemsToOrderItems, ShippingInfo, ShippingOption } from "../types/order";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { createOrderThunk, fetchCart } from "../shoppingThunk";
+import { RootState } from "../../../store";
+import { ShippingInfo, ShippingOption } from "../types/order";
 import styles from "./CheckoutPage.module.css";
 
 // Steps for the checkout process
@@ -83,11 +85,12 @@ const shippingOptions = [
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cartState, dispatch: cartDispatch } = useCart();
   const dispatch = useDispatch();
+  const { cart, loading, error } = useSelector((state: RootState) => state.shopping);
   const [activeStep, setActiveStep] = useState(0);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [creatingOrder, setCreatingOrder] = useState(false);
   
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
@@ -106,9 +109,47 @@ const CheckoutPage: React.FC = () => {
   
   // Validation states
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  interface CartItemWithProduct {
+    product?: { 
+      price?: number | string;
+      _id?: string;
+      id?: string | number;
+      name?: string;
+      image?: string;
+      color?: string;
+      size?: string;
+      weight?: string;
+    };
+    productImage?: string;
+    productName?: string;
+    productId?: string | number;
+    quantity: number;
+    color?: string;
+    size?: string;
+    weight?: string;
+    price?: number | string;
+    id?: string | number;
+    _id?: string;
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchCart() as any);
+  }, [dispatch]);
   
   // Calculate totals
-  const subtotal = cartState.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  const cartItems: CartItemWithProduct[] = (cart?.items || []) as CartItemWithProduct[];
+  const subtotal = cartItems.reduce((total: number, item: CartItemWithProduct) => {
+    const price = typeof item.product?.price === 'number' 
+      ? item.product.price 
+      : typeof item.price === 'number' 
+        ? item.price 
+        : typeof item.price === 'string'
+          ? parseFloat(item.price.toString().replace(/[^\d]/g, '')) || 0
+          : 0;
+    return total + (price * item.quantity);
+  }, 0);
   const shippingFee = selectedShipping.price;
   const total = subtotal + shippingFee;
 
@@ -175,46 +216,53 @@ const CheckoutPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeStep === 1 && !validateShippingInfo()) {
       return;
     }
     
     if (activeStep === steps.length - 1) {
-      // Place order
-      const generatedOrderNumber = Math.floor(100000 + Math.random() * 900000).toString();
-      setOrderNumber(generatedOrderNumber);
-      
-      // Create order object
-      const newOrder: Order = {
-        id: Date.now(),
-        orderNumber: generatedOrderNumber,
-        date: new Date().toISOString(),
-        status: OrderStatus.PENDING,
-        items: cartItemsToOrderItems(cartState.items),
-        shippingInfo: shippingInfo as ShippingInfo,
-        shippingOption: selectedShipping as ShippingOption,
-        paymentMethod: selectedPayment,
-        subtotal,
-        shippingFee,
-        total,
-      };
-      
-      // Save to Redux store
-      dispatch(addOrder(newOrder));
-      
-      // Save to localStorage
-      const savedOrders = localStorage.getItem('orders');
-      const orders = savedOrders ? JSON.parse(savedOrders) : [];
-      orders.push(newOrder);
-      localStorage.setItem('orders', JSON.stringify(orders));
-      
-      console.log("Order placed:", newOrder);
-      
-      // Clear cart after successful order
-      cartDispatch({ type: "CLEAR_CART" });
-      
-      setOrderComplete(true);
+      // Place order via API
+      setCreatingOrder(true);
+      try {
+        const orderData = {
+          items: cartItems.map((item: CartItemWithProduct) => ({
+            productId: String(item.product?._id || item.product?.id || item.productId || item.product || ''),
+            quantity: item.quantity,
+            color: item.color || item.product?.color,
+            size: item.size || item.product?.size,
+            weight: item.weight || item.product?.weight,
+          })),
+          shippingInfo: shippingInfo as ShippingInfo,
+          shippingOption: selectedShipping as ShippingOption,
+          paymentMethod: selectedPayment,
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = await dispatch(createOrderThunk(orderData) as any);
+        
+        interface OrderResult {
+          payload?: {
+            order?: {
+              orderNumber?: string;
+              _id?: string;
+            };
+          };
+        }
+        const orderResult = result as OrderResult;
+        if (orderResult.payload?.order) {
+          setOrderNumber(orderResult.payload.order.orderNumber || orderResult.payload.order._id || '');
+          setOrderComplete(true);
+        } else {
+          throw new Error("Không thể tạo đơn hàng");
+        }
+      } catch (error) {
+        console.error("Failed to create order:", error);
+        const errorMessage = error instanceof Error ? error.message : "Không thể tạo đơn hàng. Vui lòng thử lại.";
+        alert(errorMessage);
+      } finally {
+        setCreatingOrder(false);
+      }
       return;
     }
     
@@ -257,8 +305,24 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
+  if (loading.cart) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error.cart) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">{error.cart}</Alert>
+      </Box>
+    );
+  }
+
   const renderCartSummary = () => {
-    if (cartState.items.length === 0) {
+    if (cartItems.length === 0) {
       return (
         <Paper className={styles.paper}>
           <Box sx={{ textAlign: "center", padding: "2rem" }}>
@@ -289,33 +353,37 @@ const CheckoutPage: React.FC = () => {
         </Typography>
         
         <Box>
-          {cartState.items.map((item) => (
-            <Box key={item.id} className={styles.productItem}>
-              <img
-                src={item.product.image}
-                alt={item.product.name}
-                className={styles.productImage}
-              />
-              <Box className={styles.productDetails}>
-                <Typography variant="subtitle1" className={styles.productName}>
-                  {item.product.name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {item.product.weight && `Trọng lượng: ${item.product.weight}`}
-                  {item.product.color && ` | Màu: ${item.product.color}`}
-                  {item.product.size && ` | Size: ${item.product.size}`}
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem" }}>
-                  <Typography variant="body2">
-                    Số lượng: {item.quantity}
+          {cartItems.map((item: CartItemWithProduct, index: number) => {
+            const product = item.product || {};
+            const price = typeof product.price === 'number' ? product.price : item.price || 0;
+            return (
+              <Box key={item.id || item._id || index} className={styles.productItem}>
+                <img
+                  src={product.image || item.productImage || "https://via.placeholder.com/100"}
+                  alt={product.name || item.productName}
+                  className={styles.productImage}
+                />
+                <Box className={styles.productDetails}>
+                  <Typography variant="subtitle1" className={styles.productName}>
+                    {product.name || item.productName}
                   </Typography>
-                  <Typography variant="body1" className={styles.productPrice}>
-                    {(item.product.price * item.quantity).toLocaleString("vi-VN")} VNĐ
+                  <Typography variant="body2" color="textSecondary">
+                    {(item.weight || product.weight) && `Trọng lượng: ${item.weight || product.weight}`}
+                    {(item.color || product.color) && ` | Màu: ${item.color || product.color}`}
+                    {(item.size || product.size) && ` | Size: ${item.size || product.size}`}
                   </Typography>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: "0.5rem" }}>
+                    <Typography variant="body2">
+                      Số lượng: {item.quantity}
+                    </Typography>
+                    <Typography variant="body1" className={styles.productPrice}>
+                      {((typeof price === 'number' ? price : 0) * item.quantity).toLocaleString("vi-VN")} VNĐ
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
         
         <Box className={styles.totalSection}>
@@ -661,29 +729,41 @@ const CheckoutPage: React.FC = () => {
           <Typography variant="subtitle1" gutterBottom fontWeight={600}>
             Sản phẩm đã đặt
           </Typography>
-          {cartState.items.map((item) => (
-            <Box key={item.id} className={styles.orderItem}>
-              <img
-                src={item.product.image}
-                alt={item.product.name}
-                className={styles.orderItemImage}
-              />
-              <Box className={styles.orderItemDetails}>
-                <Typography variant="body2" fontWeight={600}>
-                  {item.product.name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {item.product.weight && `${item.product.weight} | `}
-                  {item.product.color && `${item.product.color} | `}
-                  {item.product.size && `${item.product.size} | `}
-                  SL: {item.quantity}
+          {cartItems.map((item: CartItemWithProduct, index: number) => {
+            const product = item.product || {};
+            const price = typeof product.price === 'number' 
+              ? product.price 
+              : typeof item.price === 'number' 
+                ? item.price 
+                : typeof item.price === 'string'
+                  ? parseFloat(item.price.toString().replace(/[^\d]/g, '')) || 0
+                  : typeof product.price === 'string'
+                    ? parseFloat(product.price.toString().replace(/[^\d]/g, '')) || 0
+                    : 0;
+            return (
+              <Box key={item.id || item._id || index} className={styles.orderItem}>
+                <img
+                  src={product.image || item.productImage || "https://via.placeholder.com/100"}
+                  alt={product.name || item.productName}
+                  className={styles.orderItemImage}
+                />
+                <Box className={styles.orderItemDetails}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {product.name || item.productName}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {(item.weight || product.weight) && `${item.weight || product.weight} | `}
+                    {(item.color || product.color) && `${item.color || product.color} | `}
+                    {(item.size || product.size) && `${item.size || product.size} | `}
+                    SL: {item.quantity}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" fontWeight={600} className={styles.orderItemPrice}>
+                  {(price * item.quantity).toLocaleString("vi-VN")} VNĐ
                 </Typography>
               </Box>
-              <Typography variant="body2" fontWeight={600} className={styles.orderItemPrice}>
-                {(item.product.price * item.quantity).toLocaleString("vi-VN")} VNĐ
-              </Typography>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
         
         <Divider sx={{ margin: "1rem 0" }} />
@@ -720,8 +800,9 @@ const CheckoutPage: React.FC = () => {
             endIcon={<ConfirmIcon />}
             onClick={handleNext}
             color="primary"
+            disabled={creatingOrder}
           >
-            Đặt hàng
+            {creatingOrder ? "Đang xử lý..." : "Đặt hàng"}
           </Button>
         </Box>
       </Paper>
