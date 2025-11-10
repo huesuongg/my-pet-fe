@@ -118,6 +118,22 @@ export const shoppingAPI = {
     return response.data;
   },
 
+  // Get all orders (Admin only)
+  getAllOrders: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+  }) => {
+    const response = await axiosInstance.get('/api/orders/all', {
+      params: {
+        page: params?.page || 1,
+        limit: params?.limit || 10,
+        status: params?.status,
+      },
+    });
+    return response.data;
+  },
+
   getOrderById: async (id: string) => {
     const response = await axiosInstance.get(`/api/orders/${id}`);
     return response.data;
@@ -156,6 +172,12 @@ export const shoppingAPI = {
 
   cancelOrder: async (orderId: string) => {
     const response = await axiosInstance.put(`/api/orders/${orderId}/cancel`);
+    return response.data;
+  },
+
+  // Update order status (Admin only)
+  updateOrderStatus: async (orderId: string, status: string) => {
+    const response = await axiosInstance.put(`/api/orders/${orderId}/status`, { status });
     return response.data;
   },
 
