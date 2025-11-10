@@ -7,6 +7,8 @@ import Logout from "../features/authenticate/pages/Logout";
 import NotFoundPage from "../components/NotFound";
 import HomePage from "../pages/home/HomePage";
 import { AdminDashboard } from "../features/admin/pages/Dashboard";
+import { FinanceManagement } from "../features/admin/pages/FinanceManagement";
+import { ScheduleManagement } from "../features/admin/pages/ScheduleManagement";
 import ProfilePage from "../features/forum/pages/ProfilePage";
 import NewFeeds from "../features/forum/pages/NewFeeds";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
@@ -38,6 +40,8 @@ export const routes = {
   ADMIN_PROFILE_PATH: "/dashboard/admin-profile",
   USERS_PATH: "/dashboard/users",
   SCHEDULINGS_PATH: "/dashboard/schedulings",
+  SCHEDULE_MANAGEMENT_PATH: "/dashboard/schedule-management",
+  FINANCE_PATH: "/dashboard/finance",
   PROFILE_PATH: "/profile",
   NEWSFEED_PATH: "/news-feeds",
   SHOPPING_PATH: "/shopping",
@@ -94,6 +98,8 @@ export const router = createBrowserRouter([
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
       { path: routes.USERS_PATH, element: <AdminDashboard /> },
       { path: routes.SCHEDULINGS_PATH, element: <AdminDashboard /> },
+      { path: routes.SCHEDULE_MANAGEMENT_PATH, element: <ScheduleManagement /> },
+      { path: routes.FINANCE_PATH, element: <FinanceManagement /> },
     ],
   },
   {

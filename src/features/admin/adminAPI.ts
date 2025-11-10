@@ -17,10 +17,34 @@ export interface AdminUser {
   __v: number;
 }
 
+export interface UsersResponse {
+  items: AdminUser[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  stats?: {
+    totalUsers: number;
+    totalAdmins: number;
+    totalCustomers: number;
+    bannedUsers: number;
+  };
+}
+
 export const adminAPI = {
-  // Get all users
-  getUsers: async (): Promise<AdminUser[]> => {
-    const response = await axiosInstance.get('/api/users');
+  // Get all users with pagination
+  getUsers: async (params?: {
+    page?: number;
+    limit?: number;
+    role?: string;
+  }): Promise<UsersResponse> => {
+    const response = await axiosInstance.get('/api/users', {
+      params: {
+        page: params?.page || 1,
+        limit: params?.limit || 10,
+        role: params?.role,
+      },
+    });
     return response.data;
   },
   

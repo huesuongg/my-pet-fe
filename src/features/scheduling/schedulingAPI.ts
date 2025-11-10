@@ -51,6 +51,58 @@ export const schedulingAPI = {
     }
   },
 
+  // Get all appointments (Admin only) - with pagination
+  // Uses GET /api/appointments with query params for filtering
+  getAllAppointments: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    doctorId?: string;
+  }): Promise<{
+    appointments: Appointment[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> => {
+    try {
+      const response = await axiosInstance.get("/api/appointments", {
+        params: {
+          page: params?.page || 1,
+          limit: params?.limit || 10,
+          status: params?.status,
+          doctorId: params?.doctorId,
+        },
+      });
+      
+      // Handle both array response and paginated response
+      if (Array.isArray(response.data)) {
+        return {
+          appointments: response.data,
+          total: response.data.length,
+          page: 1,
+          limit: response.data.length,
+          totalPages: 1,
+        };
+      }
+      
+      // Paginated response
+      return {
+        appointments: response.data.appointments || response.data.items || [],
+        total: response.data.total || 0,
+        page: response.data.page || 1,
+        limit: response.data.limit || 10,
+        totalPages: response.data.totalPages || Math.ceil((response.data.total || 0) / (response.data.limit || 10)),
+      };
+    } catch (error: unknown) {
+      console.error("Error fetching all appointments:", error);
+      const errorMessage = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message || "Failed to fetch appointments"
+        : "Failed to fetch appointments";
+      throw new Error(errorMessage);
+    }
+  },
+
   // Create appointment
   createAppointment: async (appointment: Omit<Appointment, "id">): Promise<Appointment> => {
     try {
@@ -79,6 +131,42 @@ export const schedulingAPI = {
         return null;
       }
       const errorMessage = axiosError?.response?.data?.message || "Failed to update appointment";
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Update appointment status (using /:id/status endpoint)
+  updateAppointmentStatus: async (id: string, status: string): Promise<Appointment | null> => {
+    try {
+      const response = await axiosInstance.patch(`/api/appointments/${id}/status`, { status });
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Error updating appointment status:", error);
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } } }
+        : null;
+      if (axiosError?.response?.status === 404) {
+        return null;
+      }
+      const errorMessage = axiosError?.response?.data?.message || "Failed to update appointment status";
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Get appointment by ID
+  getAppointmentById: async (id: string): Promise<Appointment | null> => {
+    try {
+      const response = await axiosInstance.get(`/api/appointments/${id}`);
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Error fetching appointment by ID:", error);
+      const axiosError = error && typeof error === 'object' && 'response' in error
+        ? error as { response?: { status?: number; data?: { message?: string } } }
+        : null;
+      if (axiosError?.response?.status === 404) {
+        return null;
+      }
+      const errorMessage = axiosError?.response?.data?.message || "Failed to fetch appointment";
       throw new Error(errorMessage);
     }
   },
