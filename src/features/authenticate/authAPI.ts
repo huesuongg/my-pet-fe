@@ -221,7 +221,7 @@ export const updateUserAPI = async (userId: string, payload: UpdateUserPayload):
       });
     } else {
     // Nếu không có file, dùng JSON
-      const jsonPayload: any = {};
+      const jsonPayload: Record<string, unknown> = {};
       if (payload.introduction !== undefined) jsonPayload.introduction = payload.introduction;
       if (payload.liveAt !== undefined) jsonPayload.liveAt = payload.liveAt;
       if (payload.studyAt !== undefined) jsonPayload.studyAt = payload.studyAt;
@@ -245,18 +245,21 @@ export const updateUserAPI = async (userId: string, payload: UpdateUserPayload):
     console.log('response.data.avatar:', response.data?.avatar);
     console.log('response.data.backgroundImg:', response.data?.backgroundImg);
     console.log('==============================================');
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Nếu backend trả về error nhưng có thể data đã được update
     // Hãy kiểm tra xem error response có chứa data không
+    const axiosError = error && typeof error === 'object' && 'response' in error
+      ? error as { response?: { data?: unknown } }
+      : null;
     console.error('========= updateUserAPI: Error occurred =========');
     console.error('Error:', error);
-    console.error('Error response:', error.response);
-    console.error('Error response data:', error.response?.data);
+    console.error('Error response:', axiosError?.response);
+    console.error('Error response data:', axiosError?.response?.data);
     console.error('===============================================');
     
     // Nếu error response có data, có thể backend đã update thành công nhưng trả về error
-    if (error.response?.data && typeof error.response.data === 'object') {
-      const errorData = error.response.data;
+    if (axiosError?.response?.data && typeof axiosError.response.data === 'object') {
+      const errorData = axiosError.response.data as Record<string, unknown>;
       // Kiểm tra xem có phải là user object không
       if (errorData._id || errorData.id || errorData.username) {
         console.warn('Warning: Backend returned error but data may have been updated. Using error response data.');

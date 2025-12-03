@@ -55,7 +55,7 @@ export const Header = () => {
   const navigationItems = [
     { label: "Trang chủ", path: "/", icon: <HomeIcon /> },
     { label: "Bác sĩ AI", path: "/doctor-ai", icon: <PersonIcon /> },
-    { label: "Đặt lịch", path: "/scheduling", icon: <CalendarTodayIcon /> },
+    { label: "Đặt lịch", path: "/clinics", icon: <CalendarTodayIcon /> },
     { label: "Sản phẩm", path: "/shopping", icon: <Shop2 /> },
     { label: "Mạng xã hội", path: "/news-feeds", icon: <PersonIcon /> },
     { label: "Hồ sơ thú cưng", path: "/pet-profile", icon: <PetsIcon /> },

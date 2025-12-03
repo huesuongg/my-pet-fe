@@ -7,6 +7,8 @@ import Logout from "../features/authenticate/pages/Logout";
 import NotFoundPage from "../components/NotFound";
 import HomePage from "../pages/home/HomePage";
 import { AdminDashboard } from "../features/admin/pages/Dashboard";
+import { FinanceManagement } from "../features/admin/pages/FinanceManagement";
+import { ScheduleManagement } from "../features/admin/pages/ScheduleManagement";
 import ProfilePage from "../features/forum/pages/ProfilePage";
 import NewFeeds from "../features/forum/pages/NewFeeds";
 import ShoppingPage from "../features/shopping/pages/ShoppingPage";
@@ -24,6 +26,8 @@ import AppointmentHistory from "../features/scheduling/pages/AppointmentHistory"
 import BookingPage from "../features/scheduling/pages/BookingPage";
 import RegisterPage from "../features/authenticate/pages/RegisterPage";
 import DoctorAIPage from "../features/doctor-ai";
+import ClinicsPage from "../features/clinic/pages/ClinicsPage";
+import ClinicDetailPage from "../features/clinic/pages/ClinicDetailPage";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const routes = {
@@ -34,10 +38,12 @@ export const routes = {
   REGISTER_PATH: "/register",
   DASHBOARD_PATH: "/dashboard",
   ADMIN_PROFILE_PATH: "/dashboard/admin-profile",
-  PROJECTS_PATH: "/dashboard/project",
+  USERS_PATH: "/dashboard/users",
+  SCHEDULINGS_PATH: "/dashboard/schedulings",
+  SCHEDULE_MANAGEMENT_PATH: "/dashboard/schedule-management",
+  FINANCE_PATH: "/dashboard/finance",
   PROFILE_PATH: "/profile",
   NEWSFEED_PATH: "/news-feeds",
-  PROJECTS_CREATE_PATH: "/dashboard/project/create",
   SHOPPING_PATH: "/shopping",
   PRODUCT_DETAIL_PATH: "/product/:id",
   SCHEDULING_PATH: "/scheduling",
@@ -51,7 +57,9 @@ export const routes = {
   PET_PROFILE_PATH: "/pet-profile",
   CHAT_SUPPORT_PATH: "/chat-support",
   BOOKING_PATH: "/scheduling/booking/:id",
-  DOCTORAI_PATH: "/doctor-ai"
+  DOCTORAI_PATH: "/doctor-ai",
+  CLINICS_PATH: "/clinics",
+  CLINIC_DETAIL_PATH: "/clinics/:id"
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -74,6 +82,8 @@ export const router = createBrowserRouter([
       { path: routes.ORDERS_PATH, element: <OrdersPage /> },
       { path: routes.ORDER_DETAIL_PATH, element: <OrderDetail /> },
       { path: routes.CHAT_SUPPORT_PATH, element: <ChatSupportPage /> },
+      { path: routes.CLINICS_PATH, element: <ClinicsPage /> },
+      { path: routes.CLINIC_DETAIL_PATH, element: <ClinicDetailPage /> },
     ],
   },
   {
@@ -86,8 +96,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboard /> },
       { path: routes.ADMIN_PROFILE_PATH, element: <AdminDashboard /> },
-      { path: routes.PROJECTS_PATH, element: <AdminDashboard /> },
-      { path: routes.PROJECTS_CREATE_PATH, element: <AdminDashboard /> },
+      { path: routes.USERS_PATH, element: <AdminDashboard /> },
+      { path: routes.SCHEDULINGS_PATH, element: <AdminDashboard /> },
+      { path: routes.SCHEDULE_MANAGEMENT_PATH, element: <ScheduleManagement /> },
+      { path: routes.FINANCE_PATH, element: <FinanceManagement /> },
     ],
   },
   {

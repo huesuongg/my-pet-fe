@@ -68,46 +68,46 @@ export default function AppointmentHistory() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed":
-        return "#22C55E";
-      case "pending":
-        return "#F59E0B";
-      case "cancelled":
-        return "#EF4444";
-      case "completed":
-        return "#3B82F6";
-      default:
-        return "#6B7280";
+    case "confirmed":
+      return "#22C55E";
+    case "pending":
+      return "#F59E0B";
+    case "cancelled":
+      return "#EF4444";
+    case "completed":
+      return "#3B82F6";
+    default:
+      return "#6B7280";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "confirmed":
-        return "Đã xác nhận";
-      case "pending":
-        return "Chờ xác nhận";
-      case "cancelled":
-        return "Đã hủy";
-      case "completed":
-        return "Hoàn thành";
-      default:
-        return status;
+    case "confirmed":
+      return "Đã xác nhận";
+    case "pending":
+      return "Chờ xác nhận";
+    case "cancelled":
+      return "Đã hủy";
+    case "completed":
+      return "Hoàn thành";
+    default:
+      return status;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "confirmed":
-        return <CheckCircle sx={{ fontSize: 16 }} />;
-      case "pending":
-        return <Schedule sx={{ fontSize: 16 }} />;
-      case "cancelled":
-        return <Cancel sx={{ fontSize: 16 }} />;
-      case "completed":
-        return <CheckCircle sx={{ fontSize: 16 }} />;
-      default:
-        return <Schedule sx={{ fontSize: 16 }} />;
+    case "confirmed":
+      return <CheckCircle sx={{ fontSize: 16 }} />;
+    case "pending":
+      return <Schedule sx={{ fontSize: 16 }} />;
+    case "cancelled":
+      return <Cancel sx={{ fontSize: 16 }} />;
+    case "completed":
+      return <CheckCircle sx={{ fontSize: 16 }} />;
+    default:
+      return <Schedule sx={{ fontSize: 16 }} />;
     }
   };
 

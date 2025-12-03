@@ -132,8 +132,17 @@ export const RegisterPage = (): JSX.Element => {
           setShowOTP(true);
           toast.success("Mã OTP đã được gửi đến email của bạn!");
         }
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.message || err.message || "Đăng ký thất bại";
+      } catch (err) {
+        interface ErrorResponse {
+          response?: {
+            data?: {
+              message?: string;
+            };
+          };
+          message?: string;
+        }
+        const error = err as ErrorResponse;
+        const errorMessage = error.response?.data?.message || error.message || "Đăng ký thất bại";
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
@@ -177,8 +186,18 @@ export const RegisterPage = (): JSX.Element => {
       } else {
         throw new Error("Dữ liệu phản hồi không đầy đủ");
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || "Xác thực OTP thất bại";
+    } catch (err) {
+      interface ErrorResponse {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+          };
+        };
+        message?: string;
+      }
+      const error = err as ErrorResponse;
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Xác thực OTP thất bại";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

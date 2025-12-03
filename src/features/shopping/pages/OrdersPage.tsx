@@ -16,47 +16,39 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { CircularProgress, Alert } from '@mui/material';
 import styles from './OrdersPage.module.css';
 import OrderCard from '../components/OrderCard';
-import { Order, OrderStatus } from '../types/order';
-import { setOrders } from '../shoppingSlice';
-import { mockOrders } from '../data/mockData';
+import { OrderStatus, Order } from '../types/order';
+import { fetchOrders } from '../shoppingThunk';
+import { RootState } from '../../../store';
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  interface LocalOrderItem {
+    productName?: string;
+    product?: { name?: string };
+  }
+
+  interface LocalOrder {
+    id?: number;
+    _id?: string;
+    status?: string | OrderStatus;
+    orderNumber?: string;
+    items?: LocalOrderItem[];
+    createdAt?: string;
+    date?: string;
+  }
+
+  const { orders, loading, error } = useSelector((state: RootState) => state.shopping);
   const [tabValue, setTabValue] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-  
-  // Get orders from Redux store
-  // In a real app, this would be from Redux
-  // const { orders } = useSelector((state: any) => state.shopping);
-  const [orders, setOrdersState] = useState<Order[]>(mockOrders);
-  
-  useEffect(() => {
-    // In a real app, you would dispatch an action to fetch orders
-    // dispatch(fetchOrders());
-    
-    // For now, we'll use mock data
-    dispatch(setOrders(mockOrders));
-    
-    // Load orders from localStorage if available
-    const savedOrders = localStorage.getItem('orders');
-    if (savedOrders) {
-      const parsedOrders = JSON.parse(savedOrders);
-      setOrdersState([...mockOrders, ...parsedOrders]);
-      dispatch(setOrders([...mockOrders, ...parsedOrders]));
-    }
-  }, [dispatch]);
-  
-  useEffect(() => {
-    filterOrders();
-  }, [tabValue, searchQuery, orders]);
+  const [filteredOrders, setFilteredOrders] = useState<LocalOrder[]>([]);
   
   const filterOrders = () => {
-    let filtered = [...orders];
+    let filtered: LocalOrder[] = [...(orders || [])];
     
     // Filter by tab/status
     if (tabValue !== 'all') {
@@ -66,17 +58,36 @@ const OrdersPage: React.FC = () => {
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(order => 
-        order.orderNumber.toLowerCase().includes(query) ||
-        order.items.some(item => item.productName.toLowerCase().includes(query))
-      );
+      filtered = filtered.filter(order => {
+        const orderNumber = order.orderNumber || order._id || '';
+        const items = order.items || [];
+        return orderNumber.toLowerCase().includes(query) ||
+          items.some((item: LocalOrderItem) => {
+            const productName = item.productName || item.product?.name || '';
+            return productName.toLowerCase().includes(query);
+          });
+      });
     }
     
     // Sort by date (newest first)
-    filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.date || 0).getTime();
+      const dateB = new Date(b.createdAt || b.date || 0).getTime();
+      return dateB - dateA;
+    });
     
     setFilteredOrders(filtered);
   };
+  
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchOrders({ page: 1, limit: 50 }) as any);
+  }, [dispatch]);
+  
+  useEffect(() => {
+    filterOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabValue, searchQuery, orders]);
   
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setTabValue(newValue);
@@ -90,6 +101,22 @@ const OrdersPage: React.FC = () => {
     navigate('/shopping');
   };
   
+  if (loading.orders) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error.orders) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">{error.orders}</Alert>
+      </Box>
+    );
+  }
+
   return (
     <Box className={styles.ordersContainer}>
       <Box className={styles.header}>
@@ -175,9 +202,26 @@ const OrdersPage: React.FC = () => {
             </Button>
           </Box>
         ) : (
-          filteredOrders.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))
+          filteredOrders.map((order: LocalOrder) => {
+            // Convert LocalOrder to Order format
+            const orderWithId: Order = { 
+              id: order.id || (order._id ? Number(order._id) : undefined) || 0,
+              _id: order._id,
+              orderNumber: order.orderNumber,
+              date: order.date,
+              createdAt: order.createdAt,
+              status: (order.status || OrderStatus.PENDING) as OrderStatus | string,
+              items: order.items ? order.items.map((item, index) => ({
+                id: index + 1,
+                productId: 0, // Default value since LocalOrderItem doesn't have productId
+                productName: item.productName || item.product?.name || '',
+                productImage: '',
+                price: 0,
+                quantity: 1
+              })) : []
+            };
+            return <OrderCard key={order.id || order._id || 0} order={orderWithId} />;
+          })
         )}
       </Box>
     </Box>

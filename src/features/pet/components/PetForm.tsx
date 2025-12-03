@@ -88,7 +88,7 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
     }
   }, [pet]);
 
-  const handleInputChange = (field: keyof PetFormData, value: any) => {
+  const handleInputChange = (field: keyof PetFormData, value: string | number | Date | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (formErrors[field]) {
@@ -169,13 +169,14 @@ export default function PetForm({ pet, onClose, onSuccess }: PetFormProps) {
         toast.success('Cập nhật thú cưng thành công!');
       } else {
         // Create new pet - gửi tất cả data
-        await petAPI.createPet(Number(user.id), submitData);
+        await petAPI.createPet(String(user.id), submitData);
         toast.success('Thêm thú cưng mới thành công!');
       }
       onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Có lỗi xảy ra khi lưu thú cưng');
-      toast.error(err.message || 'Có lỗi xảy ra khi lưu thú cưng');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi lưu thú cưng';
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error('Error saving pet:', err);
     } finally {
       setLoading(false);

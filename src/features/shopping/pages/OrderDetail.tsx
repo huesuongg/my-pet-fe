@@ -69,51 +69,69 @@ const OrderDetail: React.FC = () => {
     navigate('/orders');
   };
 
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
+  const getStatusColor = (status: OrderStatus | string) => {
+    const statusStr = typeof status === 'string' ? status : status;
+    switch (statusStr) {
     case OrderStatus.PENDING:
+    case 'PENDING':
       return '#FFA500'; // Orange
     case OrderStatus.PROCESSING:
+    case 'PROCESSING':
       return '#3B82F6'; // Blue
     case OrderStatus.SHIPPED:
+    case 'SHIPPED':
       return '#8B5CF6'; // Purple
     case OrderStatus.DELIVERED:
+    case 'DELIVERED':
       return '#22C55E'; // Green
     case OrderStatus.CANCELLED:
+    case 'CANCELLED':
       return '#EF4444'; // Red
     default:
       return '#6B7280'; // Gray
     }
   };
 
-  const getStatusText = (status: OrderStatus) => {
-    switch (status) {
+  const getStatusText = (status: OrderStatus | string) => {
+    const statusStr = typeof status === 'string' ? status : status;
+    switch (statusStr) {
     case OrderStatus.PENDING:
+    case 'PENDING':
       return 'Chờ xác nhận';
     case OrderStatus.PROCESSING:
+    case 'PROCESSING':
       return 'Đang xử lý';
     case OrderStatus.SHIPPED:
+    case 'SHIPPED':
       return 'Đang giao hàng';
     case OrderStatus.DELIVERED:
+    case 'DELIVERED':
       return 'Đã giao hàng';
     case OrderStatus.CANCELLED:
+    case 'CANCELLED':
       return 'Đã hủy';
     default:
       return 'Không xác định';
     }
   };
 
-  const getActiveStep = (status: OrderStatus) => {
-    switch (status) {
+  const getActiveStep = (status: OrderStatus | string) => {
+    const statusStr = typeof status === 'string' ? status : status;
+    switch (statusStr) {
     case OrderStatus.PENDING:
+    case 'PENDING':
       return 0;
     case OrderStatus.PROCESSING:
+    case 'PROCESSING':
       return 1;
     case OrderStatus.SHIPPED:
+    case 'SHIPPED':
       return 2;
     case OrderStatus.DELIVERED:
+    case 'DELIVERED':
       return 3;
     case OrderStatus.CANCELLED:
+    case 'CANCELLED':
       return -1; // Special case for cancelled
     default:
       return 0;
@@ -171,7 +189,7 @@ const OrderDetail: React.FC = () => {
         </Button>
         <Box className={styles.title}>
           <Typography variant="h4">
-            Đơn hàng #{order.orderNumber}
+            Đơn hàng #{order.orderNumber || order._id || ''}
           </Typography>
           <Chip
             label={getStatusText(order.status)}
@@ -183,12 +201,12 @@ const OrderDetail: React.FC = () => {
           />
         </Box>
         <Typography variant="body1" color="text.secondary">
-          Đặt ngày: {formatDate(order.date)}
+          Đặt ngày: {formatDate(order.date || order.createdAt || new Date().toISOString())}
         </Typography>
       </Box>
 
       {/* Order Progress */}
-      {order.status !== OrderStatus.CANCELLED && (
+      {(order.status !== OrderStatus.CANCELLED && order.status !== 'CANCELLED') && (
         <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
           <Typography variant="h6" gutterBottom>
             Trạng thái đơn hàng
@@ -244,11 +262,11 @@ const OrderDetail: React.FC = () => {
             <Box className={styles.totalSection}>
               <Box className={styles.totalRow}>
                 <Typography variant="body1">Tạm tính:</Typography>
-                <Typography variant="body1">{order.subtotal.toLocaleString('vi-VN')} VNĐ</Typography>
+                <Typography variant="body1">{(order.subtotal || 0).toLocaleString('vi-VN')} VNĐ</Typography>
               </Box>
               <Box className={styles.totalRow}>
                 <Typography variant="body1">Phí vận chuyển:</Typography>
-                <Typography variant="body1">{order.shippingFee.toLocaleString('vi-VN')} VNĐ</Typography>
+                <Typography variant="body1">{(order.shippingFee || 0).toLocaleString('vi-VN')} VNĐ</Typography>
               </Box>
               <Divider sx={{ my: 1.5 }} />
               <Box className={styles.totalRow}>
@@ -256,7 +274,7 @@ const OrderDetail: React.FC = () => {
                   Tổng cộng:
                 </Typography>
                 <Typography variant="subtitle1" className={styles.finalTotal}>
-                  {order.total.toLocaleString('vi-VN')} VNĐ
+                  {(order.total || 0).toLocaleString('vi-VN')} VNĐ
                 </Typography>
               </Box>
             </Box>
@@ -278,7 +296,7 @@ const OrderDetail: React.FC = () => {
                 Người nhận:
               </Typography>
               <Typography variant="body1" className={styles.infoValue}>
-                {order.shippingInfo.fullName}
+                {order.shippingInfo?.fullName || ''}
               </Typography>
             </Box>
             <Box className={styles.infoItem}>
@@ -286,7 +304,7 @@ const OrderDetail: React.FC = () => {
                 Số điện thoại:
               </Typography>
               <Typography variant="body1" className={styles.infoValue}>
-                {order.shippingInfo.phone}
+                {order.shippingInfo?.phone || ''}
               </Typography>
             </Box>
             <Box className={styles.infoItem}>
@@ -294,7 +312,7 @@ const OrderDetail: React.FC = () => {
                 Email:
               </Typography>
               <Typography variant="body1" className={styles.infoValue}>
-                {order.shippingInfo.email}
+                {order.shippingInfo?.email || ''}
               </Typography>
             </Box>
             <Box className={styles.infoItem}>
@@ -302,10 +320,10 @@ const OrderDetail: React.FC = () => {
                 Địa chỉ:
               </Typography>
               <Typography variant="body1" className={styles.infoValue}>
-                {order.shippingInfo.address}, {order.shippingInfo.ward}, {order.shippingInfo.district}, {order.shippingInfo.city}
+                {order.shippingInfo?.address || ''}, {order.shippingInfo?.ward || ''}, {order.shippingInfo?.district || ''}, {order.shippingInfo?.city || ''}
               </Typography>
             </Box>
-            {order.shippingInfo.notes && (
+            {order.shippingInfo?.notes && (
               <Box className={styles.infoItem}>
                 <Typography variant="body2" className={styles.infoLabel}>
                   Ghi chú:
@@ -326,13 +344,13 @@ const OrderDetail: React.FC = () => {
               </Typography>
             </Box>
             <Typography variant="body1" gutterBottom>
-              {order.shippingOption.name}
+              {order.shippingOption?.name || ''}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {order.shippingOption.description}
+              {order.shippingOption?.description || ''}
             </Typography>
             <Typography variant="subtitle2" sx={{ mt: 1, color: '#1E40AF' }}>
-              {order.shippingFee.toLocaleString('vi-VN')} VNĐ
+              {(order.shippingFee || 0).toLocaleString('vi-VN')} VNĐ
             </Typography>
           </Paper>
 
@@ -363,7 +381,7 @@ const OrderDetail: React.FC = () => {
         >
           Quay lại danh sách đơn hàng
         </Button>
-        {order.status === OrderStatus.PENDING && (
+        {(order.status === OrderStatus.PENDING || order.status === 'PENDING') && (
           <Button
             variant="contained"
             color="error"

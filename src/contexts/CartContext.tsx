@@ -10,7 +10,7 @@ interface Product {
   weight?: string;
   color?: string;
   size?: string;
-  category: any;
+  category: string | { id?: string; name?: string; _id?: string };
   inStock: boolean;
   createdAt: string;
   updatedAt: string;

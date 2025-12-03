@@ -1,6 +1,6 @@
 ﻿import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ShoppingState, Product, ProductCategory, BlogArticle, Cart, CartItem, ShoppingFilters } from './types';
-import { Order } from './types/order';
+import { Order, OrderStatus } from './types/order';
 
 const initialState: ShoppingState = {
   products: [],
@@ -84,14 +84,24 @@ const shoppingSlice = createSlice({
       state.cart = action.payload;
     },
     addToCart: (state, action: PayloadAction<CartItem>) => {
-      const existingItem = state.cart.items.find((item: CartItem) => item.product.id === action.payload.product.id);
+      const product = typeof action.payload.product === 'object' ? action.payload.product : null;
+      const productId = product?.id || product?._id || action.payload.productId;
+      const existingItem = state.cart.items.find((item: CartItem) => {
+        const itemProduct = typeof item.product === 'object' ? item.product : null;
+        const itemProductId = itemProduct?.id || itemProduct?._id || item.productId;
+        return itemProductId === productId;
+      });
       if (existingItem) {
         existingItem.quantity += action.payload.quantity;
       } else {
         state.cart.items.push(action.payload);
       }
       state.cart.totalItems = state.cart.items.reduce((total: number, item: CartItem) => total + item.quantity, 0);
-      state.cart.totalPrice = state.cart.items.reduce((total: number, item: CartItem) => total + (item.product.price * item.quantity), 0);
+      state.cart.totalPrice = state.cart.items.reduce((total: number, item: CartItem) => {
+        const itemProduct = typeof item.product === 'object' ? item.product : null;
+        const price = typeof itemProduct?.price === 'number' ? itemProduct.price : typeof item.price === 'number' ? item.price : 0;
+        return total + (price * item.quantity);
+      }, 0);
       state.cart.lastUpdated = new Date().toISOString();
     },
     updateCartItem: (state, action: PayloadAction<{ itemId: number; quantity: number }>) => {
@@ -99,14 +109,22 @@ const shoppingSlice = createSlice({
       if (item) {
         item.quantity = action.payload.quantity;
         state.cart.totalItems = state.cart.items.reduce((total: number, item: CartItem) => total + item.quantity, 0);
-        state.cart.totalPrice = state.cart.items.reduce((total: number, item: CartItem) => total + (item.product.price * item.quantity), 0);
+        state.cart.totalPrice = state.cart.items.reduce((total: number, item: CartItem) => {
+          const itemProduct = typeof item.product === 'object' ? item.product : null;
+          const price = typeof itemProduct?.price === 'number' ? itemProduct.price : typeof item.price === 'number' ? item.price : 0;
+          return total + (price * item.quantity);
+        }, 0);
         state.cart.lastUpdated = new Date().toISOString();
       }
     },
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.cart.items = state.cart.items.filter((item: CartItem) => item.id !== action.payload);
       state.cart.totalItems = state.cart.items.reduce((total: number, item: CartItem) => total + item.quantity, 0);
-      state.cart.totalPrice = state.cart.items.reduce((total: number, item: CartItem) => total + (item.product.price * item.quantity), 0);
+      state.cart.totalPrice = state.cart.items.reduce((total: number, item: CartItem) => {
+        const itemProduct = typeof item.product === 'object' ? item.product : null;
+        const price = typeof itemProduct?.price === 'number' ? itemProduct.price : typeof item.price === 'number' ? item.price : 0;
+        return total + (price * item.quantity);
+      }, 0);
       state.cart.lastUpdated = new Date().toISOString();
     },
     clearCart: (state) => {
@@ -131,10 +149,10 @@ const shoppingSlice = createSlice({
     addOrder: (state, action: PayloadAction<Order>) => {
       state.orders.unshift(action.payload); // Add new order at the beginning
     },
-    updateOrderStatus: (state, action: PayloadAction<{ orderId: number; status: string }>) => {
-      const order = state.orders.find(order => order.id === action.payload.orderId);
+    updateOrderStatus: (state, action: PayloadAction<{ orderId: number | string; status: string | OrderStatus }>) => {
+      const order = state.orders.find(order => (order.id === action.payload.orderId) || (order._id === action.payload.orderId));
       if (order) {
-        order.status = action.payload.status as any;
+        order.status = action.payload.status as OrderStatus | string;
       }
     },
     setOrdersLoading: (state, action: PayloadAction<boolean>) => {
